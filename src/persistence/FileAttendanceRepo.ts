@@ -77,4 +77,5 @@ export class FileAttendanceRepo {
     const records = this.allAttendance();
     return records.filter(record => record.studentId === studentId && record.earlyDismissal === true);
   }
+  
 }
