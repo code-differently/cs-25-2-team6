@@ -1,4 +1,4 @@
-// Smoke test to verify Jest setup
+import { describe, it, expect } from '@jest/globals';
 
 describe('Smoke test', () => {
   it('should pass', () => {
