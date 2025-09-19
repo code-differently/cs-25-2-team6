@@ -1,9 +1,17 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeEach } from '@jest/globals';
+import fs from 'fs';
+import path from 'path';
 import { StudentsCommand } from '../../src/cli/commands/students';
 import { AttendanceCommand } from '../../src/cli/commands/attendance';
 import { FileAttendanceRepo } from '../../src/persistence/FileAttendanceRepo';
 import { FileStudentRepo } from '../../src/persistence/FileStudentRepo';
 import { AttendanceStatus } from '../../src/domains/AttendanceStatus';
+
+const attendancePath = path.resolve(__dirname, '../../src/persistence/attendance.json');
+
+beforeEach(() => {
+  fs.writeFileSync(attendancePath, '[]', 'utf-8');
+});
 
 describe('Attendance Tracker Integration', () => {
   it('should add a student and mark attendance correctly', async () => {
