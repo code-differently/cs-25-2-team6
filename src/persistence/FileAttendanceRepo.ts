@@ -46,4 +46,35 @@ export class FileAttendanceRepo {
     const records = this.allAttendance();
     return records.find(r => r.studentId === studentId && r.dateISO === dateISO);
   }
+
+  // New filtering methods for CLI functionality
+  findAttendanceByDate(dateISO: string): AttendanceRecord[] {
+    const records = this.allAttendance();
+    return records.filter(record => record.dateISO === dateISO);
+  }
+
+  findAttendanceByStatus(status: AttendanceStatus): AttendanceRecord[] {
+    const records = this.allAttendance();
+    return records.filter(record => record.status === status);
+  }
+
+  getLateListByDate(dateISO: string): AttendanceRecord[] {
+    const records = this.findAttendanceByDate(dateISO);
+    return records.filter(record => record.late === true);
+  }
+
+  getEarlyDismissalListByDate(dateISO: string): AttendanceRecord[] {
+    const records = this.findAttendanceByDate(dateISO);
+    return records.filter(record => record.earlyDismissal === true);
+  }
+
+  getLateListByStudent(studentId: string): AttendanceRecord[] {
+    const records = this.allAttendance();
+    return records.filter(record => record.studentId === studentId && record.late === true);
+  }
+
+  getEarlyDismissalListByStudent(studentId: string): AttendanceRecord[] {
+    const records = this.allAttendance();
+    return records.filter(record => record.studentId === studentId && record.earlyDismissal === true);
+  }
 }

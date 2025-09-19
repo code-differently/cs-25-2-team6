@@ -1,10 +1,19 @@
 [
   {
-    "studentId": "2",
-    "dateISO": "2025-09-19",
+    "studentId": "1",
+    "dateISO": "2025-09-18",
     "status": "PRESENT",
     "late": false,
-    "earlyDismissal": false,
+    "earlyDismissal": true,
+    "onTime": true,
+    "excused": false
+  },
+  {
+    "studentId": "2",
+    "dateISO": "2025-09-18",
+    "status": "PRESENT",
+    "late": false,
+    "earlyDismissal": true,
     "onTime": true,
     "excused": false
   }

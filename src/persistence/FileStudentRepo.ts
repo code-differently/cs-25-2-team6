@@ -35,4 +35,10 @@ export class FileStudentRepo {
     const data = fs.readFileSync(this.filePath, "utf-8");
     return JSON.parse(data) as Student[];
   }
+
+  // New method for filtering by last name
+  findStudentsByLastName(lastName: string): Student[] {
+    const students = this.allStudents();
+    return students.filter(student => student.lastName === lastName);
+  }
 }
