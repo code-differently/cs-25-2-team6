@@ -492,4 +492,67 @@ test("repo handles file persistence correctly", () => {
   expect(retrievedRecords[0].status).toBe(AttendanceStatus.PRESENT);
 });
 
+// Additional edge cases for 100% coverage
+
+test("constructor creates new file when file doesn't exist", () => {
+  const nonExistentFile = path.join(__dirname, "non_existent_test_file.json");
+  
+  // Ensure file doesn't exist first
+  if (fs.existsSync(nonExistentFile)) {
+    fs.unlinkSync(nonExistentFile);
+  }
+  
+  // Create repo with non-existent file - should create the file
+  const repo = new FileAttendanceRepo(nonExistentFile);
+  
+  // Verify file was created and is empty
+  expect(fs.existsSync(nonExistentFile)).toBe(true);
+  const records = repo.allAttendance();
+  expect(records).toEqual([]);
+  expect(records.length).toBe(0);
+  
+  // Clean up
+  if (fs.existsSync(nonExistentFile)) {
+    fs.unlinkSync(nonExistentFile);
+  }
+});
+
+test("constructor uses default path when no filePath provided", () => {
+  // Create repo without specifying file path
+  const repo = new FileAttendanceRepo();
+  
+  // Should be able to add and retrieve records using default path
+  const record = new AttendanceRecord({
+    studentId: "default-test",
+    dateISO: "2025-09-18",
+    status: AttendanceStatus.PRESENT
+  });
+  
+  repo.saveAttendance(record);
+  const retrieved = repo.allAttendance();
+  
+  expect(retrieved.length).toBeGreaterThanOrEqual(1);
+  const testRecord = retrieved.find(r => r.studentId === "default-test");
+  expect(testRecord).toBeDefined();
+  expect(testRecord?.status).toBe(AttendanceStatus.PRESENT);
+});
+
+test("constructor with undefined filePath uses default path", () => {
+  // Explicitly pass undefined to test the ?? operator
+  const repo = new FileAttendanceRepo(undefined);
+  
+  const record = new AttendanceRecord({
+    studentId: "undefined-test",
+    dateISO: "2025-09-18",
+    status: AttendanceStatus.LATE
+  });
+  
+  repo.saveAttendance(record);
+  const retrieved = repo.allAttendance();
+  
+  const testRecord = retrieved.find(r => r.studentId === "undefined-test");
+  expect(testRecord).toBeDefined();
+  expect(testRecord?.status).toBe(AttendanceStatus.LATE);
+});
+
 
