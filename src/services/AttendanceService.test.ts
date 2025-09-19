@@ -1,4 +1,5 @@
 import { markAttendanceByName, StudentNotFoundError } from './AttendanceService';
+import { AttendanceStatus } from '../domains/AttendanceStatus';
 
 describe('AttendanceService', () => {
   it('marks PRESENT when onTime true and late false', () => {
@@ -9,7 +10,7 @@ describe('AttendanceService', () => {
       onTime: true,
       late: false
     });
-    expect(record.status).toBe('PRESENT');
+    expect(record.status).toBe(AttendanceStatus.PRESENT);
   });
 
   it('marks LATE when late true', () => {
@@ -19,7 +20,7 @@ describe('AttendanceService', () => {
       dateISO: '2025-09-18',
       late: true
     });
-    expect(record.status).toBe('LATE');
+    expect(record.status).toBe(AttendanceStatus.LATE);
   });
 
   it('marks ABSENT when neither onTime nor late provided', () => {
@@ -28,7 +29,7 @@ describe('AttendanceService', () => {
       lastName: 'Smith',
       dateISO: '2025-09-18'
     });
-    expect(record.status).toBe('ABSENT');
+    expect(record.status).toBe(AttendanceStatus.ABSENT);
   });
 
   it('throws StudentNotFoundError when student lookup fails', () => {

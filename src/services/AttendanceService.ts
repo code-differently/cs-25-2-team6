@@ -1,4 +1,7 @@
-// Minimal stub error for missing student
+import { Student } from '../domains/Student';
+import { AttendanceStatus } from '../domains/AttendanceStatus';
+import { StudentRoster } from '../domains/StudentRoster';
+
 export class StudentNotFoundError extends Error {
   constructor(message: string) {
     super(message);
@@ -6,15 +9,12 @@ export class StudentNotFoundError extends Error {
   }
 }
 
-// In-memory stub persistence for students and attendance
-const students = [
-  { id: '1', firstName: 'Alice', lastName: 'Smith' },
-  { id: '2', firstName: 'Bob', lastName: 'Jones' },
-];
+// Use StudentRoster for student persistence
+const studentRoster = new StudentRoster();
+studentRoster.addStudent(new Student({ id: '1', firstName: 'Alice', lastName: 'Smith' }));
+studentRoster.addStudent(new Student({ id: '2', firstName: 'Bob', lastName: 'Jones' }));
 
 const attendanceRecords: any[] = [];
-
-export type AttendanceStatus = 'PRESENT' | 'LATE' | 'ABSENT' | 'EXCUSED';
 
 export interface MarkAttendanceParams {
   firstName: string;
@@ -26,16 +26,16 @@ export interface MarkAttendanceParams {
 }
 
 export function inferStatusFromFlags(flags: { onTime?: boolean; late?: boolean }): AttendanceStatus {
-  if (flags.late) return 'LATE';
-  if (flags.onTime) return 'PRESENT';
-  return 'ABSENT';
+  if (flags.late) return AttendanceStatus.LATE;
+  if (flags.onTime) return AttendanceStatus.PRESENT;
+  return AttendanceStatus.ABSENT;
 }
 
 export function markAttendanceByName(params: MarkAttendanceParams) {
   const { firstName, lastName, dateISO, onTime, late, earlyDismissal } = params;
-  const student = students.find(
-    s => s.firstName === firstName && s.lastName === lastName
-  );
+  const student = studentRoster
+    .listAll()
+    .find(s => s.firstName === firstName && s.lastName === lastName);
   if (!student) throw new StudentNotFoundError(`Student ${firstName} ${lastName} not found`);
   const status = inferStatusFromFlags({ onTime, late });
   const record = {
