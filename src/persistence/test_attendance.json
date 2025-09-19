@@ -1,0 +1,11 @@
+[
+  {
+    "studentId": "2",
+    "dateISO": "2025-09-19",
+    "status": "PRESENT",
+    "late": false,
+    "earlyDismissal": false,
+    "onTime": true,
+    "excused": false
+  }
+]
