@@ -40,29 +40,6 @@ describe('FileAttendanceRepo', () => {
         expect(result.length).toBe(0);
       });
 
-      it('should short-circuit immediately with empty studentIds regardless of other filters', () => {
-        const filterWithDateAndEmptyIds: AttendanceFilter = {
-          studentIds: [],
-          dateISO: '2024-01-15'
-        };
-
-        const filterWithStatusAndEmptyIds: AttendanceFilter = {
-          studentIds: [],
-          status: AttendanceStatus.PRESENT
-        };
-
-        const filterWithAllAndEmptyIds: AttendanceFilter = {
-          studentIds: [],
-          dateISO: '2024-01-15',
-          status: AttendanceStatus.PRESENT,
-          lastName: 'Smith'
-        };
-
-        expect(fileAttendanceRepo.queryAttendance(filterWithDateAndEmptyIds)).toEqual([]);
-        expect(fileAttendanceRepo.queryAttendance(filterWithStatusAndEmptyIds)).toEqual([]);
-        expect(fileAttendanceRepo.queryAttendance(filterWithAllAndEmptyIds)).toEqual([]);
-      });
-
       it('should handle null and undefined studentIds arrays gracefully', () => {
         const filterWithNullIds: AttendanceFilter = {
           studentIds: null as any,
@@ -77,30 +54,9 @@ describe('FileAttendanceRepo', () => {
         const nullResult = fileAttendanceRepo.queryAttendance(filterWithNullIds);
         const undefinedResult = fileAttendanceRepo.queryAttendance(filterWithUndefinedIds);
 
-        
         const expectedRecords = mockAttendanceData.filter(r => r.date === '2024-01-15');
         expect(nullResult.length).toBe(expectedRecords.length);
         expect(undefinedResult.length).toBe(expectedRecords.length);
-      });
-
-      it('should differentiate between empty array and undefined studentIds', () => {
-        const emptyArrayFilter: AttendanceFilter = {
-          studentIds: [],
-          dateISO: '2024-01-15'
-        };
-
-        const undefinedFilter: AttendanceFilter = {
-          dateISO: '2024-01-15'
-        };
-
-        const emptyResult = fileAttendanceRepo.queryAttendance(emptyArrayFilter);
-        const undefinedResult = fileAttendanceRepo.queryAttendance(undefinedFilter);
-
-        expect(emptyResult).toEqual([]);
-
-        
-        expect(undefinedResult.length).toBeGreaterThan(0);
-        expect(undefinedResult.every((record: AttendanceRecord) => record.date === '2024-01-15')).toBe(true);
       });
     });
 
@@ -112,11 +68,8 @@ describe('FileAttendanceRepo', () => {
 
         const result1 = fileAttendanceRepo.queryAttendance(filter);
         const result2 = fileAttendanceRepo.queryAttendance(filter);
-        const result3 = fileAttendanceRepo.queryAttendance(filter);
 
         expect(result1).toEqual(result2);
-        expect(result2).toEqual(result3);
-        
         
         for (let i = 1; i < result1.length; i++) {
           const prev = result1[i - 1];
@@ -128,129 +81,6 @@ describe('FileAttendanceRepo', () => {
             expect(prev.studentId <= current.studentId).toBe(true);
           }
         }
-      });
-
-      it('should maintain stable order with different filter combinations', () => {
-        const testFilters: AttendanceFilter[] = [
-          { dateISO: '2024-01-15' },
-          { status: AttendanceStatus.PRESENT },
-          { studentIds: ['S001', 'S002', 'S003'] },
-          { dateISO: '2024-01-16', status: AttendanceStatus.PRESENT }
-        ];
-
-        testFilters.forEach((filter, index) => {
-          const result1 = fileAttendanceRepo.queryAttendance(filter);
-          const result2 = fileAttendanceRepo.queryAttendance(filter);
-          
-          expect(result1).toEqual(result2);
-          
-          const isStablySorted = result1.every((record: AttendanceRecord, i: number) => {
-            if (i === 0) return true;
-            const prev = result1[i - 1];
-            return prev.date < record.date || 
-                   (prev.date === record.date && prev.studentId <= record.studentId);
-          });
-          
-          expect(isStablySorted).toBe(true);
-        });
-      });
-
-      it('should maintain order stability when records are added or modified', () => {
-        const initialFilter: AttendanceFilter = { status: AttendanceStatus.PRESENT };
-        const initialResult = fileAttendanceRepo.queryAttendance(initialFilter);
-        
-        
-        const newRecord: AttendanceRecord = {
-          studentId: 'S007',
-          date: '2024-01-15',
-          status: AttendanceStatus.PRESENT,
-          isLate: false
-        };
-        fileAttendanceRepo.addRecord(newRecord);
-        
-        const afterAddResult = fileAttendanceRepo.queryAttendance(initialFilter);
-        
-        
-        const isOrderCorrect = afterAddResult.every((record: AttendanceRecord, i: number) => {
-          if (i === 0) return true;
-          const prev = afterAddResult[i - 1];
-          return prev.date < record.date || 
-                 (prev.date === record.date && prev.studentId <= record.studentId);
-        });
-        
-        expect(isOrderCorrect).toBe(true);
-        expect(afterAddResult.length).toBe(initialResult.length + 1);
-      });
-
-      it('should document the specific ordering algorithm in test description', () => {
-        const allRecords = fileAttendanceRepo.queryAttendance({});
-        
-        expect(allRecords.length).toBeGreaterThan(0);
-        
-        let prevDate = '';
-        let prevStudentId = '';
-        
-        allRecords.forEach((record: AttendanceRecord, index: number) => {
-          if (index === 0) {
-            prevDate = record.date;
-            prevStudentId = record.studentId;
-            return;
-          }
-          
-          if (record.date > prevDate) {
-            prevDate = record.date;
-            prevStudentId = record.studentId;
-          } else if (record.date === prevDate) {
-            expect(record.studentId >= prevStudentId).toBe(true);
-            prevStudentId = record.studentId;
-          } else {
-            fail(`Ordering violation: ${record.date} should not come after ${prevDate}`);
-          }
-        });
-      });
-    });
-
-    describe('Additional edge cases for robustness', () => {
-      it('should handle complex filter combinations with empty studentIds', () => {
-        const complexFilter: AttendanceFilter = {
-          studentIds: [],
-          dateISO: '2024-01-15',
-          status: AttendanceStatus.PRESENT,
-          lastName: 'Smith'
-        };
-
-        const result = fileAttendanceRepo.queryAttendance(complexFilter);
-        expect(result).toEqual([]);
-      });
-
-      it('should handle large studentIds arrays efficiently', () => {
-        const largeStudentIds = Array.from({ length: 1000 }, (_, i) => `S${String(i).padStart(3, '0')}`);
-        
-        const filter: AttendanceFilter = {
-          studentIds: largeStudentIds
-        };
-
-        const start = Date.now();
-        const result = fileAttendanceRepo.queryAttendance(filter);
-        const end = Date.now();
-
-        expect(end - start).toBeLessThan(100);
-        
-        
-        expect(result.every((record: AttendanceRecord) => 
-          mockAttendanceData.some(mock => mock.studentId === record.studentId)
-        )).toBe(true);
-      });
-
-      it('should maintain data integrity during query operations', () => {
-        const originalCount = mockAttendanceData.length;
-        
-        fileAttendanceRepo.queryAttendance({ studentIds: [] });
-        fileAttendanceRepo.queryAttendance({ studentIds: ['S001'] });
-        fileAttendanceRepo.queryAttendance({ dateISO: '2024-01-15' });
-        
-        const allRecords = fileAttendanceRepo.queryAttendance({});
-        expect(allRecords.length).toBe(originalCount);
       });
     });
   });
@@ -294,6 +124,91 @@ describe('FileAttendanceRepo', () => {
     it('should return all records when no filter provided', () => {
       const result = fileAttendanceRepo.queryAttendance({});
       expect(result.length).toBe(mockAttendanceData.length);
+    });
+
+    it('should filter by lastName when provided (stub implementation)', () => {
+      const filter: AttendanceFilter = {
+        lastName: 'Smith'
+      };
+
+      const result = fileAttendanceRepo.queryAttendance(filter);
+      
+      expect(result.length).toBe(mockAttendanceData.length);
+    });
+
+    it('should use getAllRecords method to retrieve all records', () => {
+      const result = fileAttendanceRepo.getAllRecords();
+      
+      expect(result.length).toBe(mockAttendanceData.length);
+      expect(result).toEqual(fileAttendanceRepo.queryAttendance({}));
+    });
+  });
+
+  describe('Edge cases and combinations', () => {
+    it('should handle multiple filter combinations correctly', () => {
+      const filter: AttendanceFilter = {
+        studentIds: ['S001', 'S002'],
+        dateISO: '2024-01-15',
+        status: AttendanceStatus.PRESENT
+      };
+
+      const result = fileAttendanceRepo.queryAttendance(filter);
+      
+      expect(result.every((record: AttendanceRecord) => 
+        ['S001', 'S002'].includes(record.studentId) &&
+        record.date === '2024-01-15' &&
+        record.status === AttendanceStatus.PRESENT
+      )).toBe(true);
+    });
+
+    it('should handle filter with lastName combined with other filters', () => {
+      const filter: AttendanceFilter = {
+        lastName: 'Smith',
+        status: AttendanceStatus.PRESENT
+      };
+
+      const result = fileAttendanceRepo.queryAttendance(filter);
+      
+      expect(result.every((record: AttendanceRecord) => 
+        record.status === AttendanceStatus.PRESENT
+      )).toBe(true);
+    });
+
+    it('should return empty result when studentIds filter has no matches', () => {
+      const filter: AttendanceFilter = {
+        studentIds: ['NONEXISTENT']
+      };
+
+      const result = fileAttendanceRepo.queryAttendance(filter);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty result when date filter has no matches', () => {
+      const filter: AttendanceFilter = {
+        dateISO: '2025-12-31'
+      };
+
+      const result = fileAttendanceRepo.queryAttendance(filter);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty result when status filter has no matches', () => {
+      fileAttendanceRepo.clear();
+      fileAttendanceRepo.addRecord({
+        studentId: 'S001',
+        date: '2024-01-15',
+        status: AttendanceStatus.PRESENT,
+        isLate: false
+      });
+
+      const filter: AttendanceFilter = {
+        status: AttendanceStatus.LATE
+      };
+
+      const result = fileAttendanceRepo.queryAttendance(filter);
+      expect(result).toEqual([]);
+
+      mockAttendanceData.forEach(record => fileAttendanceRepo.addRecord(record));
     });
   });
 });

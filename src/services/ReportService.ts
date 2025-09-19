@@ -1,114 +1,58 @@
-import { Student, AttendanceRecord, AttendanceStatus } from '../types';
+import { AttendanceRecord, AttendanceStatus, Student } from '../types/index';
+import { FileStudentRepo } from '../persistence/FileStudentRepo';
+import { FileAttendanceRepo } from '../persistence/FileAttendanceRepo';
 
-/**
- * ReportService - Handles attendance reporting and filtering functionality
- * This is a stub implementation for testing purposes
- */
 export class ReportService {
-  private students: Map<string, Student> = new Map();
-  private attendanceRecords: AttendanceRecord[] = [];
+  private studentRepo = new FileStudentRepo();
+  private attendanceRepo = new FileAttendanceRepo();
 
-  /**
-   * Add a student to the service
-   */
-  addStudent(student: Student): void {
-    this.students.set(student.id, student);
-  }
-
-  /**
-   * Add an attendance record
-   */
-  addAttendanceRecord(record: AttendanceRecord): void {
-    this.attendanceRecords.push(record);
-  }
-
-  /**
-   * Clear all data - useful for testing
-   */
-  clear(): void {
-    this.students.clear();
-    this.attendanceRecords = [];
-  }
-
-  /**
-   * Get all attendance records
-   */
-  getAllAttendanceRecords(): AttendanceRecord[] {
-    return [...this.attendanceRecords];
-  }
-
-  /**
-   * Filter attendance records by lastName (case-insensitive)
-   * Returns empty array for unknown lastName (not an error)
-   */
-  getAttendanceByLastName(lastName: string): AttendanceRecord[] {
-    if (!lastName || typeof lastName !== 'string') {
-      return [];
+  filterAttendanceBy(options: { lastName?: string; status?: AttendanceStatus; dateISO?: string }): AttendanceRecord[] {
+    let studentIds: string[] | undefined = undefined;
+    if (options.lastName) {
+      studentIds = this.resolveStudentIdsByLastName(options.lastName);
+      if (studentIds.length === 0) return [];
     }
 
-    const normalizedLastName = this.normalizeString(lastName.trim());
-    if (!normalizedLastName) {
-      return [];
+    const filter = {
+      studentIds,
+      dateISO: options.dateISO,
+      status: options.status
+    };
+
+    return this.attendanceRepo.queryAttendance(filter);
+  }
+
+  getLateListBy(options: { lastName?: string; dateISO?: string }): AttendanceRecord[] {
+    return this.filterAttendanceBy({
+      ...options,
+      status: AttendanceStatus.LATE
+    });
+  }
+
+  getEarlyDismissalListBy(options: { lastName?: string; dateISO?: string }): AttendanceRecord[] {
+    let studentIds: string[] | undefined = undefined;
+    if (options.lastName) {
+      studentIds = this.resolveStudentIdsByLastName(options.lastName);
+      if (studentIds.length === 0) return [];
     }
 
-    const matchingStudentIds = Array.from(this.students.values())
-      .filter(student => this.normalizeString(student.lastName) === normalizedLastName)
+    const filter = {
+      studentIds,
+      dateISO: options.dateISO
+    };
+
+    const allRecords = this.attendanceRepo.queryAttendance(filter);
+    return allRecords.filter(record => record.earlyDismissal === true);
+  }
+
+  private resolveStudentIdsByLastName(lastName: string): string[] {
+    if (!lastName || lastName.trim() === '') return [];
+    
+    const normalizedLastName = lastName.trim().toLowerCase();
+    const allStudents = this.studentRepo.allStudents();
+    
+    return allStudents
+      .filter(student => student.lastName.toLowerCase() === normalizedLastName)
       .map(student => student.id);
-
-    return this.attendanceRecords.filter(record => 
-      matchingStudentIds.includes(record.studentId)
-    );
-  }
-
-  /**
-   * Normalize string for case-insensitive comparison including accented characters
-   */
-  private normalizeString(str: string): string {
-    return str.toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '');
-  }
-
-  /**
-   * Filter attendance records by date
-   */
-  getAttendanceByDate(dateISO: string): AttendanceRecord[] {
-    if (!dateISO || typeof dateISO !== 'string') {
-      return [];
-    }
-
-    const trimmedDate = dateISO.trim();
-    if (!trimmedDate) {
-      return [];
-    }
-
-    return this.attendanceRecords.filter(record => record.date === trimmedDate);
-  }
-
-  /**
-   * Filter attendance records by lastName AND date (AND behavior)
-   * Both conditions must be satisfied
-   */
-  getAttendanceByLastNameAndDate(lastName: string, dateISO: string): AttendanceRecord[] {
-    if (!lastName || !dateISO || typeof lastName !== 'string' || typeof dateISO !== 'string') {
-      return [];
-    }
-
-    const lastNameRecords = this.getAttendanceByLastName(lastName);
-    const dateRecords = this.getAttendanceByDate(dateISO);
-
-    return lastNameRecords.filter(lastNameRecord =>
-      dateRecords.some(dateRecord =>
-        dateRecord.studentId === lastNameRecord.studentId && 
-        dateRecord.date === lastNameRecord.date
-      )
-    );
-  }
-
-  /**
-   * Get student by ID
-   */
-  getStudentById(studentId: string): Student | undefined {
-    return this.students.get(studentId);
   }
 }

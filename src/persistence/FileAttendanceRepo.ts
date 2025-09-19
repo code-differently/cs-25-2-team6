@@ -1,6 +1,5 @@
 import { AttendanceRecord, AttendanceFilter, AttendanceStatus } from '../types/index';
 
-
 export class FileAttendanceRepo {
   private attendanceRecords: AttendanceRecord[] = [];
 
