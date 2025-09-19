@@ -32,4 +32,23 @@ describe('AttendanceRecord', () => {
     expect(() => new AttendanceRecord({ studentId: '1', dateISO: '2025-09-18', status: AttendanceStatus.EXCUSED, late: true })).toThrow(DomainValidationError);
     expect(() => new AttendanceRecord({ studentId: '1', dateISO: '2025-09-18', status: AttendanceStatus.ABSENT, earlyDismissal: true })).toThrow(DomainValidationError);
   });
+
+  it('can construct a record that includes earlyDismissal = true', () => {
+    const r = new AttendanceRecord({
+      studentId: '1',
+      dateISO: '2025-09-18',
+      status: AttendanceStatus.PRESENT,
+      earlyDismissal: true
+    });
+    expect(r.earlyDismissal).toBe(true);
+  });
+
+  it('absence of earlyDismissal means not early dismissal (false)', () => {
+    const r = new AttendanceRecord({
+      studentId: '1',
+      dateISO: '2025-09-18',
+      status: AttendanceStatus.PRESENT
+    });
+    expect(r.earlyDismissal).toBe(false);
+  });
 });
