@@ -1,4 +1,4 @@
-//import { FileStudentRepo } from '../src/persistence/FileStudentRepo.ts';
+import { FileStudentRepo } from '../src/persistence/FileStudentRepo.ts';
 
 export class StudentsCommand {
     async run(args: string[]) {

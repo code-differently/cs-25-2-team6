@@ -1,4 +1,4 @@
-//import { AttendanceService } from '../src/services/AttendanceService.ts';
+import { AttendanceService } from '../src/services/AttendanceService.ts';
 
 export class AttendanceCommand {
     async run(args: string[]) {
