@@ -7,9 +7,11 @@ import { FileAttendanceRepo } from '../../src/persistence/FileAttendanceRepo';
 import { FileStudentRepo } from '../../src/persistence/FileStudentRepo';
 import { AttendanceStatus } from '../../src/domains/AttendanceStatus';
 
+const studentsPath = path.resolve(__dirname, '../../src/persistence/students.json');
 const attendancePath = path.resolve(__dirname, '../../src/persistence/attendance.json');
 
 beforeEach(() => {
+  fs.writeFileSync(studentsPath, '[]', 'utf-8');
   fs.writeFileSync(attendancePath, '[]', 'utf-8');
 });
 
