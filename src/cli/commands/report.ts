@@ -1,6 +1,5 @@
 import { ReportService } from '../../services/ReportService';
 
-
 export class ReportCommand {
    async run(args: string[]) {
        const subcommand = args[0];

@@ -11,7 +11,6 @@ function parseJsonOutput(output: string) {
     }
 }
 
-
 describe('CLI Management Integration', () => {
     it('should filter and report attendance records correctly', async () => {
         // Arrange: Seed students
@@ -33,27 +32,27 @@ describe('CLI Management Integration', () => {
         console.log = (msg: string) => { output = msg; };
         await reportCmd.run(['filter', '--status', 'LATE']);
         let result = parseJsonOutput(output);
-        expect(result.every(r => r.status === 'LATE')).toBe(true);
+        expect(result.every((r: any) => r.status === 'LATE')).toBe(true);
 
         // report filter --date 2025-09-17
         await reportCmd.run(['filter', '--date', '2025-09-17']);
         result = parseJsonOutput(output);
-        expect(result.every(r => r.date === '2025-09-17')).toBe(true);
+        expect(result.every((r: any) => r.date === '2025-09-17')).toBe(true);
 
         // report filter --last Smith
         await reportCmd.run(['filter', '--last', 'Smith']);
         result = parseJsonOutput(output);
-        expect(result.every(r => r.last === 'Smith')).toBe(true);
+        expect(result.every((r: any) => r.last === 'Smith')).toBe(true);
 
         // report late --date 2025-09-18
         await reportCmd.run(['late', '--date', '2025-09-18']);
         result = parseJsonOutput(output);
-        expect(result.every(r => r.status === 'LATE' && r.date === '2025-09-18')).toBe(true);
+        expect(result.every((r: any) => r.status === 'LATE' && r.date === '2025-09-18')).toBe(true);
 
         // report early --last Smith
         await reportCmd.run(['early', '--last', 'Smith']);
         result = parseJsonOutput(output);
-        expect(result.every(r => r.earlyDismissal === true && r.last === 'Smith')).toBe(true);
+        expect(result.every((r: any) => r.earlyDismissal === true && r.last === 'Smith')).toBe(true);
         console.log = originalLog;
     });
 });
