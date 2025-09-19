@@ -11,6 +11,7 @@ function parseJsonOutput(output: string) {
     }
 }
 
+
 describe('CLI Management Integration', () => {
     it('should filter and report attendance records correctly', async () => {
         // Arrange: Seed students
