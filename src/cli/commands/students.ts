@@ -1,4 +1,4 @@
-import { FileStudentRepo } from '../src/persistence/FileStudentRepo.ts';
+import { FileStudentRepo } from '../../persistence/FileStudentRepo';
 
 export class StudentsCommand {
     async run(args: string[]) {
@@ -18,10 +18,13 @@ export class StudentsCommand {
         const first = args[firstIndex + 1];
         const last = args[lastIndex + 1];
 
-        // Delegate to StudentRepository
-        // Assuming StudentRepository is imported and has a createStudent method
+        // Add student using FileStudentRepo
         const repo = new FileStudentRepo();
-        const student = await repo.createStudent({ first, last });
+        // Generate a simple id (in real app, use uuid or similar)
+        const id = `${first}_${last}`;
+        const student = { id, firstName: first, lastName: last };
+        repo.saveStudent(student);
         console.log(`Student added with ID: ${student.id}`);
+        return student;
     }
 }

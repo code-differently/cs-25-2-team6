@@ -1,4 +1,4 @@
-import { AttendanceService } from '../src/services/AttendanceService.ts';
+import { AttendanceService } from '../../services/AttendanceService';
 
 export class AttendanceCommand {
     async run(args: string[]) {
@@ -15,21 +15,18 @@ export class AttendanceCommand {
             console.error('Usage: attendance mark --first <string> --last <string> --date <YYYY-MM-DD> [--on-time] [--late] [--early-dismissal]');
             return;
         }
-        const first = args[firstIndex + 1];
-        const last = args[lastIndex + 1];
-        const date = args[dateIndex + 1];
+        const firstName = args[firstIndex + 1];
+        const lastName = args[lastIndex + 1];
+        const dateISO = args[dateIndex + 1];
 
-        // Parse attendance status
-        let status = 'ABSENT';
-        if (args.includes('--on-time')) status = 'ON_TIME';
-        else if (args.includes('--late')) status = 'LATE';
-
-        // Parse early dismissal
+        // Parse attendance flags
+        const onTime = args.includes('--on-time');
+        const late = args.includes('--late');
         const earlyDismissal = args.includes('--early-dismissal');
 
         // Call AttendanceService
         const service = new AttendanceService();
-        await service.markAttendanceByName({ first, last, date, status, earlyDismissal });
-        console.log(`Attendance marked for ${first} ${last} on ${date} as ${status}${earlyDismissal ? ' (Early Dismissal)' : ''}`);
+        await service.markAttendanceByName({ firstName, lastName, dateISO, onTime, late, earlyDismissal });
+        console.log(`Attendance marked for ${firstName} ${lastName} on ${dateISO}${onTime ? ' (On Time)' : late ? ' (Late)' : ''}${earlyDismissal ? ' (Early Dismissal)' : ''}`);
     }
 }
