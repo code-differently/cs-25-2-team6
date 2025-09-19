@@ -16,9 +16,8 @@ The assignment can be completed in TypeScript or in Java.
 TypeScript
 ## Must include at least 5 types of objects with meaningful relationships to each other.
 Building
-- Main Entrance
-- Service Entrance
-- Emergency Entrance
+- Main Building
+- Admin Building 
 Attendance Record
 - Is On Time
 - Is Late
