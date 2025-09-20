@@ -492,4 +492,36 @@ test("repo handles file persistence correctly", () => {
   expect(retrievedRecords[0].status).toBe(AttendanceStatus.PRESENT);
 });
 
+test("findByStudentAndDateRange returns only records within the range and in ascending order", () => {
+  const repo = new FileAttendanceRepo(testFile);
+  const records = [
+    new AttendanceRecord({ studentId: "1", dateISO: "2025-09-15", status: AttendanceStatus.PRESENT }),
+    new AttendanceRecord({ studentId: "1", dateISO: "2025-09-18", status: AttendanceStatus.LATE }),
+    new AttendanceRecord({ studentId: "1", dateISO: "2025-09-22", status: AttendanceStatus.ABSENT }),
+    new AttendanceRecord({ studentId: "2", dateISO: "2025-09-19", status: AttendanceStatus.PRESENT })
+  ];
+
+  records.forEach(record => repo.saveAttendance(record));
+
+  const result = repo.findByStudentAndDateRange("1", "2025-09-16", "2025-09-20");
+  expect(result.length).toBe(1);
+  expect(result[0].dateISO).toBe("2025-09-18");
+});
+
+test("findAllByStudent returns all records in deterministic order", () => {
+  const repo = new FileAttendanceRepo(testFile);
+  const records = [
+    new AttendanceRecord({ studentId: "1", dateISO: "2025-09-20", status: AttendanceStatus.PRESENT }),
+    new AttendanceRecord({ studentId: "1", dateISO: "2025-09-18", status: AttendanceStatus.LATE }),
+    new AttendanceRecord({ studentId: "2", dateISO: "2025-09-19", status: AttendanceStatus.ABSENT })
+  ];
+
+  records.forEach(record => repo.saveAttendance(record));
+
+  const result = repo.findAllByStudent("1");
+  expect(result.length).toBe(2);
+  expect(result[0].dateISO).toBe("2025-09-18");
+  expect(result[1].dateISO).toBe("2025-09-20");
+});
+
 

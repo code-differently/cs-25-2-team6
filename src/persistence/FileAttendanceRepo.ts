@@ -77,4 +77,18 @@ export class FileAttendanceRepo {
     const records = this.allAttendance();
     return records.filter(record => record.studentId === studentId && record.earlyDismissal === true);
   }
+
+  findByStudentAndDateRange(studentId: string, startISO: string, endISO: string): AttendanceRecord[] {
+    const records = this.allAttendance();
+    return records
+      .filter(record => record.studentId === studentId && record.dateISO >= startISO && record.dateISO <= endISO)
+      .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  }
+
+  findAllByStudent(studentId: string): AttendanceRecord[] {
+    const records = this.allAttendance();
+    return records
+      .filter(record => record.studentId === studentId)
+      .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  }
 }
