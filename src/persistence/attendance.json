@@ -1,6 +1,6 @@
 [
   {
-    "studentId": "Ava_Smith",
+    "studentId": "Ava_Carter",
     "dateISO": "2025-09-17",
     "status": "PRESENT",
     "late": false,
@@ -9,16 +9,7 @@
     "excused": false
   },
   {
-    "studentId": "Ben_Smith",
-    "dateISO": "2025-09-17",
-    "status": "LATE",
-    "late": true,
-    "earlyDismissal": false,
-    "onTime": false,
-    "excused": false
-  },
-  {
-    "studentId": "Ava_Smith",
+    "studentId": "Ava_Carter",
     "dateISO": "2025-09-18",
     "status": "ABSENT",
     "late": false,
@@ -27,11 +18,29 @@
     "excused": false
   },
   {
-    "studentId": "Ben_Smith",
+    "studentId": "1",
+    "dateISO": "2025-09-18",
+    "status": "PRESENT",
+    "late": false,
+    "earlyDismissal": false,
+    "onTime": true,
+    "excused": false
+  },
+  {
+    "studentId": "2",
     "dateISO": "2025-09-18",
     "status": "LATE",
     "late": true,
-    "earlyDismissal": true,
+    "earlyDismissal": false,
+    "onTime": false,
+    "excused": false
+  },
+  {
+    "studentId": "1",
+    "dateISO": "2025-09-18",
+    "status": "ABSENT",
+    "late": false,
+    "earlyDismissal": false,
     "onTime": false,
     "excused": false
   }
