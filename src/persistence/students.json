@@ -1,12 +1,12 @@
 [
   {
-    "id": "Ava_Smith",
-    "firstName": "Ava",
+    "id": "1",
+    "firstName": "Alice",
     "lastName": "Smith"
   },
   {
-    "id": "Ben_Smith",
-    "firstName": "Ben",
-    "lastName": "Smith"
+    "id": "2",
+    "firstName": "Bob",
+    "lastName": "Jones"
   }
 ]
