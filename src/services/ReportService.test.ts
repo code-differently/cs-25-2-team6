@@ -221,3 +221,76 @@ describe('ReportService', () => {
     }
   });
 });
+
+describe('ReportService User Story 3', () => {
+  let service: ReportService;
+  beforeEach(() => {
+    service = new ReportService();
+    // @ts-ignore
+    service.attendanceRepo.allAttendance = jest.fn().mockReturnValue([
+      // 2025-09-01 to 2025-09-10, present, late, absent, excused, earlyDismissal
+      { studentId: 's1', dateISO: '2025-09-01', status: AttendanceStatus.PRESENT, earlyDismissal: false },
+      { studentId: 's1', dateISO: '2025-09-02', status: AttendanceStatus.LATE, earlyDismissal: true },
+      { studentId: 's1', dateISO: '2025-09-03', status: AttendanceStatus.ABSENT, earlyDismissal: false },
+      { studentId: 's1', dateISO: '2025-09-04', status: AttendanceStatus.EXCUSED, earlyDismissal: false },
+      { studentId: 's1', dateISO: '2025-09-05', status: AttendanceStatus.PRESENT, earlyDismissal: true },
+      { studentId: 's1', dateISO: '2025-09-08', status: AttendanceStatus.LATE, earlyDismissal: false },
+      { studentId: 's1', dateISO: '2025-09-09', status: AttendanceStatus.ABSENT, earlyDismissal: true },
+      { studentId: 's1', dateISO: '2025-09-10', status: AttendanceStatus.PRESENT, earlyDismissal: false },
+    ]);
+  });
+
+  it('daily grouping returns a bucket per calendar day with correct counts', () => {
+    const buckets = service.getHistoryByTimeframe({ studentId: 's1', timeframe: 'DAILY', startISO: '2025-09-01', endISO: '2025-09-10' });
+    expect(buckets).toHaveLength(8);
+    expect(buckets[0]).toMatchObject({ date: '2025-09-01', present: 1 });
+    expect(buckets[1]).toMatchObject({ date: '2025-09-02', late: 1, earlyDismissal: 1 });
+    expect(buckets[2]).toMatchObject({ date: '2025-09-03', absent: 1 });
+    expect(buckets[3]).toMatchObject({ date: '2025-09-04', excused: 1 });
+    expect(buckets[4]).toMatchObject({ date: '2025-09-05', present: 1, earlyDismissal: 1 });
+    expect(buckets[5]).toMatchObject({ date: '2025-09-08', late: 1 });
+    expect(buckets[6]).toMatchObject({ date: '2025-09-09', absent: 1, earlyDismissal: 1 });
+    expect(buckets[7]).toMatchObject({ date: '2025-09-10', present: 1 });
+  });
+
+  it('weekly grouping rolls up to the week start (Monday)', () => {
+    const buckets = service.getHistoryByTimeframe({ studentId: 's1', timeframe: 'WEEKLY', startISO: '2025-09-01', endISO: '2025-09-10' });
+    expect(buckets).toHaveLength(2);
+    expect(buckets[0].date).toBe('2025-09-01'); // week of Sep 1
+    expect(buckets[1].date).toBe('2025-09-08'); // week of Sep 8
+    expect(buckets[0].present).toBe(2); // Sep 1, Sep 5
+    expect(buckets[1].present).toBe(1); // Sep 10
+  });
+
+  it('monthly grouping rolls up to first-of-month', () => {
+    const buckets = service.getHistoryByTimeframe({ studentId: 's1', timeframe: 'MONTHLY', startISO: '2025-09-01', endISO: '2025-09-10' });
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0].date).toBe('2025-09-01');
+    expect(buckets[0].present).toBe(3);
+    expect(buckets[0].late).toBe(2);
+    expect(buckets[0].absent).toBe(2);
+    expect(buckets[0].excused).toBe(1);
+    expect(buckets[0].earlyDismissal).toBe(3);
+  });
+
+  it('YTD summary totals match the underlying set', () => {
+    const summary = service.getYearToDateSummary('s1', 2025);
+    expect(summary).toEqual({ present: 3, late: 2, absent: 2, excused: 1, earlyDismissal: 3 });
+  });
+
+  it('Buckets returned in ascending order', () => {
+    const buckets = service.getHistoryByTimeframe({ studentId: 's1', timeframe: 'DAILY', startISO: '2025-09-01', endISO: '2025-09-10' });
+    for (let i = 1; i < buckets.length; i++) {
+      expect(buckets[i].date >= buckets[i - 1].date).toBe(true);
+    }
+  });
+
+  it('Edge case: no records returns empty array', () => {
+    // @ts-ignore
+    service.attendanceRepo.allAttendance = jest.fn().mockReturnValue([]);
+    const buckets = service.getHistoryByTimeframe({ studentId: 's1', timeframe: 'DAILY', startISO: '2025-09-01', endISO: '2025-09-10' });
+    expect(buckets).toEqual([]);
+    const summary = service.getYearToDateSummary('s1', 2025);
+    expect(summary).toEqual({ present: 0, late: 0, absent: 0, excused: 0, earlyDismissal: 0 });
+  });
+});
