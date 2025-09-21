@@ -102,4 +102,8 @@ export class FileAttendanceRepo {
       .filter(record => record.studentId === studentId)
       .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
   }
+
+  clearAll(): void {
+    fs.writeFileSync(this.filePath, JSON.stringify([]));
+  }
 }
