@@ -1,6 +1,5 @@
 import { FileAlertRuleRepo } from '../../persistence/FileAlertRuleRepo';
 import { AlertService } from '../../services/AlertService';
-import { ConsoleNotifier } from '../../services/ConsoleNotifier';
 
 
 export class AlertsCommand {
@@ -18,7 +17,7 @@ export class AlertsCommand {
            if (latesTotalIndex !== -1) thresholds.latesTotal = Number(args[latesTotalIndex + 1]);
            // Save to FileAlertRuleRepo
            const repo = new FileAlertRuleRepo();
-           await repo.save(thresholds);
+           repo.saveRules(thresholds);
            console.log('Alert thresholds saved.');
        } else if (args[0] === 'alerts' && args[1] === 'check') {
            // Parse student-id and date
@@ -37,13 +36,16 @@ export class AlertsCommand {
            }
            // Load thresholds
            const repo = new FileAlertRuleRepo();
-           let rules = await repo.load();
-           if (!rules) {
-               rules = { absences30: 3, lates30: 3, absencesTotal: 10, latesTotal: 10 }; // defaults
-           }
+           const rules = repo.getRules();
+           
            // Call AlertService
-           const notifier = new ConsoleNotifier();
-           await AlertService.notifyIfBreached(studentId, whenISO, rules, notifier);
+           const notifier = { send: (payload: any) => console.log(`ALERT: ${JSON.stringify(payload)}`) };
+           const alertService = new AlertService();
+           const result = alertService.notifyIfBreached(studentId, whenISO, rules, notifier);
+           
+           if (!result.shouldAlert) {
+               console.log('No alerts triggered.');
+           }
        } else {
            console.error('Unknown alerts command.');
        }

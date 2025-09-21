@@ -19,7 +19,12 @@ export class HistoryCommand {
 
 
            const service = new ReportService();
-           const buckets = await service.getHistoryByTimeframe({ studentId, view, start, end });
+           const buckets = await service.getHistoryByTimeframe({ 
+               studentId, 
+               timeframe: view.toUpperCase() as 'DAILY' | 'WEEKLY' | 'MONTHLY', 
+               startISO: start, 
+               endISO: end 
+           });
            // Print buckets with counts per bucket
            console.log(JSON.stringify(buckets, null, 2));
        } else if (args[0] === 'history' && args[1] === 'ytd') {
@@ -33,7 +38,7 @@ export class HistoryCommand {
            const studentId = args[studentIdIndex + 1];
            const year = yearIndex !== -1 ? args[yearIndex + 1] : undefined;
            const service = new ReportService();
-           const summary = await service.getYearToDateSummary({ studentId, year });
+           const summary = await service.getYearToDateSummary(studentId, year ? parseInt(year) : undefined);
            // Print deterministic summary
            console.log(JSON.stringify(summary, null, 2));
        } else {
