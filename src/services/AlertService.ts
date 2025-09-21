@@ -36,6 +36,8 @@ export class AlertService {
     const ytd = this.reportService.getYearToDateSummary(studentId);
     const absencesTotal = ytd.absent;
     const latesTotal = ytd.late;
+    // Debug output (remove after fixing)
+    // console.log(`Debug AlertService: studentId=${studentId}, ytd=${JSON.stringify(ytd)}, buckets.length=${buckets.length}`);
     if (rules.absences30 !== undefined && absences30 >= rules.absences30) {
       reasons.push(`absences in last 30 days (${absences30}) >= threshold (${rules.absences30})`);
     }
