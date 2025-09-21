@@ -12,7 +12,7 @@ export class AttendanceCommand {
         const lastIndex = args.indexOf('--last');
         const dateIndex = args.indexOf('--date');
         if (firstIndex === -1 || lastIndex === -1 || dateIndex === -1 || !args[firstIndex + 1] || !args[lastIndex + 1] || !args[dateIndex + 1]) {
-            console.error('Usage: attendance mark --first <string> --last <string> --date <YYYY-MM-DD> [--on-time] [--late] [--early-dismissal]');
+            console.error('Usage: attendance mark --first <string> --last <string> --date <YYYY-MM-DD> [--on-time] [--late] [--early-dismissal] [--excused]');
             return;
         }
         const firstName = args[firstIndex + 1];
@@ -23,10 +23,11 @@ export class AttendanceCommand {
         const onTime = args.includes('--on-time');
         const late = args.includes('--late');
         const earlyDismissal = args.includes('--early-dismissal');
+        const excused = args.includes('--excused');
 
         // Call AttendanceService
         const service = new AttendanceService();
-        await service.markAttendanceByName({ firstName, lastName, dateISO, onTime, late, earlyDismissal });
-        console.log(`Attendance marked for ${firstName} ${lastName} on ${dateISO}${onTime ? ' (On Time)' : late ? ' (Late)' : ''}${earlyDismissal ? ' (Early Dismissal)' : ''}`);
+        await service.markAttendanceByName({ firstName, lastName, dateISO, onTime, late, earlyDismissal, excused });
+        console.log(`Attendance marked for ${firstName} ${lastName} on ${dateISO}${onTime ? ' (On Time)' : late ? ' (Late)' : excused ? ' (Excused)' : ''}${earlyDismissal ? ' (Early Dismissal)' : ''}`);
     }
 }

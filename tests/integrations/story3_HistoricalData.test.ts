@@ -21,7 +21,7 @@ describe('Historical Data Integration', () => {
        // Arrange: Create student
        const studentsCmd = new StudentsCommand();
        await studentsCmd.run(['add', '--first', 'Sam', '--last', 'Taylor']);
-       const studentId = '1'; // Assume ID 1 for simplicity, adjust if needed
+       const studentId = 'Sam_Taylor'; // Based on the ID generation pattern
 
 
        // Seed attendance for ~45 days
