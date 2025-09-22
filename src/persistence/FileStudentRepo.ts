@@ -52,4 +52,12 @@ export class FileStudentRepo {
     const students = this.allStudents();
     return students.filter(student => student.lastName === lastName);
   }
+
+  addStudent(student: Student): void {
+    this.saveStudent(student);
+  }
+
+  clearAll(): void {
+    fs.writeFileSync(this.filePath, JSON.stringify([]));
+  }
 }
