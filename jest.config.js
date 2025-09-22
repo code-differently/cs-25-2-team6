@@ -18,5 +18,8 @@ module.exports = {
       lines: 0.9,
       statements: 0.9
     }
-  }
+  },
+  // Force integration tests to run sequentially to avoid race conditions
+  runner: "jest-runner",
+  maxWorkers: 1
 };

@@ -15,8 +15,12 @@ describe('ScheduleService', () => {
   beforeEach(() => {
     service = new ScheduleService();
     studentRepo = { allStudents: jest.fn().mockReturnValue([]) };
-    attendanceRepo = { findAttendanceBy: jest.fn(), saveAttendance: jest.fn() };
-    scheduleRepo = { savePlannedDayOff: jest.fn(), isPlannedDayOff: jest.fn() };
+    attendanceRepo = { 
+      findAttendanceBy: jest.fn(), 
+      saveAttendance: jest.fn(),
+      allAttendance: jest.fn().mockReturnValue([])
+    };
+    scheduleRepo = { saveDayOff: jest.fn(), isPlannedDayOff: jest.fn(), hasDayOff: jest.fn() };
     (service as any).studentRepo = studentRepo;
     (service as any).attendanceRepo = attendanceRepo;
     (service as any).scheduleRepo = scheduleRepo;
@@ -29,15 +33,15 @@ describe('ScheduleService', () => {
   });
 
   it('planDayOff then isPlannedDayOff returns true', () => {
-    scheduleRepo.isPlannedDayOff.mockReturnValue(true);
+    scheduleRepo.hasDayOff.mockReturnValue(true);
     service.planDayOff({ dateISO: '2025-09-23', reason: 'HOLIDAY' });
-    expect(scheduleRepo.savePlannedDayOff).toHaveBeenCalledWith({ dateISO: '2025-09-23', reason: 'HOLIDAY', scope: 'ALL_STUDENTS' });
+    expect(scheduleRepo.saveDayOff).toHaveBeenCalledWith({ dateISO: '2025-09-23', reason: 'HOLIDAY', scope: 'ALL_STUDENTS' });
     expect(service.isPlannedDayOff('2025-09-23')).toBe(true);
   });
 
   it('isOffDay true when weekend OR planned', () => {
     // First call: not planned, not weekend; second call: planned
-    scheduleRepo.isPlannedDayOff.mockImplementation((dateISO: string) => dateISO === '2025-09-23');
+    scheduleRepo.hasDayOff.mockImplementation((dateISO: string) => dateISO === '2025-09-23');
     expect(service.isOffDay('2025-09-20')).toBe(true); // Saturday
     expect(service.isOffDay('2025-09-22')).toBe(false); // Monday, not planned
     expect(service.isOffDay('2025-09-23')).toBe(true); // planned
@@ -50,11 +54,13 @@ describe('ScheduleService', () => {
     ];
     studentRepo.allStudents.mockReturnValue(students);
     attendanceRepo.findAttendanceBy.mockReturnValueOnce(undefined).mockReturnValueOnce(undefined).mockReturnValue(undefined);
-    service.applyPlannedDayOffToAllStudents('2025-09-24');
+    const count = service.applyPlannedDayOffToAllStudents('2025-09-24');
+    expect(count).toBe(2);
     expect(attendanceRepo.saveAttendance).toHaveBeenCalledTimes(2);
     // Idempotency: if already exists, should not create again
     attendanceRepo.findAttendanceBy.mockReturnValue({ studentId: '1', dateISO: '2025-09-24', status: AttendanceStatus.EXCUSED, late: false, earlyDismissal: false, onTime: false, excused: true });
-    service.applyPlannedDayOffToAllStudents('2025-09-24');
+    const count2 = service.applyPlannedDayOffToAllStudents('2025-09-24');
+    expect(count2).toBe(0);
     expect(attendanceRepo.saveAttendance).toHaveBeenCalledTimes(2);
   });
 });

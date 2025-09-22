@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
-import { ScheduledDayOffReason } from "../domains/ScheduledDayOff";
+import { DayOffReason } from "../domains/DayOffReason";
 
 export interface DayOff {
     dateISO: string;
-    reason: ScheduledDayOffReason;
+    reason: DayOffReason;
     scope: 'ALL_STUDENTS';
 
 }
@@ -19,7 +19,7 @@ export class FileScheduleRepo {
       }
     }
 
-    saveDayOff(entry: { dateISO: string, reason: ScheduledDayOffReason, scope: 'ALL_STUDENTS'}): void {
+    saveDayOff(entry: { dateISO: string, reason: DayOffReason, scope: 'ALL_STUDENTS'}): void {
         const daysOff = this.allDaysOff();
 
         const filteredDaysOff = daysOff.filter(day => day.dateISO !== entry.dateISO);
@@ -39,7 +39,7 @@ export class FileScheduleRepo {
         return daysOff.some(day => day.dateISO === dateISO);
     }
 
-    listDaysOffInRange(startISO: string, endISO: string): Array<{dateISO: string, reason: ScheduledDayOffReason}> {
+    listDaysOffInRange(startISO: string, endISO: string): Array<{dateISO: string, reason: DayOffReason}> {
         const daysOff = this.allDaysOff();
         return daysOff
             .filter(day => day.dateISO >= startISO && day.dateISO <= endISO)

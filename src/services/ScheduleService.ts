@@ -1,26 +1,73 @@
 import { FileStudentRepo } from '../persistence/FileStudentRepo';
 import { FileAttendanceRepo } from '../persistence/FileAttendanceRepo';
+import { FileScheduleRepo } from '../persistence/FileScheduleRepo';
 import { AttendanceStatus } from '../domains/AttendanceStatus';
 import { AttendanceRecord } from '../domains/AttendanceRecords';
 
 export class ScheduleService {
   private studentRepo = new FileStudentRepo();
   private attendanceRepo = new FileAttendanceRepo();
+  private scheduleRepo = new FileScheduleRepo();
+
+  /**
+   * Checks if a given date is a weekend (Saturday or Sunday).
+   * @param dateISO The date in ISO format (YYYY-MM-DD)
+   * @returns true if the date is a weekend, false otherwise
+   */
+  isWeekend(dateISO: string): boolean {
+    const d = new Date(dateISO + 'T00:00:00Z');
+    const day = d.getUTCDay();
+    return day === 0 || day === 6; // Sunday=0, Saturday=6
+  }
+
+  /**
+   * Plans a day off for a specific date with a reason.
+   * @param params Object containing dateISO, reason, and optional scope
+   */
+  planDayOff(params: { dateISO: string; reason: string; scope?: string }): void {
+    // Save the planned day off to the schedule repository
+    const plannedDayOff = {
+      dateISO: params.dateISO,
+      reason: params.reason as any, // Cast to match DayOffReason type
+      scope: 'ALL_STUDENTS' as const
+    };
+    this.scheduleRepo.saveDayOff(plannedDayOff);
+    
+    // Note: Do not automatically apply to students here.
+    // Use applyPlannedDayOffToAllStudents() separately if needed.
+  }
+
+  /**
+   * Lists planned days off within a date range.
+   * @param params Object containing start and end dates
+   * @returns Array of planned days off
+   */
+  listPlannedDays(params: { start: string; end: string }): Array<{ dateISO: string; reason: string }> {
+    return this.scheduleRepo.listDaysOffInRange(params.start, params.end);
+  }
+
+  /**
+   * Checks if a specific date has been planned as a day off.
+   * @param dateISO The date in ISO format (YYYY-MM-DD)
+   * @returns true if it's a planned day off, false otherwise
+   */
+  isPlannedDayOff(dateISO: string): boolean {
+    return this.scheduleRepo.hasDayOff(dateISO);
+  }
 
   /**
    * Applies a planned day off to all students for a specific date.
    * This method is idempotent - running it multiple times won't create duplicate entries.
    * @param dateISO The date in ISO format (YYYY-MM-DD)
+   * @returns The number of EXCUSED records created
    */
-  applyPlannedDayOffToAllStudents(dateISO: string): void {
+  applyPlannedDayOffToAllStudents(dateISO: string): number {
     const students = this.studentRepo.allStudents();
-    const existingRecords = this.attendanceRepo.allAttendance();
+    let count = 0;
     
     for (const student of students) {
       // Check if this student already has an attendance record for this date
-      const existingRecord = existingRecords.find(
-        record => record.studentId === student.id && record.dateISO === dateISO
-      );
+      const existingRecord = this.attendanceRepo.findAttendanceBy(student.id, dateISO);
       
       // Only create EXCUSED record if no record exists for this student on this date
       if (!existingRecord) {
@@ -30,48 +77,19 @@ export class ScheduleService {
           status: AttendanceStatus.EXCUSED
         });
         this.attendanceRepo.saveAttendance(excusedRecord);
+        count++;
       }
     }
+    
+    return count;
   }
 
   /**
-   * Determines if a given date is considered an "off day" (no school).
-   * Returns true for:
-   * - Planned weekdays that are scheduled off
-   * - Weekend days (Saturday/Sunday) when no specific planning overrides them
+   * Checks if a date is a day off (either weekend or planned day off).
    * @param dateISO The date in ISO format (YYYY-MM-DD)
-   * @returns true if it's an off day, false otherwise
+   * @returns true if it's a day off, false otherwise
    */
   isOffDay(dateISO: string): boolean {
-    const date = new Date(dateISO);
-    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    
-    // Check if it's a weekend (Saturday = 6, Sunday = 0)
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-    
-    const students = this.studentRepo.allStudents();
-    const attendanceRecords = this.attendanceRepo.allAttendance();
-    
-    // If no students exist, no days are considered "off days"
-    if (students.length === 0) {
-      return false;
-    }
-    
-    // Check if there are any planned activities for this date
-    // (If there are attendance records planned for a weekend, it's not an off day)
-    const hasPlannedActivities = attendanceRecords.some(
-      record => record.dateISO === dateISO && record.status !== AttendanceStatus.EXCUSED
-    );
-    
-    // Check if this date has been marked as a planned day off for all students
-    const excusedRecords = attendanceRecords.filter(
-      record => record.dateISO === dateISO && record.status === AttendanceStatus.EXCUSED
-    );
-    const isPlannedDayOff = excusedRecords.length === students.length;
-    
-    // It's an off day if:
-    // 1. It's a weekend day without planned activities, OR
-    // 2. It's a planned day off for all students
-    return (isWeekend && !hasPlannedActivities) || isPlannedDayOff;
+    return this.isWeekend(dateISO) || this.isPlannedDayOff(dateISO);
   }
 }

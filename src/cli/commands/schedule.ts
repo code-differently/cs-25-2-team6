@@ -28,8 +28,8 @@ export class ScheduleCommand {
        } else if (args[0] === 'schedule' && args[1] === 'list') {
            const startIndex = args.indexOf('--start');
            const endIndex = args.indexOf('--end');
-           const start = startIndex !== -1 ? args[startIndex + 1] : undefined;
-           const end = endIndex !== -1 ? args[endIndex + 1] : undefined;
+           const start = startIndex !== -1 ? args[startIndex + 1] : '';
+           const end = endIndex !== -1 ? args[endIndex + 1] : '';
            const service = new ScheduleService();
            const plannedDays = await service.listPlannedDays({ start, end });
            console.log(JSON.stringify(plannedDays, null, 2));
