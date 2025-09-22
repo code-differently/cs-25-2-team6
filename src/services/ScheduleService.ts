@@ -1,11 +1,18 @@
 import { FileStudentRepo } from '../persistence/FileStudentRepo';
 import { FileAttendanceRepo } from '../persistence/FileAttendanceRepo';
+<<<<<<< HEAD
 import { AttendanceStatus } from '../domains/AttendanceStatus';
 import { AttendanceRecord } from '../domains/AttendanceRecords';
+=======
+import { AttendanceRecord } from '../domains/AttendanceRecords';
+import { AttendanceStatus } from '../domains/AttendanceStatus';
+import { ScheduleRepo, DayOffReason } from '../persistence/ScheduleRepo';
+>>>>>>> 0b2ab1725e14ff3067c04b0e6cf55c1733f155dd
 
 export class ScheduleService {
   private studentRepo = new FileStudentRepo();
   private attendanceRepo = new FileAttendanceRepo();
+<<<<<<< HEAD
 
   /**
    * Applies a planned day off to all students for a specific date.
@@ -75,3 +82,45 @@ export class ScheduleService {
     return (isWeekend && !hasPlannedActivities) || isPlannedDayOff;
   }
 }
+=======
+  private scheduleRepo = new ScheduleRepo();
+
+  planDayOff(params: { dateISO: string; reason: DayOffReason; scope?: 'ALL_STUDENTS' }) {
+    const { dateISO, reason, scope = 'ALL_STUDENTS' } = params;
+    this.scheduleRepo.savePlannedDayOff({ dateISO, reason, scope });
+  }
+
+  isWeekend(dateISO: string): boolean {
+    const d = new Date(dateISO + 'T00:00:00Z');
+    const day = d.getUTCDay();
+    return day === 0 || day === 6; // Sunday=0, Saturday=6
+  }
+
+  isPlannedDayOff(dateISO: string): boolean {
+    return this.scheduleRepo.isPlannedDayOff(dateISO);
+  }
+
+  isOffDay(dateISO: string): boolean {
+    return this.isWeekend(dateISO) || this.isPlannedDayOff(dateISO);
+  }
+
+  applyPlannedDayOffToAllStudents(dateISO: string) {
+    const students = this.studentRepo.allStudents();
+    for (const student of students) {
+      // Skip if attendance record already exists
+      const existing = this.attendanceRepo.findAttendanceBy(student.id, dateISO);
+      if (existing) continue;
+      const record = new AttendanceRecord({
+        studentId: student.id,
+        dateISO,
+        status: AttendanceStatus.EXCUSED,
+        late: false,
+        earlyDismissal: false
+      });
+      this.attendanceRepo.saveAttendance(record);
+    }
+  }
+}
+
+// You will need to implement ScheduleRepo and DayOffReason in persistence/ScheduleRepo.ts
+>>>>>>> 0b2ab1725e14ff3067c04b0e6cf55c1733f155dd

@@ -103,7 +103,21 @@ export class FileAttendanceRepo {
       .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
   }
 
-  clearAll(): void {
-    fs.writeFileSync(this.filePath, JSON.stringify([]));
+  saveMany(records: AttendanceRecord[]): void {
+    const existingRecords = this.allAttendance();
+    
+    const newRecordsData = records.map(record => ({
+      studentId: record.studentId,
+      dateISO: record.dateISO,
+      status: record.status,
+      late: record.late,
+      earlyDismissal: record.earlyDismissal,
+      onTime: record.onTime,
+      excused: record.excused,
+    }));
+    
+    existingRecords.push(...newRecordsData);
+    
+    fs.writeFileSync(this.filePath, JSON.stringify(existingRecords, null, 2));
   }
 }
