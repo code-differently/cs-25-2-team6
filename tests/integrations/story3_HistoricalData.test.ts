@@ -1,8 +1,22 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeEach } from '@jest/globals';
+import fs from 'fs';
+import path from 'path';
 import { StudentsCommand } from '../../src/cli/commands/students';
 import { AttendanceCommand } from '../../src/cli/commands/attendance';
 import { HistoryCommand } from '../../src/cli/commands/history';
 import { AlertsCommand } from '../../src/cli/commands/alerts';
+
+const studentsPath = path.resolve(__dirname, '../../src/persistence/students.json');
+const attendancePath = path.resolve(__dirname, '../../src/persistence/attendance.json');
+const alertRulesPath = path.resolve(__dirname, '../../src/persistence/alert_rules.json');
+const schedulePath = path.resolve(__dirname, '../../src/persistence/scheduled_days_off.json');
+
+beforeEach(() => {
+  fs.writeFileSync(studentsPath, '[]', 'utf-8');
+  fs.writeFileSync(attendancePath, '[]', 'utf-8');
+  fs.writeFileSync(alertRulesPath, '[]', 'utf-8');
+  fs.writeFileSync(schedulePath, '[]', 'utf-8');
+});
 
 
 function captureConsole(fn: () => Promise<void>) {

@@ -6,9 +6,11 @@
     "ts-jest": "^29.4.2"
   },
   "scripts": {
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "start": "ts-node src/cli/cli-entrypoint.ts"
   },
   "dependencies": {
-    "date-fns": "^4.1.0"
+    "date-fns": "^4.1.0",
+    "ts-node": "^10.9.2"
   }
 }
