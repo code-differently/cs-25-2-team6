@@ -31,15 +31,26 @@ export class FileAttendanceRepo {
   }
 
   allAttendance(): AttendanceRecord[] {
-    const data = fs.readFileSync(this.filePath, "utf-8");
-    const recordsData = JSON.parse(data);
-    return recordsData.map((data: any) => new AttendanceRecord({
-      studentId: data.studentId,
-      dateISO: data.dateISO,
-      status: data.status as AttendanceStatus,
-      late: data.late,
-      earlyDismissal: data.earlyDismissal,
-    }));
+    try {
+      const data = fs.readFileSync(this.filePath, "utf-8");
+      if (data.trim() === '') {
+        // File is empty, initialize with empty array
+        fs.writeFileSync(this.filePath, JSON.stringify([]));
+        return [];
+      }
+      const recordsData = JSON.parse(data);
+      return recordsData.map((data: any) => new AttendanceRecord({
+        studentId: data.studentId,
+        dateISO: data.dateISO,
+        status: data.status as AttendanceStatus,
+        late: data.late,
+        earlyDismissal: data.earlyDismissal,
+      }));
+    } catch (error) {
+      // If file is corrupted or invalid JSON, reset to empty array
+      fs.writeFileSync(this.filePath, JSON.stringify([]));
+      return [];
+    }
   }
 
   findAttendanceBy(studentId: string, dateISO: string): AttendanceRecord | undefined {
@@ -76,5 +87,19 @@ export class FileAttendanceRepo {
   getEarlyDismissalListByStudent(studentId: string): AttendanceRecord[] {
     const records = this.allAttendance();
     return records.filter(record => record.studentId === studentId && record.earlyDismissal === true);
+  }
+
+  findByStudentAndDateRange(studentId: string, startISO: string, endISO: string): AttendanceRecord[] {
+    const records = this.allAttendance();
+    return records
+      .filter(record => record.studentId === studentId && record.dateISO >= startISO && record.dateISO <= endISO)
+      .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  }
+
+  findAllByStudent(studentId: string): AttendanceRecord[] {
+    const records = this.allAttendance();
+    return records
+      .filter(record => record.studentId === studentId)
+      .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
   }
 }

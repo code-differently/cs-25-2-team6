@@ -32,8 +32,19 @@ export class FileStudentRepo {
   }
 
   allStudents(): Student[] {
-    const data = fs.readFileSync(this.filePath, "utf-8");
-    return JSON.parse(data) as Student[];
+    try {
+      const data = fs.readFileSync(this.filePath, "utf-8");
+      if (data.trim() === '') {
+        // File is empty, initialize with empty array
+        fs.writeFileSync(this.filePath, JSON.stringify([]));
+        return [];
+      }
+      return JSON.parse(data) as Student[];
+    } catch (error) {
+      // If file is corrupted or invalid JSON, reset to empty array
+      fs.writeFileSync(this.filePath, JSON.stringify([]));
+      return [];
+    }
   }
 
   // New method for filtering by last name

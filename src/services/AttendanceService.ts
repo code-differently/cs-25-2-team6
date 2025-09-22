@@ -18,23 +18,25 @@ export interface MarkAttendanceParams {
   onTime?: boolean;
   late?: boolean;
   earlyDismissal?: boolean;
+  excused?: boolean;
 }
 
 export class AttendanceService {
   private studentRepo = new FileStudentRepo();
   private attendanceRepo = new FileAttendanceRepo();
 
-  inferStatusFromFlags(flags: { onTime?: boolean; late?: boolean }): AttendanceStatus {
+  inferStatusFromFlags(flags: { onTime?: boolean; late?: boolean; excused?: boolean }): AttendanceStatus {
+    if (flags.excused) return AttendanceStatus.EXCUSED;
     if (flags.late) return AttendanceStatus.LATE;
     if (flags.onTime) return AttendanceStatus.PRESENT;
     return AttendanceStatus.ABSENT;
   }
 
   markAttendanceByName(params: MarkAttendanceParams) {
-    const { firstName, lastName, dateISO, onTime, late, earlyDismissal } = params;
+    const { firstName, lastName, dateISO, onTime, late, earlyDismissal, excused } = params;
     const studentId = this.studentRepo.findStudentIdByName(firstName, lastName);
     if (!studentId) throw new StudentNotFoundError(`Student ${firstName} ${lastName} not found`);
-    const status = this.inferStatusFromFlags({ onTime, late });
+    const status = this.inferStatusFromFlags({ onTime, late, excused });
     const record = new AttendanceRecord({
       studentId,
       dateISO,
