@@ -4,12 +4,7 @@ export class HistoryCommand {
     async run(args: string[]) {
         const service = new ReportService();
         
-        if (args[0] !== 'history') {
-            console.error('Unknown command.');
-            return;
-        }
-
-        if (args[1] === 'view') {
+        if (args[0] === 'view') {
             // history view --student-id <id> --view <daily|weekly|monthly> [--start <date>] [--end <date>]
             const studentIdIndex = args.indexOf('--student-id');
             const viewIndex = args.indexOf('--view');
@@ -35,7 +30,7 @@ export class HistoryCommand {
             });
 
             console.log(JSON.stringify(buckets));
-        } else if (args[1] === 'ytd') {
+        } else if (args[0] === 'ytd') {
             // history ytd --student-id <id> [--year <year>]
             const studentIdIndex = args.indexOf('--student-id');
             const yearIndex = args.indexOf('--year');
