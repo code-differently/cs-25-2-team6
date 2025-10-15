@@ -10,6 +10,9 @@
     "start": "ts-node src/cli/cli-entrypoint.ts"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/react": "^6.1.19",
     "date-fns": "^4.1.0",
     "ts-node": "^10.9.2"
   }
