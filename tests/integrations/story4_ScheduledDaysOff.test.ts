@@ -69,7 +69,7 @@ describe('Scheduled Days Off Integration', () => {
        const D2 = '2025-09-17';
        let output = '';
        console.log = (msg: string) => { output = msg; };
-       await historyCmd.run(['history', 'view', '--student-id', '1', '--view', 'daily', '--start', D0, '--end', D2]);
+       await historyCmd.run(['view', '--student-id', '1', '--view', 'daily', '--start', D0, '--end', D2]);
        const buckets = JSON.parse(output);
        // D1 should not increment present/late/absent (should be excluded from report)
        const d1Bucket = buckets.find((b: any) => b.date === D1);

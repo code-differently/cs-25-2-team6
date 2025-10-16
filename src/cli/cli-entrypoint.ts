@@ -25,6 +25,10 @@ async function main() {
     const { AlertsCommand } = await import('./commands/alerts');
     const cmd = new AlertsCommand();
     await cmd.run(args.slice(1));
+  } else if (args[0] === 'report') {
+    const { ReportCommand } = await import('./commands/report');
+    const cmd = new ReportCommand();
+    await cmd.run(args.slice(1));
   } else {
     console.log('Usage:');
     console.log('  students ...');
@@ -32,8 +36,8 @@ async function main() {
     console.log('  schedule ...');
     console.log('  history ...');
     console.log('  alerts ...');
+    console.log('  report ...');
   }
 }
 
 main();
-
