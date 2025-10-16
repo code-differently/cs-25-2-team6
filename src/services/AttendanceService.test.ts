@@ -1,6 +1,9 @@
 import { AttendanceService, StudentNotFoundError } from './AttendanceService';
 import { AttendanceStatus } from '../domains/AttendanceStatus';
 import { FileStudentRepo } from '../persistence/FileStudentRepo';
+import { ScheduleService } from './ScheduleService';
+
+jest.mock('./ScheduleService');
 
 const TEST_STUDENTS = [
   { id: '1', firstName: 'Alice', lastName: 'Smith' },
@@ -56,5 +59,21 @@ describe('AttendanceService', () => {
         dateISO: '2025-09-18'
       })
     ).toThrow(StudentNotFoundError);
+  });
+
+  it('returns EXCUSED on planned day off even if onTime or late is provided', () => {
+    const service = new AttendanceService();
+    // Mock ScheduleService to return true for isOffDay
+    (service as any).scheduleService = { isOffDay: () => true };
+    const record = service.markAttendanceByName({
+      firstName: 'Alice',
+      lastName: 'Smith',
+      dateISO: '2025-09-25',
+      onTime: true,
+      late: true
+    });
+    expect(record.status).toBe(AttendanceStatus.EXCUSED);
+    expect(record.late).toBe(false);
+    expect(record.excused).toBe(true);
   });
 });

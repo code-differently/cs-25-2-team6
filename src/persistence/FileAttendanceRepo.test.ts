@@ -524,4 +524,28 @@ test("findAllByStudent returns all records in deterministic order", () => {
   expect(result[1].dateISO).toBe("2025-09-20");
 });
 
+test("saveMany appends all records and allAttendance shows them", () => {
+  const repo = new FileAttendanceRepo(testFile);
+  
+  const records = [
+    new AttendanceRecord({
+      studentId: "1",
+      dateISO: "2025-12-25",
+      status: AttendanceStatus.EXCUSED
+    }),
+    new AttendanceRecord({
+      studentId: "2", 
+      dateISO: "2025-12-25",
+      status: AttendanceStatus.EXCUSED
+    })
+  ];
+  
+  repo.saveMany(records);
+  
+  const allRecords = repo.allAttendance();
+  expect(allRecords.length).toBe(2);
+  expect(allRecords[0].studentId).toBe("1");
+  expect(allRecords[1].studentId).toBe("2");
+});
+
 

@@ -1,8 +1,22 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeEach } from '@jest/globals';
+import fs from 'fs';
+import path from 'path';
 import { StudentsCommand } from '../../src/cli/commands/students';
 import { AttendanceCommand } from '../../src/cli/commands/attendance';
 import { HistoryCommand } from '../../src/cli/commands/history';
 import { AlertsCommand } from '../../src/cli/commands/alerts';
+
+const studentsPath = path.resolve(__dirname, '../../src/persistence/students.json');
+const attendancePath = path.resolve(__dirname, '../../src/persistence/attendance.json');
+const alertRulesPath = path.resolve(__dirname, '../../src/persistence/alert_rules.json');
+const schedulePath = path.resolve(__dirname, '../../src/persistence/scheduled_days_off.json');
+
+beforeEach(() => {
+  fs.writeFileSync(studentsPath, '[]', 'utf-8');
+  fs.writeFileSync(attendancePath, '[]', 'utf-8');
+  fs.writeFileSync(alertRulesPath, '[]', 'utf-8');
+  fs.writeFileSync(schedulePath, '[]', 'utf-8');
+});
 
 
 function captureConsole(fn: () => Promise<void>) {
@@ -54,28 +68,28 @@ describe('Historical Data Integration', () => {
        const D2 = '2025-09-14';
        let output = '';
        console.log = (msg: string) => { output = msg; };
-       await historyCmd.run(['history', 'view', '--student-id', studentId, '--view', 'daily', '--start', D1, '--end', D2]);
+       await historyCmd.run(['view', '--student-id', studentId, '--view', 'daily', '--start', D1, '--end', D2]);
        let buckets = JSON.parse(output);
        expect(Array.isArray(buckets)).toBe(true);
        expect(buckets.length).toBeGreaterThan(0);
 
 
        // Act & Assert: weekly view
-       await historyCmd.run(['history', 'view', '--student-id', studentId, '--view', 'weekly']);
+       await historyCmd.run(['view', '--student-id', studentId, '--view', 'weekly', '--start', D1, '--end', D2]);
        buckets = JSON.parse(output);
        expect(Array.isArray(buckets)).toBe(true);
        expect(buckets.length).toBeGreaterThan(0);
 
 
        // Act & Assert: monthly view
-       await historyCmd.run(['history', 'view', '--student-id', studentId, '--view', 'monthly']);
+       await historyCmd.run(['view', '--student-id', studentId, '--view', 'monthly', '--start', D1, '--end', D2]);
        buckets = JSON.parse(output);
        expect(Array.isArray(buckets)).toBe(true);
        expect(buckets.length).toBeGreaterThan(0);
 
 
        // Act & Assert: YTD
-       await historyCmd.run(['history', 'ytd', '--student-id', studentId]);
+       await historyCmd.run(['ytd', '--student-id', studentId]);
        const ytdSummary = JSON.parse(output);
        expect(ytdSummary.absent).toBeGreaterThanOrEqual(0);
        expect(ytdSummary.late).toBeGreaterThanOrEqual(0);

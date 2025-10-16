@@ -3,10 +3,12 @@ import { FileStudentRepo } from '../persistence/FileStudentRepo';
 import { FileAttendanceRepo } from '../persistence/FileAttendanceRepo';
 import { AttendanceRecord } from '../domains/AttendanceRecords';
 import { startOfDay, startOfWeek, startOfMonth, format, isAfter, isBefore } from 'date-fns';
+import { ScheduleService } from './ScheduleService';
 
 export class ReportService {
   private studentRepo = new FileStudentRepo();
   private attendanceRepo = new FileAttendanceRepo();
+  private scheduleService = new ScheduleService();
 
   filterAttendanceBy(options: { lastName?: string; status?: AttendanceStatus; dateISO?: string }): AttendanceRecord[] {
     let studentIds: string[] | undefined = undefined;
@@ -73,6 +75,8 @@ export class ReportService {
     const end = params.endISO ? new Date(params.endISO + 'T00:00:00Z') : startOfDay(defaultEnd);
     const endPlusOneDay = new Date(end.getTime() + 24 * 60 * 60 * 1000);
     const filtered = allRecords.filter(r => {
+      // Exclude weekends and planned days off
+      if (this.scheduleService.isOffDay(r.dateISO)) return false;
       const d = new Date(r.dateISO + 'T00:00:00Z');
       return (d.getTime() >= start.getTime()) && (d.getTime() < endPlusOneDay.getTime());
     });
@@ -117,6 +121,8 @@ export class ReportService {
     const endPlusOneDay = new Date(end.getTime() + 24 * 60 * 60 * 1000);
     const allRecords = this.attendanceRepo.allAttendance().filter(r => r.studentId === studentId);
     const filtered = allRecords.filter(r => {
+      // Exclude weekends and planned days off
+      if (this.scheduleService.isOffDay(r.dateISO)) return false;
       const d = new Date(r.dateISO + 'T00:00:00Z');
       return (d.getTime() >= start.getTime()) && (d.getTime() < endPlusOneDay.getTime());
     });
