@@ -68,28 +68,28 @@ describe('Historical Data Integration', () => {
        const D2 = '2025-09-14';
        let output = '';
        console.log = (msg: string) => { output = msg; };
-       await historyCmd.run(['history', 'view', '--student-id', studentId, '--view', 'daily', '--start', D1, '--end', D2]);
+       await historyCmd.run(['view', '--student-id', studentId, '--view', 'daily', '--start', D1, '--end', D2]);
        let buckets = JSON.parse(output);
        expect(Array.isArray(buckets)).toBe(true);
        expect(buckets.length).toBeGreaterThan(0);
 
 
        // Act & Assert: weekly view
-       await historyCmd.run(['history', 'view', '--student-id', studentId, '--view', 'weekly']);
+       await historyCmd.run(['view', '--student-id', studentId, '--view', 'weekly', '--start', D1, '--end', D2]);
        buckets = JSON.parse(output);
        expect(Array.isArray(buckets)).toBe(true);
        expect(buckets.length).toBeGreaterThan(0);
 
 
        // Act & Assert: monthly view
-       await historyCmd.run(['history', 'view', '--student-id', studentId, '--view', 'monthly']);
+       await historyCmd.run(['view', '--student-id', studentId, '--view', 'monthly', '--start', D1, '--end', D2]);
        buckets = JSON.parse(output);
        expect(Array.isArray(buckets)).toBe(true);
        expect(buckets.length).toBeGreaterThan(0);
 
 
        // Act & Assert: YTD
-       await historyCmd.run(['history', 'ytd', '--student-id', studentId]);
+       await historyCmd.run(['ytd', '--student-id', studentId]);
        const ytdSummary = JSON.parse(output);
        expect(ytdSummary.absent).toBeGreaterThanOrEqual(0);
        expect(ytdSummary.late).toBeGreaterThanOrEqual(0);
