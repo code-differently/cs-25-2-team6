@@ -73,9 +73,6 @@ export default function AttendancePage() {
       newErrors.date = 'Cannot record attendance for future dates';
     }
 
-    // Remove the validation that requires changes - let users submit all PRESENT
-    // This allows bulk operations and default submissions
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -145,7 +142,7 @@ export default function AttendancePage() {
         throw new Error(errorData.message || 'Failed to submit attendance');
       }
 
-      // Success - show confirmation and reset form
+      // Success confirmation and reset form
       alert('Attendance recorded successfully!');
       
       // Reset to default state

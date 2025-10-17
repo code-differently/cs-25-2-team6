@@ -84,7 +84,7 @@ export default function DataPicker({
     onChange(newValue);
   };
 
-  // Format date for display (e.g., "Jan 15, 2024")
+  // Format date for display
   const formatDisplayDate = (date: Date): string => {
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -128,8 +128,7 @@ export default function DataPicker({
             ${!showCalendarIcon ? 'date-input-no-icon' : ''}
           `.trim()}
         />
-        
-        {/* Optional: Custom calendar icon overlay */}
+        {/*Custom calendar icon overlay */}
         {showCalendarIcon && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
             <svg 

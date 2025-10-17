@@ -76,8 +76,6 @@ export default function StudentList({
     selectedStudents.forEach(studentId => {
       onAttendanceChange(studentId, 'status', bulkStatus);
     });
-    // Optionally clear selections after bulk change
-    // setSelectedStudents(new Set());
   };
 
   // Handle bulk early dismissal toggle
@@ -323,5 +321,4 @@ export default function StudentList({
   );
 }
 
-// Export types for use in parent components
 export type { Student, AttendanceRecord };
