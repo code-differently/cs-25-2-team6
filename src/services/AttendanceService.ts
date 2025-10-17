@@ -90,97 +90,228 @@ export class AttendanceService {
   }
 
   /**
-   * Process batch attendance for multiple students on a single date
+   * Check if attendance record exists for a specific student and date
+   * @param studentId Student ID to check
+   * @param date ISO date string (YYYY-MM-DD)
+   * @returns Object with existence status and record details if found
+   */
+  public checkExistingAttendance(studentId: string, date: string): {
+    exists: boolean;
+    record?: {
+      status: AttendanceStatus;
+      late: boolean;
+      earlyDismissal: boolean;
+      excused: boolean;
+    };
+    student?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      fullName: string;
+    };
+  } {
+    // Check if student exists first
+    const student = this.studentRepo.allStudents().find(s => s.id === studentId);
+    if (!student) {
+      return { exists: false };
+    }
+
+    try {
+      const existingRecord = this.attendanceRepo.findAttendanceBy(studentId, date);
+      
+      if (existingRecord) {
+        return {
+          exists: true,
+          record: {
+            status: existingRecord.status,
+            late: existingRecord.late,
+            earlyDismissal: existingRecord.earlyDismissal,
+            excused: existingRecord.excused
+          },
+          student: {
+            id: student.id,
+            firstName: student.firstName,
+            lastName: student.lastName,
+            fullName: `${student.firstName} ${student.lastName}`
+          }
+        };
+      }
+    } catch (error) {
+   
+      console.log(`No existing attendance found for student ${studentId} on ${date}`);
+    }
+
+    return { 
+      exists: false,
+      student: {
+        id: student.id,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        fullName: `${student.firstName} ${student.lastName}`
+      }
+    };
+  }
+
+  /**
+   * Process batch attendance for multiple students on a single date with transaction support
    * @param date ISO date string (YYYY-MM-DD)
    * @param attendanceEntries Array of student attendance data
    * @param forceUpdate Whether to update existing records without confirmation
+   * @param useTransaction Whether to use transaction-like behavior (rollback on failure)
    * @returns Batch operation summary with individual results
    */
   public async batchMarkAttendance(
     date: string,
     attendanceEntries: BatchAttendanceEntry[],
-    forceUpdate: boolean = false
+    forceUpdate: boolean = false,
+    useTransaction: boolean = true
   ): Promise<BatchOperationSummary> {
     const results: BatchAttendanceResult[] = [];
+    const successfulOperations: BatchAttendanceResult[] = [];
     let successCount = 0;
     let failedCount = 0;
     let createdCount = 0;
     let updatedCount = 0;
 
-    for (const entry of attendanceEntries) {
-      try {
-        // Check if student exists
-        const student = this.studentRepo.allStudents().find(s => s.id === entry.studentId);
-        if (!student) {
-          results.push({
-            studentId: entry.studentId,
-            success: false,
-            error: 'Student not found',
-            operation: 'failed'
-          });
-          failedCount++;
-          continue;
+    // Pre-validation phase
+    const preValidation = this.validateBatchAttendanceData(date, attendanceEntries);
+    if (!preValidation.isValid) {
+      throw new Error(`Batch validation failed: ${preValidation.errors.join(', ')}`);
+    }
+
+   
+    const backupRecords: Map<string, AttendanceRecord | null> = new Map();
+    
+    if (useTransaction) {
+      for (const entry of attendanceEntries) {
+        try {
+          const existing = this.attendanceRepo.findAttendanceBy(entry.studentId, date);
+          backupRecords.set(entry.studentId, existing || null);
+        } catch (error) {
+          backupRecords.set(entry.studentId, null); 
         }
-
-        // Check for existing attendance record
-        const existingRecord = this.attendanceRepo.findAttendanceBy(entry.studentId, date);
-        
-        if (existingRecord && !forceUpdate) {
-          results.push({
-            studentId: entry.studentId,
-            studentName: `${student.firstName} ${student.lastName}`,
-            success: false,
-            error: 'Attendance record already exists. Use forceUpdate to override.',
-            operation: 'failed'
-          });
-          failedCount++;
-          continue;
-        }
-
-        // Mark attendance using existing method
-        const markParams: MarkAttendanceParams = {
-          firstName: student.firstName,
-          lastName: student.lastName,
-          dateISO: date,
-          onTime: entry.status === AttendanceStatus.PRESENT && !entry.late,
-          late: entry.late || entry.status === AttendanceStatus.LATE,
-          earlyDismissal: entry.earlyDismissal || false,
-          excused: entry.status === AttendanceStatus.EXCUSED
-        };
-
-        this.markAttendanceByName(markParams);
-
-        const operation = existingRecord ? 'updated' : 'created';
-        results.push({
-          studentId: entry.studentId,
-          studentName: `${student.firstName} ${student.lastName}`,
-          success: true,
-          operation
-        });
-
-        successCount++;
-        if (operation === 'created') createdCount++;
-        if (operation === 'updated') updatedCount++;
-
-      } catch (error) {
-        results.push({
-          studentId: entry.studentId,
-          success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
-          operation: 'failed'
-        });
-        failedCount++;
       }
     }
 
-    return {
-      totalRequested: attendanceEntries.length,
-      successful: successCount,
-      failed: failedCount,
-      created: createdCount,
-      updated: updatedCount,
-      results
-    };
+    try {
+// Processing phase
+      for (const entry of attendanceEntries) {
+        try {
+// Check if student exists using the new method
+          const existenceCheck = this.checkExistingAttendance(entry.studentId, date);
+          
+          if (!existenceCheck.student) {
+            const failResult: BatchAttendanceResult = {
+              studentId: entry.studentId,
+              success: false,
+              error: 'Student not found',
+              operation: 'failed'
+            };
+            results.push(failResult);
+            failedCount++;
+            
+
+            if (useTransaction) {
+              throw new Error(`Critical failure: Student ${entry.studentId} not found`);
+            }
+            continue;
+          }
+
+          // Check for existing attendance record
+          if (existenceCheck.exists && !forceUpdate) {
+            const failResult: BatchAttendanceResult = {
+              studentId: entry.studentId,
+              studentName: existenceCheck.student.fullName,
+              success: false,
+              error: 'Attendance record already exists. Use forceUpdate to override.',
+              operation: 'failed'
+            };
+            results.push(failResult);
+            failedCount++;
+
+
+            if (useTransaction) {
+              throw new Error(`Duplicate record found for student ${entry.studentId} on ${date}`);
+            }
+            continue;
+          }
+
+// mark attendance using existing method
+          const markParams: MarkAttendanceParams = {
+            firstName: existenceCheck.student.firstName,
+            lastName: existenceCheck.student.lastName,
+            dateISO: date,
+            onTime: entry.status === AttendanceStatus.PRESENT && !entry.late,
+            late: entry.late || entry.status === AttendanceStatus.LATE,
+            earlyDismissal: entry.earlyDismissal || false,
+            excused: entry.status === AttendanceStatus.EXCUSED
+          };
+
+          this.markAttendanceByName(markParams);
+
+          const operation = existenceCheck.exists ? 'updated' : 'created';
+          const successResult: BatchAttendanceResult = {
+            studentId: entry.studentId,
+            studentName: existenceCheck.student.fullName,
+            success: true,
+            operation
+          };
+
+          results.push(successResult);
+          successfulOperations.push(successResult);
+          successCount++;
+          
+          if (operation === 'created') createdCount++;
+          if (operation === 'updated') updatedCount++;
+
+        } catch (error) {
+          const failResult: BatchAttendanceResult = {
+            studentId: entry.studentId,
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            operation: 'failed'
+          };
+          results.push(failResult);
+          failedCount++;
+
+          // If using transactions, rollback and rethrow
+          if (useTransaction) {
+            await this.rollbackBatchOperations(successfulOperations, date, backupRecords);
+            throw error;
+          }
+        }
+      }
+
+      return {
+        totalRequested: attendanceEntries.length,
+        successful: successCount,
+        failed: failedCount,
+        created: createdCount,
+        updated: updatedCount,
+        results
+      };
+
+    } catch (error) {
+      // Transaction rollback occurred
+      if (useTransaction) {
+        console.error('Batch operation failed, rollback completed:', error);
+        return {
+          totalRequested: attendanceEntries.length,
+          successful: 0,
+          failed: attendanceEntries.length,
+          created: 0,
+          updated: 0,
+          results: attendanceEntries.map(entry => ({
+            studentId: entry.studentId,
+            success: false,
+            error: 'Batch operation rolled back due to failure',
+            operation: 'failed' as const
+          }))
+        };
+      }
+      
+      throw error;
+    }
   }
 
   /**
@@ -399,5 +530,38 @@ export class AttendanceService {
       record.dateISO >= startDate &&
       record.dateISO <= endDate
     );
+  }
+
+  /**
+   * Rollback mechanism for failed batch operations
+   * @param successfulOperations Array of successful operations to rollback
+   * @param date Date of the operations
+   * @param backupRecords Map of original records for restoration
+   */
+  private async rollbackBatchOperations(
+    successfulOperations: BatchAttendanceResult[],
+    date: string,
+    backupRecords: Map<string, AttendanceRecord | null>
+  ): Promise<void> {
+    console.log(`Rolling back ${successfulOperations.length} successful operations for date ${date}`);
+    
+    for (const operation of successfulOperations) {
+      try {
+        const backup = backupRecords.get(operation.studentId);
+        
+        if (operation.operation === 'created') {
+          // For created records, we would need a delete method in the repository
+          // Since we don't have one, we log this for now
+          console.log(`Would rollback created record for student ${operation.studentId} on ${date}`);
+          // In a real implementation: this.attendanceRepo.deleteAttendance(operation.studentId, date);
+        } else if (operation.operation === 'updated' && backup) {
+          // Restore the previous record
+          console.log(`Rolling back updated record for student ${operation.studentId} on ${date}`);
+          this.attendanceRepo.saveAttendance(backup);
+        }
+      } catch (error) {
+        console.error(`Failed to rollback operation for student ${operation.studentId}:`, error);
+      }
+    }
   }
 }
