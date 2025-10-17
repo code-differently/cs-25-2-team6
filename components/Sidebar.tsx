@@ -1,13 +1,15 @@
+"use client"
+
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import './Sidebar.css'
 
 export default function Sidebar() {
-  const router = useRouter()
+  const pathname = usePathname()
   
   // Function to check if link is active
   const isActive = (path: string) => {
-    return router.pathname === path
+    return pathname === path
   }
 
   return (
@@ -21,10 +23,10 @@ export default function Sidebar() {
         <span className="breadcrumb-item">Home</span>
         <span className="breadcrumb-separator">›</span>
         <span className="breadcrumb-current">
-          {router.pathname === '/' && 'Calendar'}
-          {router.pathname === '/attendance' && 'Attendance'}
-          {router.pathname === '/reports' && 'Reports'}
-          {router.pathname === '/settings' && 'Settings'}
+          {pathname === '/' && 'Calendar'}
+          {pathname === '/attendance' && 'Attendance'}
+          {pathname === '/reports' && 'Reports'}
+          {pathname === '/settings' && 'Settings'}
         </span>
       </div>
       
@@ -33,6 +35,11 @@ export default function Sidebar() {
           <li>
             <Link href="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
               📅 Calendar
+            </Link>
+          </li>
+          <li>
+            <Link href="/attendance" className={`nav-link ${isActive('/attendance') ? 'active' : ''}`}>
+              ✅ Attendance
             </Link>
           </li>
           <li>
