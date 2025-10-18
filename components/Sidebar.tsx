@@ -18,18 +18,6 @@ export default function Sidebar() {
         <h2>Dashboard</h2>
       </div>
       
-      {/* Breadcrumb Navigation */}
-      <div className="breadcrumb">
-        <span className="breadcrumb-item">Home</span>
-        <span className="breadcrumb-separator">›</span>
-        <span className="breadcrumb-current">
-          {pathname === '/' && 'Calendar'}
-          {pathname === '/attendance' && 'Attendance'}
-          {pathname === '/reports' && 'Reports'}
-          {pathname === '/settings' && 'Settings'}
-        </span>
-      </div>
-      
       <nav className="sidebar-nav">
         <ul>
           <li>
