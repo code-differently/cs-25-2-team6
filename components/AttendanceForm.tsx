@@ -8,6 +8,9 @@ interface AttendanceFormProps {
 
 function AttendanceForm({ isOpen, onClose }: AttendanceFormProps) {
   const [selectedStudents, setSelectedStudents] = useState([true, true, true, true, false]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
   const students = ['Bob Smith', 'Charlie Brown', 'Diana Martinez', 'Ethan Williams', 'Fiona Lee'];
 
   const toggleStudent = (index: number) => {
@@ -33,6 +36,25 @@ function AttendanceForm({ isOpen, onClose }: AttendanceFormProps) {
   };
 
   const selectedCount = selectedStudents.filter(s => s).length;
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    setMessage('');
+    setIsError(false);
+
+    try {
+      // Simulate saving attendance (replace with real API call later)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setMessage('Attendance saved successfully!');
+      setIsError(false);
+    } catch (error) {
+      setMessage('Failed to save attendance. Please try again.');
+      setIsError(true);
+    }
+    
+    setIsLoading(false);
+  };
 
   // Don't show modal if not open
   if (!isOpen) {
@@ -62,6 +84,12 @@ function AttendanceForm({ isOpen, onClose }: AttendanceFormProps) {
               {selectedCount === 0 ? 'Select All' : 'Deselect All'}
             </button>
           </div>
+
+          {message && (
+            <div className={isError ? 'error-message' : 'success-message'}>
+              {message}
+            </div>
+          )}
 
           <div className="bulk-actions">
             <span className="selected-count">{selectedCount} students selected</span>
@@ -97,7 +125,13 @@ function AttendanceForm({ isOpen, onClose }: AttendanceFormProps) {
 
         <div className="modal-footer">
           <button className="cancel-btn" onClick={onClose}>Cancel</button>
-          <button className="submit-btn">✓ Submit Attendance</button>
+          <button 
+            className="submit-btn" 
+            onClick={handleSubmit}
+            disabled={isLoading}
+          >
+            {isLoading ? '⏳ Saving...' : '✓ Submit Attendance'}
+          </button>
         </div>
       </div>
     </div>
