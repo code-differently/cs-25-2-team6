@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-// Use edge runtime for better Vercel compatibility
-export const runtime = 'edge';
+// Use standard Node.js runtime for better compatibility  
+export const runtime = 'nodejs';
 
 // In-memory storage for attendance records (temporary solution)
 // TODO: Replace with Supabase once deployment is stable
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
         // Create attendance record
         const attendanceRecord = {
-          id: `ATT_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `ATT_${Date.now()}_${Math.floor(Math.random() * 1000000)}`,
           studentId: student.id,
           studentName: `${studentRecord.firstName} ${studentRecord.lastName}`,
           date: validatedData.date,

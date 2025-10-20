@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-// Use edge runtime for better Vercel compatibility and performance
-export const runtime = 'edge';
+// Use standard Node.js runtime for better compatibility
+export const runtime = 'nodejs';
 
 // In-memory storage for Vercel deployment (temporary solution)
 // TODO: Replace with Supabase once deployment is stable
