@@ -144,4 +144,240 @@ export class ReportService {
       .filter(s => s.lastName.toLowerCase() === lastName.toLowerCase())
       .map(s => s.id);
   }
+
+  // Methods for report generation, filtering, aggregation, sorting, and pagination
+
+  
+  generateFilteredReport(filters: {
+    studentIds?: string[];
+    classIds?: string[];
+    dateFrom?: string;
+    dateTo?: string;
+    statuses?: AttendanceStatus[];
+    relativePeriod?: string;
+  }) {
+    let records = this.attendanceRepo.allAttendance();
+    const students = this.studentRepo.allStudents();
+
+  // Filters
+    if (filters.studentIds && filters.studentIds.length > 0) {
+      records = records.filter(record => filters.studentIds!.includes(record.studentId));
+    }
+
+    if (filters.dateFrom) {
+      records = records.filter(record => record.dateISO >= filters.dateFrom!);
+    }
+
+    if (filters.dateTo) {
+      records = records.filter(record => record.dateISO <= filters.dateTo!);
+    }
+
+    if (filters.statuses && filters.statuses.length > 0) {
+      records = records.filter(record => filters.statuses!.includes(record.status));
+    }
+
+  // Handle relative periods
+    if (filters.relativePeriod) {
+      const dateRange = this.calculateRelativeDateRange(filters.relativePeriod);
+      records = records.filter(record => 
+        record.dateISO >= dateRange.start && record.dateISO <= dateRange.end
+      );
+    }
+
+    return {
+      records,
+      totalRecords: records.length,
+      optimizations: ['basic-filtering']
+    };
+  }
+
+  //aggregation logic
+  calculateAggregations(
+    records: AttendanceRecord[], 
+    aggregationTypes: string[], 
+    groupBy: string[]
+  ) {
+    const students = this.studentRepo.allStudents();
+    const aggregations: any = {};
+
+    if (aggregationTypes.includes('count')) {
+      aggregations.counts = {
+        total: records.length,
+        present: records.filter(r => r.status === AttendanceStatus.PRESENT).length,
+        absent: records.filter(r => r.status === AttendanceStatus.ABSENT).length,
+        late: records.filter(r => r.status === AttendanceStatus.LATE).length,
+        excused: records.filter(r => r.status === AttendanceStatus.EXCUSED).length
+      };
+    }
+
+    if (aggregationTypes.includes('percentage')) {
+      const total = records.length;
+      if (total > 0) {
+        aggregations.percentages = {
+          present: Math.round((aggregations.counts.present / total) * 100),
+          absent: Math.round((aggregations.counts.absent / total) * 100),
+          late: Math.round((aggregations.counts.late / total) * 100),
+          excused: Math.round((aggregations.counts.excused / total) * 100)
+        };
+      }
+    }
+
+    // Group by student 
+    if (groupBy.includes('student')) {
+      aggregations.byStudent = this.groupRecordsByStudent(records, students);
+    }
+
+    return aggregations;
+  }
+
+  
+  sortRecords(records: AttendanceRecord[], sortBy: string, sortOrder: string) {
+    const students = this.studentRepo.allStudents();
+    
+    return records.sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'name':
+          const studentA = students.find(s => s.id === a.studentId);
+          const studentB = students.find(s => s.id === b.studentId);
+          const nameA = studentA ? `${studentA.firstName} ${studentA.lastName}` : '';
+          const nameB = studentB ? `${studentB.firstName} ${studentB.lastName}` : '';
+          comparison = nameA.localeCompare(nameB);
+          break;
+        case 'date':
+          comparison = a.dateISO.localeCompare(b.dateISO);
+          break;
+        case 'status':
+          comparison = a.status.localeCompare(b.status);
+          break;
+        default:
+          comparison = a.dateISO.localeCompare(b.dateISO);
+      }
+      
+      return sortOrder === 'desc' ? -comparison : comparison;
+    });
+  }
+
+  // Paginate records
+  paginateRecords(records: AttendanceRecord[], page: number, limit: number) {
+    const offset = (page - 1) * limit;
+    const paginatedRecords = records.slice(offset, offset + limit);
+    
+    return {
+      records: paginatedRecords,
+      pagination: {
+        page,
+        limit,
+        total: records.length,
+        hasNext: offset + limit < records.length,
+        hasPrev: page > 1
+      }
+    };
+  }
+
+  // Validate student IDs exist
+  async validateStudentIds(studentIds: string[]): Promise<string[]> {
+    const students = this.studentRepo.allStudents();
+    const validIds = students.map(s => s.id);
+    return studentIds.filter(id => validIds.includes(id));
+  }
+
+  
+  // Validate class IDs exist 
+   
+  async validateClassIds(classIds: string[]): Promise<string[]> {
+    
+    return [];
+  }
+
+  // convert records to CSV format
+  async convertToCSV(records: any[]): Promise<string> {
+    if (records.length === 0) {
+      return 'No data available';
+    }
+
+    const headers = Object.keys(records[0]);
+    const csvRows = records.map(record => 
+      headers.map(header => `"${record[header]}"`).join(',')
+    );
+    
+    return [headers.join(','), ...csvRows].join('\n');
+  }
+
+  // Helper methods
+
+  private calculateRelativeDateRange(period: string): { start: string; end: string } {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    let startDate: Date;
+    
+    switch (period) {
+      case '7days':
+        startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case '30days':
+        startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case '90days':
+        startDate = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
+        break;
+      case 'semester':
+        startDate = new Date(today.getTime() - 180 * 24 * 60 * 60 * 1000);
+        break;
+      case 'year':
+        startDate = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+    }
+    
+    return {
+      start: startDate.toISOString().split('T')[0],
+      end: today.toISOString().split('T')[0]
+    };
+  }
+
+  private groupRecordsByStudent(records: AttendanceRecord[], students: any[]) {
+    const grouped: any = {};
+    
+    records.forEach(record => {
+      const student = students.find(s => s.id === record.studentId);
+      if (!student) return;
+      
+      const studentName = `${student.firstName} ${student.lastName}`;
+      
+      if (!grouped[studentName]) {
+        grouped[studentName] = {
+          studentId: record.studentId,
+          studentName,
+          totalDays: 0,
+          present: 0,
+          absent: 0,
+          late: 0,
+          excused: 0
+        };
+      }
+      
+      grouped[studentName].totalDays++;
+      
+      switch (record.status) {
+        case AttendanceStatus.PRESENT:
+          grouped[studentName].present++;
+          break;
+        case AttendanceStatus.ABSENT:
+          grouped[studentName].absent++;
+          break;
+        case AttendanceStatus.LATE:
+          grouped[studentName].late++;
+          break;
+        case AttendanceStatus.EXCUSED:
+          grouped[studentName].excused++;
+          break;
+      }
+    });
+    
+    return Object.values(grouped);
+  }
 }
