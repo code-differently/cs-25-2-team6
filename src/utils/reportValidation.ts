@@ -4,15 +4,17 @@
  */
 
 import { ZodError } from 'zod';
+import { AttendanceStatus } from '../domains/AttendanceStatus';
 import { 
   ReportFiltersSchema, 
+  LegacyReportFiltersSchema,
   type ReportFilters, 
+  type LegacyReportFilters,
   type DateRange,
   DateRangeSchema,
   PaginationSchema,
   type Pagination
 } from '../types/reports';
-import { AttendanceStatus } from '../domains/AttendanceStatus';
 
 export interface ValidationResult<T> {
   isValid: boolean;
@@ -319,6 +321,62 @@ export function getDefaultReportFilters(): ReportFilters {
       sortOrder: 'desc' as const
     }
   };
+}
+
+/**
+ * Validates legacy report filters for existing ReportService compatibility
+ */
+export function validateLegacyReportFilters(filters: unknown): ValidationResult<LegacyReportFilters> {
+  try {
+    const validatedFilters = LegacyReportFiltersSchema.parse(filters);
+    
+    return {
+      isValid: true,
+      data: validatedFilters,
+      errors: [],
+      warnings: []
+    };
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return {
+        isValid: false,
+        data: null,
+        errors: formatZodErrors(error),
+        warnings: []
+      };
+    }
+    
+    return {
+      isValid: false,
+      data: null,
+      errors: ['Unexpected validation error occurred'],
+      warnings: []
+    };
+  }
+}
+
+/**
+ * Converts new ReportFilters format to legacy format for ReportService compatibility
+ */
+export function convertToLegacyFilters(filters: ReportFilters): LegacyReportFilters {
+  const legacy: LegacyReportFilters = {};
+  
+  // Convert student selection to lastName
+  if (filters.studentSelection?.searchQuery) {
+    legacy.lastName = filters.studentSelection.searchQuery;
+  }
+  
+  // Convert attendance status array to single status (take first one)
+  if (filters.attendanceStatus && filters.attendanceStatus.length > 0) {
+    legacy.status = filters.attendanceStatus[0];
+  }
+  
+  // Convert date range to single date (use start date)
+  if (filters.dateRange) {
+    legacy.dateISO = filters.dateRange.startDate;
+  }
+  
+  return legacy;
 }
 
 /**

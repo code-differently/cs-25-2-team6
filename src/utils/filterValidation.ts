@@ -8,11 +8,13 @@ import {
   FilterType,
   StudentNameFilterSchema,
   MultiSelectFilterSchema,
-  AdvancedFilterOptionsSchema,
+  LateListFilterSchema,
+  EarlyDismissalFilterSchema,
   FilterValidationStateSchema,
   type StudentNameFilter,
   type MultiSelectFilter,
-  type AdvancedFilterOptions,
+  type LateListFilter,
+  type EarlyDismissalFilter,
   type FilterValidationState
 } from '../types/filters';
 
@@ -112,7 +114,7 @@ export function validateMultiSelectFilter(filter: unknown): FilterValidationResu
       return {
         isValid: false,
         data: null,
-        errors: [`Too many selections (max: ${validatedFilter.maxSelections})`],
+        errors: [`Too many selections (maximum: ${validatedFilter.maxSelections})`],
         warnings
       };
     }
@@ -143,29 +145,22 @@ export function validateMultiSelectFilter(filter: unknown): FilterValidationResu
 }
 
 /**
- * Validates advanced filter options
+ * Validates late list filter according to User Story 2 acceptance criteria
  */
-export function validateAdvancedFilterOptions(options: unknown): FilterValidationResult<AdvancedFilterOptions> {
+export function validateLateListFilter(filter: unknown): FilterValidationResult<LateListFilter> {
   try {
-    const validatedOptions = AdvancedFilterOptionsSchema.parse(options);
+    const validatedFilter = LateListFilterSchema.parse(filter);
     
     const warnings: string[] = [];
     
-    if (validatedOptions.debounceDelay < 100) {
-      warnings.push('Very low debounce delay may cause excessive API calls');
-    }
-    
-    if (validatedOptions.debounceDelay > 2000) {
-      warnings.push('High debounce delay may feel unresponsive to users');
-    }
-    
-    if (validatedOptions.clientSideThreshold < 100) {
-      warnings.push('Low client-side threshold may cause frequent server requests');
+    // Warn if both date and lastName provided (might be overly restrictive)
+    if (validatedFilter.dateISO && validatedFilter.lastName) {
+      warnings.push('Filtering by both date and last name may return very limited results');
     }
     
     return {
       isValid: true,
-      data: validatedOptions,
+      data: validatedFilter,
       errors: [],
       warnings
     };
@@ -182,7 +177,46 @@ export function validateAdvancedFilterOptions(options: unknown): FilterValidatio
     return {
       isValid: false,
       data: null,
-      errors: ['Invalid advanced filter options'],
+      errors: ['Invalid late list filter'],
+      warnings: []
+    };
+  }
+}
+
+/**
+ * Validates early dismissal filter according to User Story 2 acceptance criteria
+ */
+export function validateEarlyDismissalFilter(filter: unknown): FilterValidationResult<EarlyDismissalFilter> {
+  try {
+    const validatedFilter = EarlyDismissalFilterSchema.parse(filter);
+    
+    const warnings: string[] = [];
+    
+    // Warn if both date and lastName provided (might be overly restrictive)
+    if (validatedFilter.dateISO && validatedFilter.lastName) {
+      warnings.push('Filtering by both date and last name may return very limited results');
+    }
+    
+    return {
+      isValid: true,
+      data: validatedFilter,
+      errors: [],
+      warnings
+    };
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return {
+        isValid: false,
+        data: null,
+        errors: error.issues.map(issue => issue.message),
+        warnings: []
+      };
+    }
+    
+    return {
+      isValid: false,
+      data: null,
+      errors: ['Invalid early dismissal filter'],
       warnings: []
     };
   }

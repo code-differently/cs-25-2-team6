@@ -41,7 +41,7 @@ export const DateRangeSchema = z.object({
 
 export const StudentSelectionSchema = z.object({
   studentIds: z.array(z.string().min(1, 'Student ID cannot be empty')).optional(),
-  searchQuery: z.string().max(100, 'Search query too long').optional(),
+  searchQuery: z.string().max(100, 'Search query is too long').optional(),
   classIds: z.array(z.string().min(1, 'Class ID cannot be empty')).optional()
 });
 
@@ -59,13 +59,20 @@ export const ReportFiltersSchema = z.object({
   pagination: PaginationSchema.optional()
 });
 
+// Compatibility schema for existing ReportService interface
+export const LegacyReportFiltersSchema = z.object({
+  lastName: z.string().optional(),
+  status: AttendanceStatusSchema.optional(),
+  dateISO: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').optional()
+});
+
 export const PresetRangeSchema = z.enum([
   'thisWeek',
   'lastWeek', 
   'thisMonth',
   'lastMonth',
   'thisYear',
-  'ytd', // Year to date
+  'ytd',
   'custom'
 ]);
 
@@ -89,7 +96,7 @@ export const ReportSummarySchema = z.object({
   excusedCount: z.number(),
   earlyDismissalCount: z.number(),
   dateRange: DateRangeSchema,
-  generatedAt: z.string() // ISO timestamp
+  generatedAt: z.string()
 });
 
 export const ValidationResultSchema = z.object({
@@ -104,6 +111,7 @@ export type DateRange = z.infer<typeof DateRangeSchema>;
 export type StudentSelection = z.infer<typeof StudentSelectionSchema>;
 export type Pagination = z.infer<typeof PaginationSchema>;
 export type ReportFilters = z.infer<typeof ReportFiltersSchema>;
+export type LegacyReportFilters = z.infer<typeof LegacyReportFiltersSchema>;
 export type PresetRange = z.infer<typeof PresetRangeSchema>;
 export type ReportData = z.infer<typeof ReportDataSchema>;
 export type ReportSummary = z.infer<typeof ReportSummarySchema>;

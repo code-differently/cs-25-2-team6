@@ -38,7 +38,6 @@ export function validateDateRange(startDate: Date, endDate: Date): boolean {
     return false;
   }
   
-  // Maximum 1 year range
   const oneYearMs = 365 * 24 * 60 * 60 * 1000;
   const rangeDuration = endDate.getTime() - startDate.getTime();
   if (rangeDuration > oneYearMs) {
