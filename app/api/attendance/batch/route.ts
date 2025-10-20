@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { AttendanceService } from '@/src/services/AttendanceService';
-import { FileAttendanceRepo } from '@/src/persistence/FileAttendanceRepo';
-import { FileStudentRepo } from '@/src/persistence/FileStudentRepo';
-import { AttendanceStatus } from '@/src/domains/AttendanceStatus';
+
+// Use edge runtime for better Vercel compatibility
+export const runtime = 'edge';
+
+// In-memory storage for attendance records (temporary solution)
+// TODO: Replace with Supabase once deployment is stable
+let attendanceStore: any[] = [];
+
+// Mock students data (same as in students API)
+const studentsStore: any[] = [
+  { id: 'STU001', firstName: 'Alice', lastName: 'Johnson', grade: '7th' },
+  { id: 'STU002', firstName: 'Bob', lastName: 'Smith', grade: '8th' },
+  { id: 'STU003', firstName: 'Carol', lastName: 'Davis', grade: '7th' },
+  { id: 'STU004', firstName: 'David', lastName: 'Wilson', grade: '9th' },
+  { id: 'STU005', firstName: 'Emma', lastName: 'Brown', grade: '8th' }
+];
 
 // Zod validation schema for batch attendance request
 const BatchAttendanceSchema = z.object({
@@ -16,38 +28,31 @@ const BatchAttendanceSchema = z.object({
   })).min(1, "At least one student must be selected")
 });
 
-// Initialize  attendance services 
-const attendanceService = new AttendanceService();
-
 export async function POST(request: NextRequest) {
   try {
-    
     const body = await request.json();
     const validatedData = BatchAttendanceSchema.parse(body);
 
-// Check for existing attendance records 
-    const attendanceRepo = new FileAttendanceRepo();
+    // Check for existing attendance records in memory
     const existingRecords = [];
     for (const student of validatedData.students) {
-      try {
-        const existing = attendanceRepo.findAttendanceBy(student.id, validatedData.date);
-        if (existing) {
-          existingRecords.push({
-            studentId: student.id,
-            existingStatus: existing.status,
-            existingRecord: {
-              late: existing.late,
-              earlyDismissal: existing.earlyDismissal
-            }
-          });
-        }
-      } catch (error) {
-// Student might not exist
-        console.warn(`Could not check existing attendance for student ${student.id}:`, error);
+      const existing = attendanceStore.find((record: any) => 
+        record.studentId === student.id && record.date === validatedData.date
+      );
+      
+      if (existing) {
+        existingRecords.push({
+          studentId: student.id,
+          existingStatus: existing.status,
+          existingRecord: {
+            late: existing.late,
+            earlyDismissal: existing.earlyDismissal
+          }
+        });
       }
     }
 
-// If duplicates found, return conflict response for teacher confirmation 
+    // If duplicates found, return conflict response for teacher confirmation 
     if (existingRecords.length > 0) {
       return NextResponse.json({
         success: false,
@@ -59,16 +64,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Process batch attendance submission
-    const studentRepo = new FileStudentRepo();
     const results = [];
     let successCount = 0;
     let errorCount = 0;
 
     for (const student of validatedData.students) {
       try {
-// Find student by ID to get their name for the service
-        const allStudents = studentRepo.allStudents();
-        const studentRecord = allStudents.find(s => s.id === student.id);
+        // Find student by ID to get their name
+        const studentRecord = studentsStore.find((s: any) => s.id === student.id);
         
         if (!studentRecord) {
           results.push({
@@ -80,18 +83,21 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-// Use the existing service method 
-        const markAttendanceParams = {
-          firstName: studentRecord.firstName,
-          lastName: studentRecord.lastName,
-          dateISO: validatedData.date,
-          onTime: student.status === 'PRESENT' && !student.late,
+        // Create attendance record
+        const attendanceRecord = {
+          id: `ATT_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          studentId: student.id,
+          studentName: `${studentRecord.firstName} ${studentRecord.lastName}`,
+          date: validatedData.date,
+          status: student.status,
           late: student.late || student.status === 'LATE',
           earlyDismissal: student.earlyDismissal,
-          excused: student.status === 'EXCUSED'
+          excused: student.status === 'EXCUSED',
+          createdAt: new Date().toISOString()
         };
 
-        attendanceService.markAttendanceByName(markAttendanceParams);
+        // Save to in-memory storage
+        attendanceStore.push(attendanceRecord);
         
         results.push({
           studentId: student.id,
@@ -110,7 +116,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    
     return NextResponse.json({
       success: true,
       message: `Batch attendance processed: ${successCount} successful, ${errorCount} failed`,

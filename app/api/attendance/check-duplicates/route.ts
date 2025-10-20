@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { FileAttendanceRepo } from '@/src/persistence/FileAttendanceRepo';
-import { FileStudentRepo } from '@/src/persistence/FileStudentRepo';
+
+// Use edge runtime for better Vercel compatibility
+export const runtime = 'edge';
+
+// In-memory storage (same as batch API)
+let attendanceStore: any[] = [];
+
+// Mock students data
+const studentsStore: any[] = [
+  { id: 'STU001', firstName: 'Alice', lastName: 'Johnson', grade: '7th' },
+  { id: 'STU002', firstName: 'Bob', lastName: 'Smith', grade: '8th' },
+  { id: 'STU003', firstName: 'Carol', lastName: 'Davis', grade: '7th' },
+  { id: 'STU004', firstName: 'David', lastName: 'Wilson', grade: '9th' },
+  { id: 'STU005', firstName: 'Emma', lastName: 'Brown', grade: '8th' }
+];
 
 // Zod validation schema for duplicate check 
 const DuplicateCheckSchema = z.object({
@@ -15,43 +28,35 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { date, studentIds } = DuplicateCheckSchema.parse(body);
 
-    
-    const attendanceRepo = new FileAttendanceRepo();
-    const studentRepo = new FileStudentRepo();
-    const allStudents = studentRepo.allStudents();
-
-// Check each student for existing attendance and validity
+    // Check each student for existing attendance and validity
     const duplicates = [];
     const nonExistentStudents = [];
 
     for (const studentId of studentIds) {
-     
-      const studentRecord = allStudents.find(s => s.id === studentId);
+      // Find student in mock data
+      const studentRecord = studentsStore.find((s: any) => s.id === studentId);
       
       if (!studentRecord) {
         nonExistentStudents.push(studentId);
         continue;
       }
 
-// Check for existing attendance record
-      try {
-        const existingRecord = attendanceRepo.findAttendanceBy(studentId, date);
-        
-        if (existingRecord) {
-          duplicates.push({
-            studentId: studentId,
-            studentName: `${studentRecord.firstName} ${studentRecord.lastName}`,
-            existingRecord: {
-              status: existingRecord.status,
-              late: existingRecord.late,
-              earlyDismissal: existingRecord.earlyDismissal,
-              excused: existingRecord.excused
-            }
-          });
-        }
-      } catch (error) {
-       
-        console.log(`No existing attendance found for student ${studentId} on ${date}`);
+      // Check for existing attendance record in memory
+      const existingRecord = attendanceStore.find((record: any) => 
+        record.studentId === studentId && record.date === date
+      );
+      
+      if (existingRecord) {
+        duplicates.push({
+          studentId: studentId,
+          studentName: `${studentRecord.firstName} ${studentRecord.lastName}`,
+          existingRecord: {
+            status: existingRecord.status,
+            late: existingRecord.late,
+            earlyDismissal: existingRecord.earlyDismissal,
+            excused: existingRecord.excused
+          }
+        });
       }
     }
 

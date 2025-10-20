@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { FileStudentRepo } from '@/src/persistence/FileStudentRepo';
 
-// Temporarily comment out Supabase import until dependency issue is resolved
-// import { supabase } from '@/src/lib/supabase';
+// Use edge runtime for better Vercel compatibility and performance
+export const runtime = 'edge';
+
+// In-memory storage for Vercel deployment (temporary solution)
+// TODO: Replace with Supabase once deployment is stable
+let studentsStore: any[] = [
+  { id: 'STU001', firstName: 'Alice', lastName: 'Johnson', grade: '7th' },
+  { id: 'STU002', firstName: 'Bob', lastName: 'Smith', grade: '8th' },
+  { id: 'STU003', firstName: 'Carol', lastName: 'Davis', grade: '7th' },
+  { id: 'STU004', firstName: 'David', lastName: 'Wilson', grade: '9th' },
+  { id: 'STU005', firstName: 'Emma', lastName: 'Brown', grade: '8th' }
+];
 
 // Utility functions for data transformation (will be used when Supabase is working)
 const transformSupabaseStudent = (supabaseStudent: any) => ({
@@ -51,16 +60,13 @@ export async function GET(request: NextRequest) {
 
     const validatedQuery = StudentsQuerySchema.parse(queryParams);
 
-    // Use file-based system (will add Supabase back later)
-    const studentRepo = new FileStudentRepo();
-    const allStudents = studentRepo.allStudents();
-    
-    let filteredStudents = allStudents;
+    // Use in-memory storage (serverless-compatible)
+    let filteredStudents = [...studentsStore];
 
     // Search filter 
     if (validatedQuery?.search) {
       const searchTerm = validatedQuery.search.toLowerCase();
-      filteredStudents = filteredStudents.filter(student => 
+      filteredStudents = filteredStudents.filter((student: any) => 
         `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchTerm) ||
         student.id.toLowerCase().includes(searchTerm)
       );
@@ -68,13 +74,13 @@ export async function GET(request: NextRequest) {
 
     // Grade filter (optional)
     if (validatedQuery?.grade) {
-      filteredStudents = filteredStudents.filter(student => 
-        (student as any).grade === validatedQuery.grade
+      filteredStudents = filteredStudents.filter((student: any) => 
+        student.grade === validatedQuery.grade
       );
     }
 
     // Sort students alphabetically by last name, then first name
-    filteredStudents.sort((a, b) => {
+    filteredStudents.sort((a: any, b: any) => {
       const lastNameComparison = a.lastName.localeCompare(b.lastName);
       if (lastNameComparison !== 0) return lastNameComparison;
       return a.firstName.localeCompare(b.firstName);
@@ -85,12 +91,12 @@ export async function GET(request: NextRequest) {
     const paginatedStudents = filteredStudents.slice(offset, offset + limit);
 
     // Transform data for frontend
-    const studentList = paginatedStudents.map(student => ({
+    const studentList = paginatedStudents.map((student: any) => ({
       id: student.id,
       firstName: student.firstName,
       lastName: student.lastName,
       fullName: `${student.firstName} ${student.lastName}`,
-      grade: (student as any).grade || undefined
+      grade: student.grade || undefined
     }));
 
     return NextResponse.json({
@@ -132,21 +138,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = CreateStudentSchema.parse(body);
 
-    // Check for duplicates in file system
-    const studentRepo = new FileStudentRepo();
-    const existingStudents = studentRepo.allStudents();
-    const existingFileStudent = existingStudents.find(s => s.id === validatedData.id);
+    // Check for duplicates in in-memory storage
+    const existingStudent = studentsStore.find((s: any) => s.id === validatedData.id);
     
-    if (existingFileStudent) {
+    if (existingStudent) {
       return NextResponse.json({
         success: false,
         error: 'DUPLICATE_ID',
         message: 'A student with this ID already exists',
         existingStudent: {
-          id: existingFileStudent.id,
-          firstName: existingFileStudent.firstName,
-          lastName: existingFileStudent.lastName,
-          grade: (existingFileStudent as any).grade || undefined
+          id: existingStudent.id,
+          firstName: existingStudent.firstName,
+          lastName: existingStudent.lastName,
+          grade: existingStudent.grade || undefined
         }
       }, { status: 409 });
     }
@@ -163,10 +167,10 @@ export async function POST(request: NextRequest) {
       newStudent.grade = validatedData.grade;
     }
 
-    // Save to file system
-    studentRepo.saveStudent(newStudent);
+    // Save to in-memory storage
+    studentsStore.push(newStudent);
 
-    // TODO: Add Supabase sync here once dependency issues are resolved
+    // TODO: Add Supabase sync here once deployment is stable
 
     return NextResponse.json({
       success: true,
