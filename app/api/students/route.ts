@@ -2,12 +2,32 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FileStudentRepo } from '@/src/persistence/FileStudentRepo';
 
+// Temporarily comment out Supabase import until dependency issue is resolved
+// import { supabase } from '@/src/lib/supabase';
+
+// Utility functions for data transformation (will be used when Supabase is working)
+const transformSupabaseStudent = (supabaseStudent: any) => ({
+  id: supabaseStudent.student_id,
+  firstName: supabaseStudent.first_name,
+  lastName: supabaseStudent.last_name,
+  fullName: `${supabaseStudent.first_name} ${supabaseStudent.last_name}`,
+  grade: supabaseStudent.grade_level || undefined
+});
+
+const transformToSupabaseStudent = (student: any) => ({
+  student_id: student.id,
+  first_name: student.firstName,
+  last_name: student.lastName,
+  grade_level: student.grade || null,
+  active: true
+});
+
 
 const StudentsQuerySchema = z.object({
   search: z.string().optional(), // Search by name
   grade: z.string().optional(),  // Filter by grade
-  limit: z.string().regex(/^\d+$/).optional().transform(val => val ? parseInt(val) : undefined),
-  offset: z.string().regex(/^\d+$/).optional().transform(val => val ? parseInt(val) : undefined)
+  limit: z.string().regex(/^\d+$/).optional().transform((val: string | undefined) => val ? parseInt(val) : undefined),
+  offset: z.string().regex(/^\d+$/).optional().transform((val: string | undefined) => val ? parseInt(val) : undefined)
 }).optional();
 
 // Validation schema for creating new students 
@@ -29,13 +49,11 @@ export async function GET(request: NextRequest) {
       offset: searchParams.get('offset') || undefined
     };
 
-    
     const validatedQuery = StudentsQuerySchema.parse(queryParams);
 
-    // Initialize repository
+    // Use file-based system (will add Supabase back later)
     const studentRepo = new FileStudentRepo();
     const allStudents = studentRepo.allStudents();
-
     
     let filteredStudents = allStudents;
 
@@ -62,12 +80,11 @@ export async function GET(request: NextRequest) {
       return a.firstName.localeCompare(b.firstName);
     });
 
-   
     const limit = validatedQuery?.limit || 100;
     const offset = validatedQuery?.offset || 0;
     const paginatedStudents = filteredStudents.slice(offset, offset + limit);
 
-// Transform data for frontend
+    // Transform data for frontend
     const studentList = paginatedStudents.map(student => ({
       id: student.id,
       firstName: student.firstName,
@@ -76,7 +93,6 @@ export async function GET(request: NextRequest) {
       grade: (student as any).grade || undefined
     }));
 
-    
     return NextResponse.json({
       success: true,
       students: studentList,
@@ -89,22 +105,19 @@ export async function GET(request: NextRequest) {
     }, { status: 200 });
 
   } catch (error) {
-
-//Error handling
-    
+    // Error handling
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
         error: 'VALIDATION_ERROR',
         message: 'Invalid query parameters',
-        details: error.issues.map((err: any) => ({
+        details: error.issues.map((err: z.ZodIssue) => ({
           field: err.path.join('.'),
           message: err.message
         }))
       }, { status: 400 });
     }
 
-    
     console.error('Students list API error:', error);
     return NextResponse.json({
       success: false,
@@ -119,39 +132,41 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = CreateStudentSchema.parse(body);
 
+    // Check for duplicates in file system
     const studentRepo = new FileStudentRepo();
-    
-    // Check if student ID already exists 
     const existingStudents = studentRepo.allStudents();
-    const existingStudent = existingStudents.find(s => s.id === validatedData.id);
+    const existingFileStudent = existingStudents.find(s => s.id === validatedData.id);
     
-    if (existingStudent) {
+    if (existingFileStudent) {
       return NextResponse.json({
         success: false,
         error: 'DUPLICATE_ID',
         message: 'A student with this ID already exists',
         existingStudent: {
-          id: existingStudent.id,
-          firstName: existingStudent.firstName,
-          lastName: existingStudent.lastName,
-          grade: (existingStudent as any).grade || undefined
+          id: existingFileStudent.id,
+          firstName: existingFileStudent.firstName,
+          lastName: existingFileStudent.lastName,
+          grade: (existingFileStudent as any).grade || undefined
         }
       }, { status: 409 });
     }
 
-   
+    // Create student object
     const newStudent: any = {
       id: validatedData.id,
       firstName: validatedData.firstName,
       lastName: validatedData.lastName
     };
 
-    // Add grade (optional)
+    // Add grade if provided
     if (validatedData.grade) {
       newStudent.grade = validatedData.grade;
     }
 
+    // Save to file system
     studentRepo.saveStudent(newStudent);
+
+    // TODO: Add Supabase sync here once dependency issues are resolved
 
     return NextResponse.json({
       success: true,
@@ -171,14 +186,13 @@ export async function POST(request: NextRequest) {
         success: false,
         error: 'VALIDATION_ERROR',
         message: 'Invalid student data',
-        details: error.issues.map((err: any) => ({
+        details: error.issues.map((err: z.ZodIssue) => ({
           field: err.path.join('.'),
           message: err.message
         }))
       }, { status: 400 });
     }
 
-   
     if (error instanceof SyntaxError) {
       return NextResponse.json({
         success: false,
