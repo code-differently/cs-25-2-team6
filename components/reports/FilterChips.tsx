@@ -9,45 +9,32 @@ interface FilterChipsProps {
 }
 
 function FilterChips({ filters, onRemoveFilter, onClearAll }: FilterChipsProps) {
+  // Create list of active filters - more beginner friendly
   const activeFilters: Array<{ type: string; label: string; value?: string }> = [];
 
-  // Add student name chips
-  filters.studentNames.forEach(name => {
-    activeFilters.push({
-      type: 'studentNames',
-      label: `Student: ${name}`,
-      value: name
-    });
-  });
+  // Add student chips
+  for (const name of filters.studentNames) {
+    activeFilters.push({ type: 'studentNames', label: `Student: ${name}`, value: name });
+  }
 
   // Add class chips
-  filters.classes.forEach(className => {
-    activeFilters.push({
-      type: 'classes',
-      label: `Class: ${className}`,
-      value: className
-    });
-  });
+  for (const className of filters.classes) {
+    activeFilters.push({ type: 'classes', label: `Class: ${className}`, value: className });
+  }
 
-  // Add attendance status chips
-  filters.attendanceStatuses.forEach(status => {
-    activeFilters.push({
-      type: 'attendanceStatuses',
-      label: `Status: ${status}`,
-      value: status
-    });
-  });
+  // Add status chips
+  for (const status of filters.attendanceStatuses) {
+    activeFilters.push({ type: 'attendanceStatuses', label: `Status: ${status}`, value: status });
+  }
 
-  // Add date range chip
+  // Add date range chip if dates are set
   if (filters.dateFrom || filters.dateTo) {
     const fromDate = filters.dateFrom?.toLocaleDateString() || 'Start';
     const toDate = filters.dateTo?.toLocaleDateString() || 'End';
-    activeFilters.push({
-      type: 'dateRange',
-      label: `Date: ${fromDate} - ${toDate}`
-    });
+    activeFilters.push({ type: 'dateRange', label: `Date: ${fromDate} - ${toDate}` });
   }
 
+  // Don't show anything if no filters are active
   if (activeFilters.length === 0) return null;
 
   const handleRemoveFilter = (filter: typeof activeFilters[0]) => {
