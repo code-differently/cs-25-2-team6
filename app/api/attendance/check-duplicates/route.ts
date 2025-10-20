@@ -4,7 +4,7 @@ import { z } from 'zod';
 // Use edge runtime for better Vercel compatibility
 export const runtime = 'edge';
 
-// In-memory storage (same as batch API)
+// In-memory storage 
 let attendanceStore: any[] = [];
 
 // Mock students data
