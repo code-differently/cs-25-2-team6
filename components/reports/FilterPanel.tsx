@@ -23,11 +23,33 @@ function FilterPanel() {
   };
 
   const handleClassChange = (selectedValues: string[]) => {
-    filters.handleMultiSelect('classes', selectedValues);
+    // Remove unselected items
+    filters.filters.classes.forEach(value => {
+      if (!selectedValues.includes(value)) {
+        filters.handleFilterToggle('classes', value, false);
+      }
+    });
+    // Add newly selected items
+    selectedValues.forEach(value => {
+      if (!filters.filters.classes.includes(value)) {
+        filters.handleFilterToggle('classes', value, true);
+      }
+    });
   };
 
   const handleStatusChange = (selectedValues: string[]) => {
-    filters.handleMultiSelect('attendanceStatuses', selectedValues);
+    // Remove unselected items
+    filters.filters.attendanceStatuses.forEach(value => {
+      if (!selectedValues.includes(value)) {
+        filters.handleFilterToggle('attendanceStatuses', value, false);
+      }
+    });
+    // Add newly selected items
+    selectedValues.forEach(value => {
+      if (!filters.filters.attendanceStatuses.includes(value)) {
+        filters.handleFilterToggle('attendanceStatuses', value, true);
+      }
+    });
   };
 
   const handleRemoveFilter = (filterType: string, value?: string) => {

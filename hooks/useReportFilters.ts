@@ -73,14 +73,6 @@ export function useReportFilters() {
     }));
   };
 
-  // Simple multi-select handler for beginner friendliness
-  const handleMultiSelect = (filterType: 'classes' | 'attendanceStatuses', selectedValues: string[]) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterType]: selectedValues
-    }));
-  };
-
   const clearAllFilters = () => {
     setFilters(defaultFilters);
   };
@@ -102,7 +94,6 @@ export function useReportFilters() {
     handleFilterToggle,
     handleDateRangeChange,
     handleStudentMultiSelect,
-    handleMultiSelect,
     clearAllFilters,
     saveFilterPreset
   };
