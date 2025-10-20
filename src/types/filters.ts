@@ -4,7 +4,6 @@
 
 import { z } from 'zod';
 
-// Filter types enum
 export enum FilterType {
   STUDENT_NAME = 'studentName',
   DATE_RANGE = 'dateRange',
@@ -12,10 +11,10 @@ export enum FilterType {
   CLASS_SELECTION = 'classSelection'
 }
 
-// Input sanitization schema
+// Removes dangerous characters and validates non-empty result
 export const SanitizedInputSchema = z.string()
   .trim()
-  .transform((str) => str.replace(/[<>\"'%;()&+]/g, '')) // Remove potentially dangerous characters
+  .transform((str) => str.replace(/[<>\"'%;()&+]/g, ''))
   .refine((str) => str.length > 0, 'Input cannot be empty after sanitization');
 
 // Student name filter schema with partial matching
@@ -27,34 +26,30 @@ export const StudentNameFilterSchema = z.object({
   caseSensitive: z.boolean().default(false)
 });
 
-// Multi-select filter base schema
 export const MultiSelectFilterSchema = z.object({
   selectedItems: z.array(z.string()),
   selectAll: z.boolean().default(false),
   maxSelections: z.number().optional()
 });
 
-// Class filter schema
 export const ClassFilterSchema = MultiSelectFilterSchema.extend({
   selectedItems: z.array(z.string().min(1, 'Class ID cannot be empty')),
   gradeLevel: z.string().optional()
 });
 
-// Status filter schema
 export const StatusFilterSchema = MultiSelectFilterSchema.extend({
   selectedItems: z.array(z.enum(['PRESENT', 'LATE', 'ABSENT', 'EXCUSED']))
 });
 
-// Advanced filter options
+// Performance and UX settings for filtering behavior
 export const AdvancedFilterOptionsSchema = z.object({
   enableDebounce: z.boolean().default(true),
-  debounceDelay: z.number().min(100).max(2000).default(300), // milliseconds
+  debounceDelay: z.number().min(100).max(2000).default(300),
   enableClientSideFiltering: z.boolean().default(true),
   clientSideThreshold: z.number().default(1000), // Switch to server-side if more records
   enablePagination: z.boolean().default(true)
 });
 
-// Combined filter state schema
 export const FilterStateSchema = z.object({
   studentName: StudentNameFilterSchema.optional(),
   classSelection: ClassFilterSchema.optional(),
@@ -73,7 +68,7 @@ export const FilterStateSchema = z.object({
   })
 });
 
-// Filter validation state
+// Tracks validation state and user interactions for UI feedback
 export const FilterValidationStateSchema = z.object({
   isValid: z.boolean(),
   hasErrors: z.boolean(),

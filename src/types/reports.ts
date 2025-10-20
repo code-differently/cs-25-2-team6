@@ -5,7 +5,6 @@
 import { z } from 'zod';
 import { AttendanceStatus } from '../domains/AttendanceStatus';
 
-// Zod schema for attendance status enum
 export const AttendanceStatusSchema = z.enum([
   AttendanceStatus.PRESENT,
   AttendanceStatus.LATE,
@@ -13,7 +12,7 @@ export const AttendanceStatusSchema = z.enum([
   AttendanceStatus.EXCUSED
 ]);
 
-// Zod schema for date range validation
+// Enforces YYYY-MM-DD format, 1-year max range, no future dates
 export const DateRangeSchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
@@ -40,14 +39,12 @@ export const DateRangeSchema = z.object({
   { message: 'Future dates are not allowed' }
 );
 
-// Zod schema for student selection
 export const StudentSelectionSchema = z.object({
   studentIds: z.array(z.string().min(1, 'Student ID cannot be empty')).optional(),
   searchQuery: z.string().max(100, 'Search query too long').optional(),
   classIds: z.array(z.string().min(1, 'Class ID cannot be empty')).optional()
 });
 
-// Zod schema for pagination
 export const PaginationSchema = z.object({
   page: z.number().int().min(1, 'Page must be at least 1').default(1),
   limit: z.number().int().min(1).max(100, 'Limit cannot exceed 100').default(20),
@@ -55,7 +52,6 @@ export const PaginationSchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).default('desc')
 });
 
-// Main report filters schema
 export const ReportFiltersSchema = z.object({
   dateRange: DateRangeSchema.optional(),
   attendanceStatus: z.array(AttendanceStatusSchema).optional(),
@@ -63,7 +59,6 @@ export const ReportFiltersSchema = z.object({
   pagination: PaginationSchema.optional()
 });
 
-// Preset date ranges
 export const PresetRangeSchema = z.enum([
   'thisWeek',
   'lastWeek', 
@@ -74,7 +69,6 @@ export const PresetRangeSchema = z.enum([
   'custom'
 ]);
 
-// Report data interface
 export const ReportDataSchema = z.object({
   studentId: z.string(),
   firstName: z.string(),
@@ -87,7 +81,6 @@ export const ReportDataSchema = z.object({
   className: z.string().optional()
 });
 
-// Report summary statistics
 export const ReportSummarySchema = z.object({
   totalRecords: z.number(),
   presentCount: z.number(),
@@ -99,7 +92,6 @@ export const ReportSummarySchema = z.object({
   generatedAt: z.string() // ISO timestamp
 });
 
-// Validation result schema
 export const ValidationResultSchema = z.object({
   isValid: z.boolean(),
   errors: z.array(z.string()),
