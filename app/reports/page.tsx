@@ -1,4 +1,5 @@
 import DashboardLayout from '@/components/DashboardLayout'
+import FilterPanel from '@/components/reports/FilterPanel'
 
 export default function Reports() {
   return (
@@ -9,18 +10,13 @@ export default function Reports() {
           View and filter attendance reports by student, date, or status.
         </p>
         
-        {/* Placeholder for Reports functionality */}
+        <FilterPanel />
+        
+        {/* Placeholder for Reports results */}
         <div className="reports-placeholder">
           <div className="placeholder-content">
-            <h3>Reports Dashboard Coming Soon</h3>
-            <p>This will include:</p>
-            <ul style={{ textAlign: 'left', display: 'inline-block' }}>
-              <li>• Filter by student name</li>
-              <li>• Filter by date range</li>
-              <li>• Filter by attendance status</li>
-              <li>• Export functionality</li>
-              <li>• Visual charts and graphs</li>
-            </ul>
+            <h3>Report Results</h3>
+            <p>Filtered attendance data will appear here after clicking "Generate Report".</p>
           </div>
         </div>
       </div>
