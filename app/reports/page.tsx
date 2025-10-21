@@ -4,6 +4,8 @@ import { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import RAGQueryBox from '@/components/RAGQueryBox';
 import QuerySuggestions from '@/components/QuerySuggestions';
+import DashboardLayout from '@/components/DashboardLayout'
+import FilterPanel from '@/components/reports/FilterPanel'
 
 export default function Reports() {
   const [selectedQuery, setSelectedQuery] = useState('');
@@ -20,73 +22,19 @@ export default function Reports() {
 
   return (
     <DashboardLayout>
-      <div className="reports-container space-y-6">
-        <div>
-          <h1 className="page-title">📊 Attendance Reports</h1>
-          <p className="page-description">
-            Ask questions about attendance data or use traditional filters to analyze patterns.
-          </p>
-        </div>
-
-        {/* Mode Toggle */}
-        <div className="flex justify-center space-x-4 mb-6">
-          <button
-            onClick={() => setShowTraditionalFilters(false)}
-            className={`px-4 py-2 rounded-md font-medium ${
-              !showTraditionalFilters
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            💬 Ask Questions
-          </button>
-          <button
-            onClick={() => setShowTraditionalFilters(true)}
-            className={`px-4 py-2 rounded-md font-medium ${
-              showTraditionalFilters
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            🔍 Traditional Filters
-          </button>
-        </div>
-
-        {/* Natural Language Query Interface */}
-        {!showTraditionalFilters && (
-          <div className="space-y-6">
-            <RAGQueryBox
-              onResults={handleQueryResults}
-              className="w-full"
-            />
-            
-            {!queryResults && (
-              <QuerySuggestions
-                onSelectQuery={handleSelectQuery}
-                className="w-full"
-              />
-            )}
-          </div>
-        )}
-
-        {/* Traditional Filters Interface */}
-        {showTraditionalFilters && (
-          <div className="bg-white rounded-lg border shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Traditional Filters</h3>
-            <div className="reports-placeholder">
-              <div className="placeholder-content">
-                <h4 className="text-md font-medium mb-2">Filter Options Coming Soon</h4>
-                <p className="text-gray-600 mb-4">This will include:</p>
-                <ul style={{ textAlign: 'left', display: 'inline-block' }}>
-                  <li>• Filter by student name</li>
-                  <li>• Filter by date range</li>
-                  <li>• Filter by attendance status</li>
-                  <li>• Multiple filter combinations</li>
-                  <li>• Export functionality</li>
-                  <li>• Visual charts and graphs</li>
-                </ul>
-              </div>
-            </div>
+      <div className="reports-container">
+        <h1 className="page-title">📊 Attendance Reports</h1>
+        <p className="page-description">
+          View and filter attendance reports by student, date, or status.
+        </p>
+        
+        <FilterPanel />
+        
+        {/* Placeholder for Reports results */}
+        <div className="reports-placeholder">
+          <div className="placeholder-content">
+            <h3>Report Results</h3>
+            <p>Filtered attendance data will appear here after clicking "Generate Report".</p>
           </div>
         )}
 
