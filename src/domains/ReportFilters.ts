@@ -10,6 +10,7 @@ export interface ReportFilters {
   studentIds?: string[];
   studentName?: string; // For name-based search
   lastName?: string; // Backward compatibility
+  grades?: string[]; // Grade level filtering (e.g., ['7th', '8th'])
   
   // Class filtering (for future class system)
   classIds?: string[];
