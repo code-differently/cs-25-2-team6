@@ -10,7 +10,7 @@ export default function Reports() {
       <div className="reports-container">
         <h1 className="page-title">📊 Attendance Reports</h1>
         <p className="page-description">
-          View and filter attendance reports by student, date, or status.
+          Comprehensive attendance analytics and insights
         </p>
         
         {/* Main Reports Dashboard */}

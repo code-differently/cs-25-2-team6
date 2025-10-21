@@ -23,38 +23,38 @@ interface ReportSummaryCardsProps {
 }
 
 // Simple SVG Icon Components
-const TrendingUp: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+const TrendingUp: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 24 }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" width={size} height={size}>
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
   </svg>
 );
 
-const TrendingDown: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+const TrendingDown: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 24 }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" width={size} height={size}>
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
   </svg>
 );
 
-const Users: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+const Users: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 24 }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" width={size} height={size}>
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a4 4 0 11-8 0 4 4 0 018 0z" />
   </svg>
 );
 
-const Clock: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+const Clock: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 24 }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" width={size} height={size}>
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
 
-const CheckCircle: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+const CheckCircle: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 24 }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" width={size} height={size}>
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
 
-const AlertCircle: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+const AlertCircle: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 24 }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" width={size} height={size}>
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
@@ -73,7 +73,7 @@ const CardHeader: React.FC<{ children: React.ReactNode; className?: string }> = 
 );
 
 const CardTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>
+  <h3 className={`text-lg font-semibold ${className}`} style={{ color: '#1F2937' }}>
     {children}
   </h3>
 );
@@ -137,32 +137,32 @@ export const ReportSummaryCards: React.FC<ReportSummaryCardsProps> = ({
     {
       title: 'Total Students',
       value: safeTotalStudents,
-      icon: <Users className="h-5 w-5 text-blue-600" />,
+      icon: <Users className="text-purple-600" size={500} />,
       trend: 'neutral'
     },
     {
       title: 'Present Today',
       value: safePresentCount,
-      icon: <CheckCircle className="h-5 w-5 text-green-600" />,
+      icon: <CheckCircle className="text-purple-600" size={500} />,
       trend: 'up'
     },
     {
       title: 'Absent Today',
       value: safeAbsentCount,
-      icon: <AlertCircle className="h-5 w-5 text-red-600" />,
+      icon: <AlertCircle className="text-purple-600" size={500} />,
       trend: safeTotalStudents > 0 && safeAbsentCount > (safeTotalStudents * 0.1) ? 'down' : 'neutral'
     },
     {
       title: 'Late Arrivals',
       value: safeLateCount,
-      icon: <Clock className="h-5 w-5 text-yellow-600" />,
+      icon: <Clock className="text-purple-600" size={500} />,
       trend: safeTotalStudents > 0 && safeLateCount > (safeTotalStudents * 0.05) ? 'down' : 'neutral'
     },
     {
       title: 'Attendance Rate',
       value: `${safeAttendanceRate.toFixed(1)}%`,
       change: calculateTrend(safeAttendanceRate, previousPeriodRate),
-      icon: <TrendingUp className="h-5 w-5 text-purple-600" />,
+      icon: <TrendingUp className="text-purple-600" size={500} />,
       trend: safeAttendanceRate >= 90 ? 'up' : safeAttendanceRate >= 75 ? 'neutral' : 'down'
     }
   ];
@@ -204,7 +204,7 @@ export const ReportSummaryCards: React.FC<ReportSummaryCardsProps> = ({
       {summaryCards.map((card, index) => (
         <Card key={index} className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+            <CardTitle className="text-sm font-medium">
               {card.title}
             </CardTitle>
             {card.icon}

@@ -82,16 +82,18 @@ export default function ReportDashboard() {
     <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Attendance Reports</h1>
-          <p className="text-gray-600 mt-1">
-            Comprehensive attendance analytics and insights
-          </p>
-        </div>
-        
         <div className="flex space-x-3">
           <button
             onClick={() => setShowChart(!showChart)}
+            style={{ 
+                backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1
+            }}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
             {showChart ? 'Hide Charts' : 'Show Charts'}
@@ -100,7 +102,16 @@ export default function ReportDashboard() {
           <button
             onClick={refreshData}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            style={{ 
+                backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1
+            }}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
           >
             {loading ? 'Refreshing...' : 'Refresh Data'}
           </button>
@@ -109,8 +120,7 @@ export default function ReportDashboard() {
 
       {/* Filters Section */}
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Filters</h2>
-        
+        <h2 className="text-lg font-semibold mb-4" style={{ color: '#1F2937' }}>Filters</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Date Range */}
           {/*
@@ -130,7 +140,7 @@ export default function ReportDashboard() {
         */}
           {/* Status Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
               Status
             </label>
             <select
@@ -148,7 +158,7 @@ export default function ReportDashboard() {
 
           {/* Export Options */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
               Export
             </label>
             <div className="flex space-x-2">
@@ -196,7 +206,7 @@ export default function ReportDashboard() {
       {showChart && (
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold " style={{ color: '#1F2937' }}>
               Attendance Trends
             </h2>
             
@@ -228,8 +238,8 @@ export default function ReportDashboard() {
 
       {/* Data Table */}
       <div className="bg-white rounded-lg shadow-md">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+        <div className="p-6 border-b" style={{ color: '#1F2937' }}>
+          <h2 className="text-lg font-semibold" style={{ color: '#1F2937' }}>
             Detailed Attendance Records
           </h2>
           <p className="text-sm text-gray-600 mt-1">

@@ -37,7 +37,7 @@ const CardHeader: React.FC<{ children: React.ReactNode; className?: string }> = 
 );
 
 const CardTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>
+  <h3 className={`text-lg font-semibold ${className}`}  style={{ color: '#1F2937' }}>
     {children}
   </h3>
 );
