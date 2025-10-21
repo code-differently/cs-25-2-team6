@@ -1,32 +1,13 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { useReportData } from 'src/services/hooks/useReportData';
+import { useReportData, type ReportFilters, type AttendanceRecord, type ExportFormat } from '../../src/services/hooks/useReportData';
 import ReportSummaryCards from './ReportSummaryCards';
 import AttendanceDataTable from './AttendanceDataTable';
 import AttendanceChart from './AttendanceChart';
 /* import DataPicker from '../DataPicker'; */
 
-export interface ReportFilters {
-  startDate: string;
-  endDate: string;
-  studentId?: string;
-  status?: 'PRESENT' | 'LATE' | 'ABSENT' | 'EXCUSED' | 'ALL';
-  classId?: string;
-}
-
-export interface AttendanceRecord {
-  id: string;
-  studentId: string;
-  studentName: string;
-  date: string;
-  status: 'PRESENT' | 'LATE' | 'ABSENT' | 'EXCUSED';
-  earlyDismissal: boolean;
-  className?: string;
-}
-
 export type ChartType = 'line' | 'bar' | 'pie' | 'area';
-export type ExportFormat = 'csv' | 'excel' | 'pdf';
 
 export default function ReportDashboard() {
   // Filter state
@@ -157,10 +138,10 @@ export default function ReportDashboard() {
                 opacity: loading ? 0.5 : 1
             }}>
               <option value="ALL">All Statuses</option>
-              <option value="PRESENT">Present</option>
-              <option value="LATE">Late</option>
-              <option value="ABSENT">Absent</option>
-              <option value="EXCUSED">Excused</option>
+              <option value="present">Present</option>
+              <option value="late">Late</option>
+              <option value="absent">Absent</option>
+              <option value="excused">Excused</option>
             </select>
           </div>
 
@@ -185,7 +166,7 @@ export default function ReportDashboard() {
                 CSV
               </button>
               <button
-                onClick={() => handleExport('excel')}
+                onClick={() => handleExport('xlsx')}
                 className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700" style={{ 
                 backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
                 color: 'white',
@@ -226,12 +207,12 @@ export default function ReportDashboard() {
 
       {/* Summary Cards */}
       <ReportSummaryCards 
-        summaryStats={summaryStats}
-        loading={loading}
-        dateRange={{
-          startDate: filters.startDate,
-          endDate: filters.endDate
-        }}
+        totalStudents={summaryStats.totalStudents}
+        presentCount={summaryStats.presentCount}
+        absentCount={summaryStats.absentCount}
+        lateCount={summaryStats.lateCount}
+        attendanceRate={summaryStats.attendanceRate}
+        isLoading={loading}
       />
 
       {/* Charts Section */}
@@ -269,12 +250,17 @@ export default function ReportDashboard() {
             </div>
           </div>
           
-          <AttendanceChart
-            data={reportData}
-            chartType={chartType}
-            loading={loading}
-            filters={filters}
-          />
+          <div className={loading ? 'opacity-50' : ''}>
+            <AttendanceChart
+              data={reportData}
+              chartType={chartType}
+              onChartTypeChange={handleChartTypeChange}
+              dateRange={{
+                start: filters.startDate,
+                end: filters.endDate
+              }}
+            />
+          </div>
         </div>
       )}
 
@@ -291,9 +277,21 @@ export default function ReportDashboard() {
         
         <AttendanceDataTable
           data={reportData}
-          loading={loading}
-          onExport={handleExport}
-          filters={filters}
+          isLoading={loading}
+          onSort={(column, direction) => {
+            // TODO: Implement sorting
+            console.log('Sort:', column, direction);
+          }}
+          onPageChange={(page, pageSize) => {
+            // TODO: Implement pagination
+            console.log('Page change:', page, pageSize);
+          }}
+          onExport={(format, filteredData) => {
+            handleExport(format);
+          }}
+          totalRecords={reportData.length}
+          currentPage={1}
+          pageSize={25}
         />
       </div>
     </div>

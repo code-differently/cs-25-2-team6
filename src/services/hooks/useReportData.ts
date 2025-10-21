@@ -1,5 +1,27 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import type { ReportFilters, AttendanceRecord, ExportFormat } from '../components/reports/ReportDashboard';
+
+export interface ReportFilters {
+  startDate: string;
+  endDate: string;
+  studentId?: string;
+  status?: 'present' | 'late' | 'absent' | 'excused' | 'ALL';
+  classId?: string;
+}
+
+export interface AttendanceRecord {
+  id: string;
+  studentId: string;
+  studentName: string;
+  className: string;
+  date: string;
+  status: 'present' | 'absent' | 'late' | 'excused';
+  timeIn?: string;
+  timeOut?: string;
+  notes?: string;
+  earlyDismissal?: boolean;
+}
+
+export type ExportFormat = 'csv' | 'xlsx' | 'pdf';
 
 export interface SummaryStats {
   totalStudents: number;
@@ -30,16 +52,16 @@ export function useReportData(filters: ReportFilters) {
       return acc;
     }, {} as Record<string, number>);
 
-    const presentCount = statusCounts['PRESENT'] || 0;
-    const lateCount = statusCounts['LATE'] || 0;
-    const absentCount = statusCounts['ABSENT'] || 0;
-    const excusedCount = statusCounts['EXCUSED'] || 0;
+    const presentCount = statusCounts['present'] || 0;
+    const lateCount = statusCounts['late'] || 0;
+    const absentCount = statusCounts['absent'] || 0;
+    const excusedCount = statusCounts['excused'] || 0;
     
     const attendanceRate = totalRecords > 0 ? 
       ((presentCount + lateCount + excusedCount) / totalRecords) * 100 : 0;
     const presentRate = totalRecords > 0 ? (presentCount / totalRecords) * 100 : 0;
     
-    const earlyDismissalCount = data.filter(record => record.earlyDismissal).length;
+    const earlyDismissalCount = data.filter(record => record.earlyDismissal === true).length;
 
     return {
       totalStudents: uniqueStudents,

@@ -117,7 +117,7 @@ export const ReportSummaryCards: React.FC<ReportSummaryCardsProps> = ({
   isLoading = false
 }) => {
   const calculateTrend = (current: number, previous?: number) => {
-    if (!previous || previous === 0) return null;
+    if (!previous || previous === 0) return undefined;
     const change = current - previous;
     return {
       value: Math.abs(change),
