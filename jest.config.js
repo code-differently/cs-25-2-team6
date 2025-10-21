@@ -5,13 +5,13 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: 'tsconfig.json',
-      babelConfig: {
-        presets: [
-          '@babel/preset-env',
-          '@babel/preset-typescript',
-          '@babel/preset-react'
-        ]
-      }
+    }],
+    '^.+\\.(js|jsx)$': ['babel-jest', {
+      presets: [
+        '@babel/preset-env',
+        '@babel/preset-typescript',
+        ['@babel/preset-react', { runtime: 'automatic' }]
+      ]
     }]
   },
   testMatch: ["**/*.test.ts", "**/*.test.tsx"],
