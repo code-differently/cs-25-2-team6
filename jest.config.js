@@ -1,16 +1,16 @@
-const { createDefaultPreset } = require("ts-jest");
-
-const tsJestTransformCfg = createDefaultPreset().transform;
-
 /** @type {import("jest").Config} **/
 module.exports = {
+  preset: 'ts-jest',
   testEnvironment: "jsdom",
   transform: {
-    ...tsJestTransformCfg,
-    "^.+\\.(ts|tsx)$": ["ts-jest", {
-      tsconfig: "tsconfig.json",
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: 'tsconfig.json',
       babelConfig: {
-        presets: ["@babel/preset-react", "@babel/preset-typescript"]
+        presets: [
+          '@babel/preset-env',
+          '@babel/preset-typescript',
+          '@babel/preset-react'
+        ]
       }
     }]
   },

@@ -16,9 +16,14 @@ export const formatStudentName = (firstName: string, lastName: string): string =
   const formatName = (name: string): string => {
     if (!name || typeof name !== 'string') return '';
     return name.trim()
-      .split(/\s+/)
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
+      .split('-')
+      .map(part => 
+        part.trim()
+          .split(/\s+/)
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ')
+      )
+      .join('-');
   };
 
   const formattedFirst = formatName(firstName);

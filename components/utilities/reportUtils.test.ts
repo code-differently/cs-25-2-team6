@@ -90,7 +90,7 @@ describe('Report Utilities', () => {
   describe('calculateTableHeight', () => {
     test('calculates height within constraints', () => {
       expect(calculateTableHeight(0)).toBe('200px'); // MIN_HEIGHT
-      expect(calculateTableHeight(5)).toBe('315px'); // (5 * 45) + 50 + 20
+      expect(calculateTableHeight(5)).toBe('295px'); // (5 * 45) + 50 + 20 = 295
       expect(calculateTableHeight(20)).toBe('600px'); // MAX_HEIGHT
     });
 
