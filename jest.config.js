@@ -1,18 +1,24 @@
 /** @type {import("jest").Config} **/
 module.exports = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/js-with-babel',
   testEnvironment: "jsdom",
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: 'tsconfig.json',
-    }],
-    '^.+\\.(js|jsx)$': ['babel-jest', {
-      presets: [
-        '@babel/preset-env',
-        '@babel/preset-typescript',
-        ['@babel/preset-react', { runtime: 'automatic' }]
-      ]
-    }]
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.json',
+        babelConfig: {
+          presets: [
+            ['@babel/preset-env', { targets: { node: 'current' } }],
+            '@babel/preset-typescript',
+            ['@babel/preset-react', { runtime: 'automatic' }]
+          ]
+        }
+      }
+    ]
+  },
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1'
   },
   testMatch: ["**/*.test.ts", "**/*.test.tsx"],
   collectCoverage: true,
