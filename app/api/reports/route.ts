@@ -1,103 +1,143 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FileStudentRepo } from '@/src/persistence/FileStudentRepo';
-import { FileAttendanceRepo } from '@/src/persistence/FileAttendanceRepo';
-import { AttendanceStatus } from '@/src/domains/AttendanceStatus';
-import { AttendanceRecord } from '@/src/domains/AttendanceRecords';
+import { z } from 'zod';
+import { ReportService } from '../../../src/services/ReportService';
+import { AttendanceStatus } from '../../../src/domains/AttendanceStatus';
 
-const studentRepo = new FileStudentRepo();
-const attendanceRepo = new FileAttendanceRepo();
+// Validation schemas
+const ReportRequestSchema = z.object({
+  filters: z.object({
+    studentIds: z.array(z.string()).optional(),
+    studentName: z.string().optional(),
+    lastName: z.string().optional(),
+    grades: z.array(z.string()).optional(),
+    classIds: z.array(z.string()).optional(),
+    dateISO: z.string().optional(),
+    dateFrom: z.string().optional(),
+    dateTo: z.string().optional(),
+    relativePeriod: z.enum(['today', 'week', 'month', 'quarter', '7days', '30days', '90days', 'semester', 'year']).optional(),
+    status: z.nativeEnum(AttendanceStatus).optional(),
+    statuses: z.array(z.nativeEnum(AttendanceStatus)).optional(),
+    includeExcused: z.boolean().optional(),
+    onlyLate: z.boolean().optional(),
+    onlyEarlyDismissal: z.boolean().optional()
+  }).optional().default({}),
+  aggregations: z.object({
+    includeCount: z.boolean().optional(),
+    includePercentage: z.boolean().optional(),
+    includeStreaks: z.boolean().optional(),
+    includeTrends: z.boolean().optional(),
+    includeComparative: z.boolean().optional()
+  }).optional(),
+  sorting: z.object({
+    sortBy: z.enum(['name', 'date', 'status', 'attendanceRate', 'class', 'totalDays']),
+    sortOrder: z.enum(['asc', 'desc'])
+  }).optional(),
+  pagination: z.object({
+    page: z.number().int().min(1),
+    limit: z.number().int().min(1).max(1000)
+  }).optional(),
+  useCache: z.boolean().optional().default(true)
+});
 
+export const runtime = 'nodejs';
+
+/**
+ 
+ * Generate comprehensive attendance reports with filtering, aggregation, and insights
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    
+    // Validate request
+    const validatedRequest = ReportRequestSchema.parse(body);
+    
+    // Generate report
+    const reportService = new ReportService();
+    const result = await reportService.generateComprehensiveReport(validatedRequest);
+    
+    return NextResponse.json({
+      success: true,
+      data: result,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Report generation error:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid request format',
+        details: error.issues
+      }, { status: 400 });
+    }
+    
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Internal server error'
+    }, { status: 500 });
+  }
+}
+
+/**
+ 
+ * Get a simple report with query parameters (for quick dashboard access)
+ */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     
-// FILTERS 
-
-    const studentName = searchParams.get('studentName') || '';
-    const dateFrom = searchParams.get('dateFrom') || '';
-    const dateTo = searchParams.get('dateTo') || '';
-    const status = searchParams.get('status') || '';
+    // Parse query parameters
+    const filters: any = {};
     
-  
-    const allRecords = attendanceRepo.allAttendance();
-    const allStudents = studentRepo.allStudents();
-    
-    
-    let filteredRecords = allRecords;
-    
-
-    if (studentName) {
-      const matchingStudents = allStudents.filter(student => 
-        `${student.firstName} ${student.lastName}`.toLowerCase().includes(studentName.toLowerCase())
-      );
-      const studentIds = matchingStudents.map(s => s.id);
-      filteredRecords = filteredRecords.filter((record: AttendanceRecord) => 
-        studentIds.includes(record.studentId)
-      );
+    if (searchParams.get('studentName')) {
+      filters.studentName = searchParams.get('studentName');
     }
     
-
-    if (dateFrom) {
-      filteredRecords = filteredRecords.filter((record: AttendanceRecord) => 
-        record.dateISO >= dateFrom
-      );
+    if (searchParams.get('relativePeriod')) {
+      filters.relativePeriod = searchParams.get('relativePeriod');
     }
     
-    if (dateTo) {
-      filteredRecords = filteredRecords.filter((record: AttendanceRecord) => 
-        record.dateISO <= dateTo
-      );
+    if (searchParams.get('status')) {
+      filters.status = searchParams.get('status') as AttendanceStatus;
     }
     
-
-    if (status && Object.values(AttendanceStatus).includes(status as AttendanceStatus)) {
-      filteredRecords = filteredRecords.filter((record: AttendanceRecord) => 
-        record.status === status
-      );
+    if (searchParams.get('dateFrom')) {
+      filters.dateFrom = searchParams.get('dateFrom');
     }
-
-
-    const enhancedRecords = filteredRecords.map((record: AttendanceRecord) => {
-      const student = allStudents.find(s => s.id === record.studentId);
-      return {
-        id: record.studentId,
-        studentName: student ? `${student.firstName} ${student.lastName}` : 'Unknown Student',
-        date: record.dateISO,
-        status: record.status,
-        late: record.late,
-        earlyDismissal: record.earlyDismissal,
-        excused: record.excused
-      };
-    });
     
-    // Sort by student name, then date
-    enhancedRecords.sort((a: any, b: any) => {
-      const nameCompare = a.studentName.localeCompare(b.studentName);
-      if (nameCompare !== 0) return nameCompare;
-      return a.date.localeCompare(b.date);
-    });
+    if (searchParams.get('dateTo')) {
+      filters.dateTo = searchParams.get('dateTo');
+    }
+    
+    // Build request
+    const reportRequest = {
+      filters,
+      aggregations: {
+        includeCount: true,
+        includePercentage: true,
+        includeComparative: searchParams.get('includeComparative') === 'true'
+      },
+      useCache: searchParams.get('useCache') !== 'false'
+    };
+    
+    // Generate report
+    const reportService = new ReportService();
+    const result = await reportService.generateComprehensiveReport(reportRequest);
     
     return NextResponse.json({
       success: true,
-      data: enhancedRecords,
-      total: enhancedRecords.length,
-      filters: {
-        studentName: studentName || null,
-        dateFrom: dateFrom || null,
-        dateTo: dateTo || null,
-        status: status || null
-      }
+      data: result,
+      timestamp: new Date().toISOString()
     });
     
   } catch (error) {
-    console.error('Reports API Error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch attendance reports',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    console.error('Report GET error:', error);
+    
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Internal server error'
+    }, { status: 500 });
   }
 }

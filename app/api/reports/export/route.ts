@@ -1,158 +1,99 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FileStudentRepo } from '@/src/persistence/FileStudentRepo';
-import { FileAttendanceRepo } from '@/src/persistence/FileAttendanceRepo';
-import { AttendanceStatus } from '@/src/domains/AttendanceStatus';
-import { AttendanceRecord } from '@/src/domains/AttendanceRecords';
+import { z } from 'zod';
+import { ReportService } from '../../../../src/services/ReportService';
+import { AttendanceStatus } from '../../../../src/domains/AttendanceStatus';
 
-const studentRepo = new FileStudentRepo();
-const attendanceRepo = new FileAttendanceRepo();
+export const runtime = 'nodejs';
+// Export format validation
+const ExportFormatSchema = z.enum(['csv', 'json', 'pdf']);
 
-export async function GET(request: NextRequest) {
+
+export async function POST(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const body = await request.json();
+    const { format, filters = {}, options = {} } = body;
     
-// Extract filter parameters the same as reports route
-    const studentName = searchParams.get('studentName') || '';
-    const dateFrom = searchParams.get('dateFrom') || '';
-    const dateTo = searchParams.get('dateTo') || '';
-    const status = searchParams.get('status') || '';
-    const format = searchParams.get('format') || 'csv';
     
-// same logic as reports route
-    const allRecords = attendanceRepo.allAttendance();
-    const allStudents = studentRepo.allStudents();
-    let filteredRecords = allRecords;
+    const validatedFormat = ExportFormatSchema.parse(format);
     
-// Apply filters
-    if (studentName) {
-      const matchingStudents = allStudents.filter(student => 
-        `${student.firstName} ${student.lastName}`.toLowerCase().includes(studentName.toLowerCase())
-      );
-      const studentIds = matchingStudents.map(s => s.id);
-      filteredRecords = filteredRecords.filter((record: AttendanceRecord) => 
-        studentIds.includes(record.studentId)
-      );
-    }
+    const reportService = new ReportService();
+    const exportData = await reportService.exportReport({ filters }, validatedFormat, options);
     
-    if (dateFrom) {
-      filteredRecords = filteredRecords.filter((record: AttendanceRecord) => 
-        record.dateISO >= dateFrom
-      );
-    }
-    
-    if (dateTo) {
-      filteredRecords = filteredRecords.filter((record: AttendanceRecord) => 
-        record.dateISO <= dateTo
-      );
-    }
-    
-    if (status && Object.values(AttendanceStatus).includes(status as AttendanceStatus)) {
-      filteredRecords = filteredRecords.filter((record: AttendanceRecord) => 
-        record.status === status
-      );
-    }
-    
-// update records with student information
-    const enhancedRecords = filteredRecords.map((record: AttendanceRecord) => {
-      const student = allStudents.find(s => s.id === record.studentId);
-      return {
-        studentName: student ? `${student.firstName} ${student.lastName}` : 'Unknown Student',
-        date: record.dateISO,
-        status: record.status,
-        late: record.late ? 'Yes' : 'No',
-        earlyDismissal: record.earlyDismissal ? 'Yes' : 'No',
-        excused: record.excused ? 'Yes' : 'No'
-      };
-    });
-    
-   
-    enhancedRecords.sort((a: any, b: any) => {
-      const nameCompare = a.studentName.localeCompare(b.studentName);
-      if (nameCompare !== 0) return nameCompare;
-      return a.date.localeCompare(b.date);
-    });
-    
-    // Generate export format
-    if (format === 'csv') {
-      const csvContent = generateCSV(enhancedRecords);
-      const filename = `attendance-report-${new Date().toISOString().split('T')[0]}.csv`;
-      
-      return new NextResponse(csvContent, {
-        headers: {
-          'Content-Type': 'text/csv',
-          'Content-Disposition': `attachment; filename="${filename}"`,
-          'Cache-Control': 'no-cache'
-        }
-      });
-    }
-    
-    if (format === 'json') {
-      const filename = `attendance-report-${new Date().toISOString().split('T')[0]}.json`;
-      
-      return new NextResponse(JSON.stringify({
-        exportDate: new Date().toISOString(),
-        filters: {
-          studentName: studentName || null,
-          dateFrom: dateFrom || null,
-          dateTo: dateTo || null,
-          status: status || null
-        },
-        totalRecords: enhancedRecords.length,
-        data: enhancedRecords
-      }, null, 2), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Disposition': `attachment; filename="${filename}"`,
-          'Cache-Control': 'no-cache'
-        }
-      });
-    }
-    
- // CSV default formatting 
-    const csvContent = generateCSV(enhancedRecords);
-    const filename = `attendance-report-${new Date().toISOString().split('T')[0]}.csv`;
-    
-    return new NextResponse(csvContent, {
+    return new NextResponse(exportData.data as string, {
+      status: 200,
       headers: {
-        'Content-Type': 'text/csv',
-        'Content-Disposition': `attachment; filename="${filename}"`,
-        'Cache-Control': 'no-cache'
+        'Content-Type': exportData.mimeType,
+        'Content-Disposition': `attachment; filename="${exportData.filename}"`
       }
     });
     
   } catch (error) {
-    console.error('Export API Error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to export attendance report',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    console.error('Export API error:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid format specified',
+        details: error.issues
+      }, { status: 400 });
+    }
+    
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Export failed'
+    }, { status: 500 });
   }
 }
 
-function generateCSV(records: any[]): string {
-  if (records.length === 0) {
-    return 'No data available for export';
-  }
-  //CSV structure
+/**
 
-  const headers = ['Student Name', 'Date', 'Status', 'Late', 'Early Dismissal', 'Excused'];
-  
- 
-  const rows = records.map(record => [
-    `"${record.studentName}"`,
-    record.date,
-    record.status,
-    record.late,
-    record.earlyDismissal,
-    record.excused
-  ]);
-  
-  // Combine headers and rows
-  const csvLines = [headers.join(','), ...rows.map(row => row.join(','))];
-  
-  return csvLines.join('\n');
+ * Export reports with query parameters
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    
+    // Parse format
+    const format = searchParams.get('format') || 'json';
+    const validatedFormat = ExportFormatSchema.parse(format);
+    
+    // Parsing filters
+    const filters: any = {};
+    if (searchParams.get('studentName')) filters.studentName = searchParams.get('studentName');
+    if (searchParams.get('dateFrom')) filters.dateFrom = searchParams.get('dateFrom');
+    if (searchParams.get('dateTo')) filters.dateTo = searchParams.get('dateTo');
+    if (searchParams.get('status')) filters.status = searchParams.get('status') as AttendanceStatus;
+    if (searchParams.get('relativePeriod')) filters.relativePeriod = searchParams.get('relativePeriod');
+    
+    const reportService = new ReportService();
+    const exportData = await reportService.exportReport({ filters }, validatedFormat);
+    
+    return new NextResponse(exportData.data as string, {
+      status: 200,
+      headers: {
+        'Content-Type': exportData.mimeType,
+        'Content-Disposition': `attachment; filename="${exportData.filename}"`
+      }
+    });
+    
+  } catch (error) {
+    console.error('Export GET error:', error);
+    
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Export failed'
+    }, { status: 500 });
+  }
+}
+
+function getContentType(format: string): string {
+  switch (format) {
+    case 'csv':
+      return 'text/csv';
+    case 'pdf':
+      return 'application/pdf';
+    case 'json':
+    default:
+      return 'application/json';
+  }
 }
