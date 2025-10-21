@@ -37,7 +37,7 @@ const CardHeader: React.FC<{ children: React.ReactNode; className?: string }> = 
 );
 
 const CardTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <h3 className={`text-lg font-semibold ${className}`}  style={{ color: '#1F2937' }}>
+  <h3 className={`text-lg font-semibold ${className}`}  style={{ color: '#1F2937', marginTop: '10px' }}>
     {children}
   </h3>
 );
@@ -122,7 +122,7 @@ const SelectContent: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   if (!context || !context.isOpen) return null;
 
   return (
-    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto" style={{ color: '#1F2937' }}>
       {children}
     </div>
   );
@@ -301,8 +301,8 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({
 
       case 'bar':
         return (
-          <div className="h-80 relative">
-            <svg className="w-full h-full" viewBox="0 0 800 300">
+          <div className="h-80 relative" >
+            <svg className="w-full h-full" viewBox="0 0 800 300" >
               {/* Grid lines */}
               {Array.from({ length: 6 }, (_, i) => {
                 const y = (maxValue / 5) * i;

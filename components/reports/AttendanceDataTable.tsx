@@ -67,13 +67,14 @@ interface ButtonProps {
   className?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<ButtonProps & { style?: React.CSSProperties }> = ({
   children,
   onClick,
   disabled = false,
   variant = 'default',
   size = 'md',
-  className = ''
+  className = '',
+  style
 }) => {
   const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
@@ -91,9 +92,10 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`${baseClasses} ${sizeClasses[size]} ${className}`}
       onClick={onClick}
       disabled={disabled}
+      style={style}
     >
       {children}
     </button>
@@ -290,6 +292,7 @@ const TableHead: React.FC<{
 }> = ({ children, className = '', onClick }) => (
   <th 
     className={`h-12 px-4 text-left align-middle font-medium text-gray-500 ${onClick ? 'cursor-pointer' : ''} ${className}`} 
+    style={{ color: '#1F2937', marginLeft: '30px' }}
     onClick={onClick}
   >
     {children}
@@ -420,17 +423,30 @@ export const AttendanceDataTable: React.FC<AttendanceDataTableProps> = ({
 
         <div className="flex gap-2">
           <Button
-            variant="outline"
             size="sm"
             onClick={() => onExport('csv', filteredData)}
+            style={{ 
+                backgroundColor:'#3B82F6', 
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none'
+            }}
           >
             <Download className="h-4 w-4 mr-2" />
             Export CSV
           </Button>
           <Button
-            variant="outline"
             size="sm"
             onClick={() => onExport('xlsx', filteredData)}
+            style={{ 
+                backgroundColor: '#3B82F6', 
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                marginLeft: '10px'
+            }}
           >
             <Download className="h-4 w-4 mr-2" />
             Export Excel
@@ -447,7 +463,7 @@ export const AttendanceDataTable: React.FC<AttendanceDataTableProps> = ({
                 className="cursor-pointer hover:bg-gray-50 group"
                 onClick={() => handleTableSort('studentName')}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" style={{ color: '#1F2937', marginRight: '10px' }}>
                   Student Name
                   <SortIcon column="studentName" />
                 </div>
@@ -456,7 +472,7 @@ export const AttendanceDataTable: React.FC<AttendanceDataTableProps> = ({
                 className="cursor-pointer hover:bg-gray-50 group"
                 onClick={() => handleTableSort('studentId')}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" style={{ color: '#1F2937', marginRight: '10px' }}>
                   Student ID
                   <SortIcon column="studentId" />
                 </div>
@@ -465,7 +481,7 @@ export const AttendanceDataTable: React.FC<AttendanceDataTableProps> = ({
                 className="cursor-pointer hover:bg-gray-50 group"
                 onClick={() => handleTableSort('className')}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" style={{ color: '#1F2937', marginRight: '10px' }}>
                   Class
                   <SortIcon column="className" />
                 </div>
@@ -474,7 +490,7 @@ export const AttendanceDataTable: React.FC<AttendanceDataTableProps> = ({
                 className="cursor-pointer hover:bg-gray-50 group"
                 onClick={() => handleTableSort('date')}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" style={{ color: '#1F2937', marginRight: '10px' }}>
                   Date
                   <SortIcon column="date" />
                 </div>
@@ -483,7 +499,7 @@ export const AttendanceDataTable: React.FC<AttendanceDataTableProps> = ({
                 className="cursor-pointer hover:bg-gray-50 group"
                 onClick={() => handleTableSort('status')}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" style={{ color: '#1F2937', marginRight: '10px' }}>
                   Status
                   <SortIcon column="status" />
                 </div>

@@ -109,7 +109,8 @@ export default function ReportDashboard() {
                 borderRadius: '8px',
                 border: 'none',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.5 : 1
+                opacity: loading ? 0.5 : 1,
+                marginLeft: '8px'
             }}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
           >
@@ -120,7 +121,7 @@ export default function ReportDashboard() {
 
       {/* Filters Section */}
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-lg font-semibold mb-4" style={{ color: '#1F2937' }}>Filters</h2>
+        <h2 className="text-lg font-semibold mb-4" style={{ color: '#1F2937', marginTop: '15px', marginBottom: '10px' }}>Filters</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Date Range */}
           {/*
@@ -140,14 +141,21 @@ export default function ReportDashboard() {
         */}
           {/* Status Filter */}
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
-              Status
+            <label className="block text-sm font-medium mb-2" style={{ color: '#1F2937', marginRight: '8px' }}>
+              Status:
             </label>
             <select
               value={filters.status}
               onChange={(e) => handleStatusFilter(e.target.value as ReportFilters['status'])}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style={{ 
+                backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1
+            }}>
               <option value="ALL">All Statuses</option>
               <option value="PRESENT">Present</option>
               <option value="LATE">Late</option>
@@ -159,25 +167,49 @@ export default function ReportDashboard() {
           {/* Export Options */}
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: '#1F2937' }}>
-              Export
+              Export:
             </label>
             <div className="flex space-x-2">
               <button
                 onClick={() => handleExport('csv')}
-                className="px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
-              >
+                className="px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700" style={{ 
+                backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+                marginRight: '8px'
+            }}>
                 CSV
               </button>
               <button
                 onClick={() => handleExport('excel')}
-                className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-              >
+                className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700" style={{ 
+                backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+                marginRight: '8px'
+            }}>
                 Excel
               </button>
               <button
                 onClick={() => handleExport('pdf')}
-                className="px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
-              >
+                className="px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700" style={{ 
+                backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.5 : 1,
+                marginRight: '8px'
+            }}>
                 PDF
               </button>
             </div>
@@ -204,9 +236,9 @@ export default function ReportDashboard() {
 
       {/* Charts Section */}
       {showChart && (
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="bg-white p-6 rounded-lg shadow-md" style={{ marginTop: '32px' }}>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold " style={{ color: '#1F2937' }}>
+            <h2 className="text-lg font-semibold " style={{ color: '#1F2937', marginBottom: '10px' }}>
               Attendance Trends
             </h2>
             
@@ -215,11 +247,21 @@ export default function ReportDashboard() {
                 <button
                   key={type}
                   onClick={() => handleChartTypeChange(type)}
-                  className={`px-3 py-1 text-sm rounded capitalize ${
+                  className= {`px-3 py-1 text-sm rounded capitalize ${
                     chartType === type
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
+                  style={{ 
+                    backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
+                    color: 'white',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.5 : 1,
+                    marginRight: '8px'
+                }}
                 >
                   {type}
                 </button>
@@ -239,7 +281,7 @@ export default function ReportDashboard() {
       {/* Data Table */}
       <div className="bg-white rounded-lg shadow-md">
         <div className="p-6 border-b" style={{ color: '#1F2937' }}>
-          <h2 className="text-lg font-semibold" style={{ color: '#1F2937' }}>
+          <h2 className="text-lg font-semibold" style={{ color: '#1F2937', marginTop: '10px' }}>
             Detailed Attendance Records
           </h2>
           <p className="text-sm text-gray-600 mt-1">
