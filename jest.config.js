@@ -4,11 +4,17 @@ const tsJestTransformCfg = createDefaultPreset().transform;
 
 /** @type {import("jest").Config} **/
 module.exports = {
-  testEnvironment: "node",
+  testEnvironment: "jsdom",
   transform: {
     ...tsJestTransformCfg,
+    "^.+\\.(ts|tsx)$": ["ts-jest", {
+      tsconfig: "tsconfig.json",
+      babelConfig: {
+        presets: ["@babel/preset-react", "@babel/preset-typescript"]
+      }
+    }]
   },
-  testMatch: ["**/*.test.ts"],
+  testMatch: ["**/*.test.ts", "**/*.test.tsx"],
   collectCoverage: true,
   coverageDirectory: "coverage",
   coverageThreshold: {
