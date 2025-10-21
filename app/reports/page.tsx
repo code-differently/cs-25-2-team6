@@ -4,11 +4,40 @@ import { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import RAGQueryBox from '@/components/RAGQueryBox';
 import QuerySuggestions from '@/components/QuerySuggestions';
+import FilterPanel from '@/components/reports/FilterPanel';
+import AttendanceDataTable, { type AttendanceRecord, type ExportFormat } from '@/components/reports/AttendanceDataTable';
+import AttendanceChart, { type ChartType } from '@/components/reports/AttendanceChart';
+import ReportSummaryCards from '@/components/reports/ReportSummaryCards';
 
 export default function Reports() {
   const [selectedQuery, setSelectedQuery] = useState('');
   const [queryResults, setQueryResults] = useState(null);
   const [showTraditionalFilters, setShowTraditionalFilters] = useState(false);
+  const [chartType, setChartType] = useState<ChartType>('bar');
+  const handleChartTypeChange = (type: ChartType) => {
+    setChartType(type);
+  };
+  
+  // Mock data for development - replace with actual data later
+  const mockData = {
+    totalStudents: 150,
+    presentCount: 120,
+    absentCount: 20,
+    lateCount: 10,
+    attendanceRate: 85.5,
+    records: Array(25).fill(null).map((_, i) => ({
+      id: i.toString(),
+      studentId: `s${i + 1}`,
+      studentName: `Student ${i + 1}`,
+      className: `Class ${Math.floor(i / 5) + 1}`,
+      date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
+      status: ['present', 'absent', 'late', 'excused'][Math.floor(Math.random() * 4)] as 'present' | 'absent' | 'late' | 'excused',
+      timeIn: '09:00',
+      timeOut: '15:00',
+      notes: `Note for student ${i + 1}`,
+      earlyDismissal: false
+    }))
+  };
 
   const handleSelectQuery = (query: string) => {
     setSelectedQuery(query);
@@ -71,21 +100,65 @@ export default function Reports() {
 
         {/* Traditional Filters Interface */}
         {showTraditionalFilters && (
-          <div className="bg-white rounded-lg border shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Traditional Filters</h3>
-            <div className="reports-placeholder">
-              <div className="placeholder-content">
-                <h4 className="text-md font-medium mb-2">Filter Options Coming Soon</h4>
-                <p className="text-gray-600 mb-4">This will include:</p>
-                <ul style={{ textAlign: 'left', display: 'inline-block' }}>
-                  <li>• Filter by student name</li>
-                  <li>• Filter by date range</li>
-                  <li>• Filter by attendance status</li>
-                  <li>• Multiple filter combinations</li>
-                  <li>• Export functionality</li>
-                  <li>• Visual charts and graphs</li>
-                </ul>
+          <div className="space-y-6">
+            <FilterPanel />
+            
+            <ReportSummaryCards
+              totalStudents={mockData.totalStudents}
+              presentCount={mockData.presentCount}
+              absentCount={mockData.absentCount}
+              lateCount={mockData.lateCount}
+              attendanceRate={mockData.attendanceRate}
+              isLoading={false}
+            />
+
+            <div className="bg-white rounded-lg border shadow-sm p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Attendance Trends</h3>
+                <div className="flex space-x-2">
+                  {(['bar', 'line', 'area'] as ChartType[]).map(type => (
+                    <button
+                      key={type}
+                      onClick={() => setChartType(type)}
+                      className={`px-3 py-1 text-sm rounded capitalize ${
+                        chartType === type
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
               </div>
+              <AttendanceChart
+                data={mockData.records}
+                chartType={chartType}
+                onChartTypeChange={handleChartTypeChange}
+              />
+            </div>
+
+            <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+              <div className="p-6 border-b">
+                <h3 className="text-lg font-semibold text-gray-900">Attendance Records</h3>
+                <p className="text-sm text-gray-600 mt-1">Detailed view of all attendance records</p>
+              </div>
+              <AttendanceDataTable
+                data={mockData.records}
+                isLoading={false}
+                onSort={(column, direction) => {
+                  console.log('Sort:', column, direction);
+                }}
+                onPageChange={(page, pageSize) => {
+                  console.log('Page change:', page, pageSize);
+                }}
+                onExport={(format) => {
+                  console.log('Export:', format);
+                }}
+                totalRecords={mockData.records.length}
+                currentPage={1}
+                pageSize={25}
+              />
             </div>
           </div>
         )}

@@ -5,6 +5,7 @@ import { useReportData, type ReportFilters, type AttendanceRecord, type ExportFo
 import ReportSummaryCards from './ReportSummaryCards';
 import AttendanceDataTable from './AttendanceDataTable';
 import AttendanceChart from './AttendanceChart';
+import LoadingSpinner from '../LoadingSpinner';
 /* import DataPicker from '../DataPicker'; */
 
 export type ChartType = 'line' | 'bar' | 'pie' | 'area';
@@ -33,15 +34,34 @@ export default function ReportDashboard() {
 
   // Filter update handlers
   const handleFilterChange = useCallback((newFilters: Partial<ReportFilters>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-  }, []);
+    // Reset studentId and classId if they were previously set but not in newFilters
+    const updatedFilters = { ...newFilters };
+    if (!newFilters.studentId && filters.studentId) {
+      updatedFilters.studentId = undefined;
+    }
+    if (!newFilters.classId && filters.classId) {
+      updatedFilters.classId = undefined;
+    }
+    if (!newFilters.status && filters.status) {
+      updatedFilters.status = 'ALL';
+    }
+    setFilters(prev => ({ ...prev, ...updatedFilters }));
+  }, [filters]);
 
   const handleDateRangeChange = useCallback((startDate: string, endDate: string) => {
     setFilters(prev => ({ ...prev, startDate, endDate }));
   }, []);
 
-  const handleStatusFilter = useCallback((status: ReportFilters['status']) => {
+  const handleStatusFilter = useCallback((status: 'present' | 'late' | 'absent' | 'excused' | 'ALL') => {
     setFilters(prev => ({ ...prev, status }));
+  }, []);
+
+  const handleStudentFilter = useCallback((studentId: string) => {
+    setFilters(prev => ({ ...prev, studentId }));
+  }, []);
+
+  const handleClassFilter = useCallback((classId: string) => {
+    setFilters(prev => ({ ...prev, classId }));
   }, []);
 
   // Export handler
@@ -61,21 +81,32 @@ export default function ReportDashboard() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Error: </strong>
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
+
+      {/* Main Content */}
+      {loading ? (
+        <div className="flex justify-center items-center min-h-[200px]">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <div>
+          {/* Header */}
+          <div className="flex justify-between items-center">
         <div className="flex space-x-3">
           <button
             onClick={() => setShowChart(!showChart)}
-            style={{ 
-                backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.5 : 1
-            }}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              loading
+                ? 'bg-gray-400 cursor-not-allowed opacity-50'
+                : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
+            } text-white`}
+
           >
             {showChart ? 'Hide Charts' : 'Show Charts'}
           </button>
@@ -83,17 +114,12 @@ export default function ReportDashboard() {
           <button
             onClick={refreshData}
             disabled={loading}
-            style={{ 
-                backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.5 : 1,
-                marginLeft: '8px'
-            }}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+            className={`ml-2 px-4 py-2 rounded-lg transition-colors ${
+              loading
+                ? 'bg-gray-400 cursor-not-allowed opacity-50'
+                : 'bg-red-600 hover:bg-red-700 cursor-pointer'
+            } text-white`}
+
           >
             {loading ? 'Refreshing...' : 'Refresh Data'}
           </button>
@@ -127,16 +153,12 @@ export default function ReportDashboard() {
             </label>
             <select
               value={filters.status}
-              onChange={(e) => handleStatusFilter(e.target.value as ReportFilters['status'])}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" style={{ 
-                backgroundColor: loading ? '#9CA3AF' : '#3B82F6', 
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.5 : 1
-            }}>
+              onChange={(e) => handleStatusFilter(e.target.value as 'present' | 'late' | 'absent' | 'excused' | 'ALL')}
+              className={`w-full px-4 py-2 rounded-lg transition-colors ${
+                loading
+                  ? 'bg-gray-400 cursor-not-allowed opacity-50'
+                  : 'bg-white border-gray-300 hover:border-blue-500 cursor-pointer'
+              } border focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}>
               <option value="ALL">All Statuses</option>
               <option value="present">Present</option>
               <option value="late">Late</option>
@@ -202,6 +224,8 @@ export default function ReportDashboard() {
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
         </div>
       )}
 

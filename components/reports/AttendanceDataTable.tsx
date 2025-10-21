@@ -13,6 +13,7 @@ export interface AttendanceRecord {
   timeIn?: string;
   timeOut?: string;
   notes?: string;
+  earlyDismissal?: boolean;
 }
 
 interface AttendanceDataTableProps {
