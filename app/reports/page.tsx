@@ -1,5 +1,8 @@
 'use client';
 
+import React from 'react';
+import DashboardLayout from '@/components/DashboardLayout';
+import ReportsDashboard from '../../components/reports/ReportDashboard';
 import { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import RAGQueryBox from '@/components/RAGQueryBox';
@@ -25,9 +28,11 @@ export default function Reports() {
       <div className="reports-container">
         <h1 className="page-title">📊 Attendance Reports</h1>
         <p className="page-description">
-          View and filter attendance reports by student, date, or status.
+          Comprehensive attendance analytics and insights
         </p>
         
+        {/* Main Reports Dashboard */}
+        <ReportsDashboard />
         <FilterPanel />
         
         {/* Placeholder for Reports results */}
