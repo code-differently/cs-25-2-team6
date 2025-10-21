@@ -1,62 +1,43 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { AttendanceRecord } from '../domains/AttendanceRecords';
 import { AttendanceStatus } from '../domains/AttendanceStatus';
 import { ReportFilters, ReportMetadata, ReportAggregations, ReportRequest } from '../domains/ReportFilters';
+import { 
+  ReportData, 
+  StudentAttendanceStats, 
+  DateAttendanceStats, 
+  ReportSummary,
+  AttendanceRecord as ReportAttendanceRecord,
+  ReportInsights
+} from '../domains/ReportData';
+import { QueryResult, ReportQueryResult, QueryMetrics, PaginationInfo } from '../domains/QueryResult';
 import { FileStudentRepo, Student } from './FileStudentRepo';
 import { FileAttendanceRepo } from './FileAttendanceRepo';
 
-//report data structure
-export interface ReportData {
-  id: string;
-  filters: ReportFilters;
-  records: AttendanceRecord[];
-  metadata: ReportMetadata;
-  aggregations?: any;
-  createdAt: string;
-  expiresAt: string;
-}
+// Serverless-compatible in-memory cache
+let reportCache: Map<string, { data: ReportData; expiresAt: number }> = new Map();
+let savedReports: Array<{ id: string; name: string; request: ReportRequest; createdAt: string }> = [];
 
-//aggregate 
-export interface AggregatedReportResult {
-  records: AttendanceRecord[];
-  totalRecords: number;
-  filteredRecords: number;
-  aggregations: any;
-  metadata: ReportMetadata;
-}
-
-// FileReportRepo: Repository for report data aggregation, caching, and persistence
- 
+/**
+ * FileReportRepo: Serverless-compatible repository for report data aggregation, caching, and persistence
+ * Uses in-memory storage instead of file system for Vercel compatibility
+ */
 export class FileReportRepo {
-  private reportsFilePath: string;
-  private cacheFilePath: string;
   private studentRepo: FileStudentRepo;
   private attendanceRepo: FileAttendanceRepo;
 
-  constructor(reportsFilePath?: string, cacheFilePath?: string) {
-    this.reportsFilePath = reportsFilePath ?? path.join(__dirname, 'reports.json');
-    this.cacheFilePath = cacheFilePath ?? path.join(__dirname, 'reports_cache.json');
+  constructor() {
     this.studentRepo = new FileStudentRepo();
     this.attendanceRepo = new FileAttendanceRepo();
-    
-    this.initializeFiles();
   }
 
-  private initializeFiles(): void {
-    if (!fs.existsSync(this.reportsFilePath)) {
-      fs.writeFileSync(this.reportsFilePath, JSON.stringify([]));
-    }
-    if (!fs.existsSync(this.cacheFilePath)) {
-      fs.writeFileSync(this.cacheFilePath, JSON.stringify([]));
-    }
-  }
-
-
-  async generateReport(request: ReportRequest): Promise<AggregatedReportResult> {
+  /**
+   * Generate a comprehensive report with filtering, aggregation, and caching
+   */
+  async generateReport(request: ReportRequest): Promise<ReportQueryResult> {
     const startTime = Date.now();
+    const version = '1.0.0';
     
-   
+    // Check cache first
     let cacheHit = false;
     if (request.useCache !== false) {
       const cachedResult = this.getCachedReport(request.filters);
@@ -64,76 +45,71 @@ export class FileReportRepo {
         cacheHit = true;
         return {
           ...cachedResult,
-          metadata: {
-            ...cachedResult.metadata,
-            queryTime: Date.now() - startTime,
+          metrics: {
+            ...cachedResult.metrics,
+            executionTimeMs: Date.now() - startTime,
             cacheHit: true
           }
         };
       }
     }
 
-// Get all data
+    // Get all data
     const allRecords = this.attendanceRepo.allAttendance();
     const allStudents = this.studentRepo.allStudents();
 
-    
+    // Apply filters
     const filteredRecords = this.applyFilters(allRecords, allStudents, request.filters);
 
-// aggregation logic
-    const aggregations = this.calculateAggregations(
-      filteredRecords, 
-      allStudents,
-      request.aggregations || {}
-    );
+    // Build report data structure
+    const reportData = await this.buildReportData(filteredRecords, allStudents, request);
 
-    
-    let sortedRecords = filteredRecords;
-    if (request.sorting) {
-      sortedRecords = this.sortRecords(filteredRecords, allStudents, request.sorting);
-    }
+    // Apply sorting and pagination
+    const finalData = this.applySortingAndPagination(reportData, request);
 
+    const executionTime = Date.now() - startTime;
 
-    let finalRecords = sortedRecords;
-    let paginationInfo = null;
-    if (request.pagination) {
-      const paginatedResult = this.paginateRecords(sortedRecords, request.pagination);
-      finalRecords = paginatedResult.records;
-      paginationInfo = paginatedResult.pagination;
-    }
-
-    const queryTime = Date.now() - startTime;
-
-    // Create metadata
-    const metadata: ReportMetadata = {
-      totalRecords: allRecords.length,
-      filteredRecords: filteredRecords.length,
-      generatedAt: new Date().toISOString(),
-      appliedFilters: request.filters,
-      queryTime,
-      cacheHit
+    // Create query metrics
+    const metrics: QueryMetrics = {
+      executionTimeMs: executionTime,
+      recordsProcessed: allRecords.length,
+      recordsFiltered: filteredRecords.length,
+      cacheHit,
+      queryComplexity: this.calculateComplexity(request),
+      optimizationSuggestions: this.getOptimizationSuggestions(request, executionTime)
     };
 
-    const result: AggregatedReportResult = {
-      records: finalRecords,
-      totalRecords: allRecords.length,
-      filteredRecords: filteredRecords.length,
-      aggregations: {
-        ...aggregations,
-        ...(paginationInfo && { pagination: paginationInfo })
+    // Create query result
+    const result: ReportQueryResult = {
+      data: finalData,
+      metrics,
+      timestamp: new Date().toISOString(),
+      version,
+      query: {
+        filters: request.filters,
+        parameters: { ...request },
+        hash: this.generateCacheId(request.filters)
       },
-      metadata
+      status: 'success',
+      reportType: this.determineReportType(request),
+      generationTime: executionTime,
+      dataFreshness: new Date().toISOString(),
+      exportOptions: {
+        available: ['csv', 'json', 'pdf']
+      }
     };
 
-    // Cache the result if caching is enabled
+    // Cache the result
     if (request.useCache !== false) {
-      this.cacheReport(request.filters, result, queryTime);
+      this.cacheReport(request.filters, result);
     }
 
     return result;
   }
 
-//Filters
+  /**
+   * Apply all filters to attendance records
+   */
   private applyFilters(
     records: AttendanceRecord[], 
     students: Student[], 
@@ -141,13 +117,14 @@ export class FileReportRepo {
   ): AttendanceRecord[] {
     let filteredRecords = [...records];
 
+    // Student ID filters
     if (filters.studentIds && filters.studentIds.length > 0) {
       filteredRecords = filteredRecords.filter(record => 
         filters.studentIds!.includes(record.studentId)
       );
     }
 
-    
+    // Student name filter
     if (filters.studentName) {
       const matchingStudents = students.filter(student => {
         const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
@@ -159,7 +136,7 @@ export class FileReportRepo {
       );
     }
 
-   
+    // Last name filter
     if (filters.lastName) {
       const matchingStudents = students.filter(student =>
         student.lastName.toLowerCase().includes(filters.lastName!.toLowerCase())
@@ -170,14 +147,20 @@ export class FileReportRepo {
       );
     }
 
-   
+    // Grade level filter - Note: Student interface doesn't have grade property yet
+    // This would need to be implemented when Student interface is extended
+    if (filters.grades && filters.grades.length > 0) {
+      // TODO: Implement when Student interface includes grade property
+      console.warn('Grade filtering not yet implemented - Student interface needs grade property');
+    }
+
+    // Date filters
     if (filters.dateISO) {
       filteredRecords = filteredRecords.filter(record => 
         record.dateISO === filters.dateISO
       );
     }
 
-    
     if (filters.dateFrom) {
       filteredRecords = filteredRecords.filter(record => 
         record.dateISO >= filters.dateFrom!
@@ -190,7 +173,7 @@ export class FileReportRepo {
       );
     }
 
-   
+    // Relative period filter
     if (filters.relativePeriod) {
       const dateRange = this.calculateRelativeDateRange(filters.relativePeriod);
       filteredRecords = filteredRecords.filter(record => 
@@ -198,21 +181,23 @@ export class FileReportRepo {
       );
     }
 
-
+    // Status filters
     if (filters.status) {
       filteredRecords = filteredRecords.filter(record => 
         record.status === filters.status
       );
     }
 
-  
     if (filters.statuses && filters.statuses.length > 0) {
       filteredRecords = filteredRecords.filter(record => 
         filters.statuses!.includes(record.status)
       );
     }
 
+    // Note: Attendance rate filters would be implemented here when added to ReportFilters interface
+    // This would allow filtering students by their overall attendance percentage
 
+    // Special condition filters
     if (filters.onlyLate) {
       filteredRecords = filteredRecords.filter(record => record.late === true);
     }
@@ -228,107 +213,336 @@ export class FileReportRepo {
     return filteredRecords;
   }
 
-// aggregation logic
-  private calculateAggregations(
-    records: AttendanceRecord[], 
-    students: Student[],
-    aggregationOptions: ReportAggregations
-  ): any {
-    const aggregations: any = {};
-
-    if (aggregationOptions.includeCount !== false) {
-      aggregations.counts = {
-        total: records.length,
-        present: records.filter(r => r.status === AttendanceStatus.PRESENT).length,
-        absent: records.filter(r => r.status === AttendanceStatus.ABSENT).length,
-        late: records.filter(r => r.status === AttendanceStatus.LATE).length,
-        excused: records.filter(r => r.status === AttendanceStatus.EXCUSED).length,
-        earlyDismissal: records.filter(r => r.earlyDismissal === true).length
+  /**
+   * Build comprehensive report data structure
+   */
+  private async buildReportData(
+    filteredRecords: AttendanceRecord[],
+    allStudents: Student[],
+    request: ReportRequest
+  ): Promise<ReportData> {
+    // Convert to report attendance records
+    const reportRecords: ReportAttendanceRecord[] = filteredRecords.map((record, index) => {
+      const student = allStudents.find(s => s.id === record.studentId);
+      return {
+        id: `${record.studentId}_${record.dateISO}_${index}`, // Generate unique ID
+        studentId: record.studentId,
+        studentName: student ? `${student.firstName} ${student.lastName}` : 'Unknown',
+        studentFirstName: student?.firstName || '',
+        studentLastName: student?.lastName || '',
+        grade: undefined, // Student interface doesn't have grade yet
+        date: record.dateISO,
+        status: record.status,
+        late: record.late,
+        earlyDismissal: record.earlyDismissal,
+        excused: record.excused,
+        createdAt: new Date().toISOString() // Generate timestamp
       };
-    }
-
-    if (aggregationOptions.includePercentage) {
-      const total = records.length;
-      if (total > 0) {
-        aggregations.percentages = {
-          present: Math.round((aggregations.counts.present / total) * 100),
-          absent: Math.round((aggregations.counts.absent / total) * 100),
-          late: Math.round((aggregations.counts.late / total) * 100),
-          excused: Math.round((aggregations.counts.excused / total) * 100),
-          earlyDismissal: Math.round((aggregations.counts.earlyDismissal / total) * 100)
-        };
-      }
-    }
-
-    if (aggregationOptions.includeStreaks) {
-      aggregations.streaks = this.calculateAttendanceStreaks(records, students);
-    }
-
-    if (aggregationOptions.includeTrends) {
-      aggregations.trends = this.calculateAttendanceTrends(records);
-    }
-
-    if (aggregationOptions.includeComparative) {
-      aggregations.comparative = this.calculateComparativeMetrics(records, students);
-    }
-
-    return aggregations;
-  }
-
-
-  private sortRecords(
-    records: AttendanceRecord[], 
-    students: Student[],
-    sortOptions: { sortBy: string; sortOrder: string }
-  ): AttendanceRecord[] {
-    return records.sort((a, b) => {
-      let comparison = 0;
-
-      switch (sortOptions.sortBy) {
-        case 'name':
-          const studentA = students.find(s => s.id === a.studentId);
-          const studentB = students.find(s => s.id === b.studentId);
-          const nameA = studentA ? `${studentA.firstName} ${studentA.lastName}` : '';
-          const nameB = studentB ? `${studentB.firstName} ${studentB.lastName}` : '';
-          comparison = nameA.localeCompare(nameB);
-          break;
-        case 'date':
-          comparison = a.dateISO.localeCompare(b.dateISO);
-          break;
-        case 'status':
-          comparison = a.status.localeCompare(b.status);
-          break;
-        default:
-          comparison = a.dateISO.localeCompare(b.dateISO);
-      }
-
-      return sortOptions.sortOrder === 'desc' ? -comparison : comparison;
     });
-  }
 
-//pagination logic
-  private paginateRecords(
-    records: AttendanceRecord[], 
-    paginationOptions: { page: number; limit: number }
-  ): { records: AttendanceRecord[]; pagination: any } {
-    const { page, limit } = paginationOptions;
-    const offset = (page - 1) * limit;
-    const paginatedRecords = records.slice(offset, offset + limit);
+    // Calculate student statistics
+    const studentStats = this.calculateStudentStats(filteredRecords, allStudents);
+
+    // Calculate date statistics
+    const dateStats = this.calculateDateStats(filteredRecords);
+
+    // Calculate summary
+    const summary = this.calculateSummary(filteredRecords, allStudents);
+
+    // Generate insights
+    const insights = this.generateInsights(filteredRecords, allStudents, studentStats);
+
+    // Create metadata
+    const metadata: ReportMetadata = {
+      totalRecords: this.attendanceRepo.allAttendance().length,
+      filteredRecords: filteredRecords.length,
+      generatedAt: new Date().toISOString(),
+      appliedFilters: request.filters,
+      queryTime: 0, // Will be set later
+      cacheHit: false // Will be set later
+    };
 
     return {
-      records: paginatedRecords,
-      pagination: {
-        page,
-        limit,
-        total: records.length,
-        totalPages: Math.ceil(records.length / limit),
-        hasNext: offset + limit < records.length,
-        hasPrev: page > 1
+      records: reportRecords,
+      studentStats,
+      dateStats,
+      summary,
+      metadata,
+      insights
+    };
+  }
+
+  /**
+   * Apply sorting and pagination to report data
+   */
+  private applySortingAndPagination(reportData: ReportData, request: ReportRequest): ReportData {
+    let sortedData = { ...reportData };
+
+    // Apply sorting if specified
+    if (request.sorting) {
+      sortedData.records = this.sortRecords(reportData.records, request.sorting);
+    }
+
+    // Apply pagination if specified
+    if (request.pagination) {
+      const paginatedResult = this.paginateRecords(sortedData.records, request.pagination);
+      sortedData.records = paginatedResult.records;
+      // Add pagination info to metadata if needed
+    }
+
+    return sortedData;
+  }
+
+  /**
+   * Calculate student attendance statistics
+   */
+  private calculateStudentStats(
+    records: AttendanceRecord[],
+    students: Student[]
+  ): StudentAttendanceStats[] {
+    return students.map(student => {
+      const studentRecords = records.filter(r => r.studentId === student.id);
+      const totalDays = studentRecords.length;
+      const presentDays = studentRecords.filter(r => r.status === AttendanceStatus.PRESENT).length;
+      const lateDays = studentRecords.filter(r => r.late === true).length;
+      const absentDays = studentRecords.filter(r => r.status === AttendanceStatus.ABSENT).length;
+      const excusedDays = studentRecords.filter(r => r.excused === true).length;
+
+      const attendanceRate = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+      const lateRate = totalDays > 0 ? Math.round((lateDays / totalDays) * 100) : 0;
+
+      return {
+        studentId: student.id,
+        studentName: `${student.firstName} ${student.lastName}`,
+        grade: undefined, // Student interface doesn't have grade yet
+        totalDays,
+        presentDays,
+        lateDays,
+        absentDays,
+        excusedDays,
+        attendanceRate,
+        lateRate,
+        consecutiveAbsences: this.calculateConsecutiveAbsences(studentRecords),
+        longestPresentStreak: this.calculateLongestPresentStreak(studentRecords),
+        lastAttendanceDate: this.getLastAttendanceDate(studentRecords),
+        averageWeeklyAttendance: this.calculateAverageWeeklyAttendance(studentRecords),
+        trend: this.calculateTrend(studentRecords)
+      };
+    }).filter(stats => stats.totalDays > 0); // Only include students with attendance records
+  }
+
+  /**
+   * Calculate date-based attendance statistics
+   */
+  private calculateDateStats(records: AttendanceRecord[]): DateAttendanceStats[] {
+    const recordsByDate = records.reduce((acc, record) => {
+      if (!acc[record.dateISO]) {
+        acc[record.dateISO] = [];
+      }
+      acc[record.dateISO].push(record);
+      return acc;
+    }, {} as Record<string, AttendanceRecord[]>);
+
+    return Object.entries(recordsByDate).map(([date, dayRecords]) => {
+      const totalStudents = dayRecords.length;
+      const presentStudents = dayRecords.filter(r => r.status === AttendanceStatus.PRESENT).length;
+      const lateStudents = dayRecords.filter(r => r.late === true).length;
+      const absentStudents = dayRecords.filter(r => r.status === AttendanceStatus.ABSENT).length;
+      const excusedStudents = dayRecords.filter(r => r.excused === true).length;
+
+      return {
+        date,
+        totalStudents,
+        presentStudents,
+        lateStudents,
+        absentStudents,
+        excusedStudents,
+        attendanceRate: totalStudents > 0 ? Math.round((presentStudents / totalStudents) * 100) : 0,
+        lateRate: totalStudents > 0 ? Math.round((lateStudents / totalStudents) * 100) : 0
+      };
+    }).sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  /**
+   * Calculate report summary statistics
+   */
+  private calculateSummary(records: AttendanceRecord[], students: Student[]): ReportSummary {
+    const uniqueStudents = new Set(records.map(r => r.studentId)).size;
+    const uniqueDates = new Set(records.map(r => r.dateISO));
+    const sortedDates = Array.from(uniqueDates).sort();
+
+    const totalPresentDays = records.filter(r => r.status === AttendanceStatus.PRESENT).length;
+    const totalLateDays = records.filter(r => r.late === true).length;
+    const totalAbsentDays = records.filter(r => r.status === AttendanceStatus.ABSENT).length;
+    const totalExcusedDays = records.filter(r => r.excused === true).length;
+
+    const overallAttendanceRate = records.length > 0 ? Math.round((totalPresentDays / records.length) * 100) : 0;
+    const overallLateRate = records.length > 0 ? Math.round((totalLateDays / records.length) * 100) : 0;
+
+    // Calculate student performance metrics
+    const studentStats = this.calculateStudentStats(records, students);
+    const riskStudents = studentStats.filter(s => s.attendanceRate < 80).length;
+    const perfectAttendance = studentStats.filter(s => s.attendanceRate === 100).length;
+
+    return {
+      totalStudents: uniqueStudents,
+      totalRecords: records.length,
+      dateRange: {
+        start: sortedDates[0] || '',
+        end: sortedDates[sortedDates.length - 1] || '',
+        totalDays: uniqueDates.size
+      },
+      overallStats: {
+        averageAttendanceRate: overallAttendanceRate,
+        averageLateRate: overallLateRate,
+        totalPresentDays,
+        totalLateDays,
+        totalAbsentDays,
+        totalExcusedDays
+      },
+      trends: {
+        attendanceDirection: this.calculateOverallTrend(records),
+        riskStudents,
+        perfectAttendance
       }
     };
   }
 
-// Calculate date range for relative periods
+  /**
+   * Generate AI-style insights and recommendations
+   */
+  private generateInsights(
+    records: AttendanceRecord[],
+    students: Student[],
+    studentStats: StudentAttendanceStats[]
+  ): ReportInsights {
+    const keyFindings: string[] = [];
+    const recommendations: string[] = [];
+    const alertStudents: any[] = [];
+    const patterns: any[] = [];
+
+    // Analyze attendance patterns
+    const overallRate = records.length > 0 ? Math.round((records.filter(r => r.status === AttendanceStatus.PRESENT).length / records.length) * 100) : 0;
+    
+    if (overallRate < 85) {
+      keyFindings.push(`Overall attendance rate of ${overallRate}% is below recommended 85% threshold`);
+      recommendations.push('Consider implementing attendance intervention programs');
+    }
+
+    // Identify at-risk students
+    const riskStudents = studentStats.filter(s => s.attendanceRate < 80);
+    if (riskStudents.length > 0) {
+      keyFindings.push(`${riskStudents.length} students have attendance rates below 80%`);
+      recommendations.push('Schedule meetings with at-risk students and their families');
+      
+      riskStudents.forEach(student => {
+        alertStudents.push({
+          studentId: student.studentId,
+          studentName: student.studentName,
+          alertType: 'attendance' as const,
+          severity: student.attendanceRate < 60 ? 'high' as const : 'medium' as const,
+          description: `Attendance rate: ${student.attendanceRate}%`
+        });
+      });
+    }
+
+    // Analyze tardiness patterns
+    const lateStudents = studentStats.filter(s => s.lateRate > 20);
+    if (lateStudents.length > 0) {
+      keyFindings.push(`${lateStudents.length} students have tardiness rates above 20%`);
+      recommendations.push('Review morning routines and transportation options with frequently late students');
+    }
+
+    return {
+      keyFindings,
+      recommendations,
+      alertStudents,
+      patterns
+    };
+  }
+
+  // Helper methods for calculations
+  private calculateStudentAttendanceRates(records: AttendanceRecord[], students: Student[]): Record<string, number> {
+    const rates: Record<string, number> = {};
+    
+    students.forEach(student => {
+      const studentRecords = records.filter(r => r.studentId === student.id);
+      const totalDays = studentRecords.length;
+      const presentDays = studentRecords.filter(r => r.status === AttendanceStatus.PRESENT).length;
+      rates[student.id] = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+    });
+
+    return rates;
+  }
+
+  private calculateConsecutiveAbsences(records: AttendanceRecord[]): number {
+    const sortedRecords = records.sort((a, b) => b.dateISO.localeCompare(a.dateISO)); // Most recent first
+    let consecutive = 0;
+    
+    for (const record of sortedRecords) {
+      if (record.status === AttendanceStatus.ABSENT) {
+        consecutive++;
+      } else {
+        break;
+      }
+    }
+    
+    return consecutive;
+  }
+
+  private calculateLongestPresentStreak(records: AttendanceRecord[]): number {
+    const sortedRecords = records.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+    let maxStreak = 0;
+    let currentStreak = 0;
+    
+    for (const record of sortedRecords) {
+      if (record.status === AttendanceStatus.PRESENT) {
+        currentStreak++;
+        maxStreak = Math.max(maxStreak, currentStreak);
+      } else {
+        currentStreak = 0;
+      }
+    }
+    
+    return maxStreak;
+  }
+
+  private getLastAttendanceDate(records: AttendanceRecord[]): string | undefined {
+    const sortedRecords = records.sort((a, b) => b.dateISO.localeCompare(a.dateISO));
+    return sortedRecords.length > 0 ? sortedRecords[0].dateISO : undefined;
+  }
+
+  private calculateAverageWeeklyAttendance(records: AttendanceRecord[]): number {
+    // Simplified calculation - could be more sophisticated
+    const totalDays = records.length;
+    const presentDays = records.filter(r => r.status === AttendanceStatus.PRESENT).length;
+    return totalDays > 0 ? Math.round((presentDays / totalDays) * 5) : 0; // Assuming 5-day school week
+  }
+
+  private calculateTrend(records: AttendanceRecord[]): 'improving' | 'declining' | 'stable' {
+    if (records.length < 10) return 'stable'; // Not enough data
+    
+    const sortedRecords = records.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+    const midPoint = Math.floor(sortedRecords.length / 2);
+    
+    const firstHalf = sortedRecords.slice(0, midPoint);
+    const secondHalf = sortedRecords.slice(midPoint);
+    
+    const firstHalfRate = firstHalf.filter(r => r.status === AttendanceStatus.PRESENT).length / firstHalf.length;
+    const secondHalfRate = secondHalf.filter(r => r.status === AttendanceStatus.PRESENT).length / secondHalf.length;
+    
+    const difference = secondHalfRate - firstHalfRate;
+    
+    if (difference > 0.05) return 'improving';
+    if (difference < -0.05) return 'declining';
+    return 'stable';
+  }
+
+  private calculateOverallTrend(records: AttendanceRecord[]): 'improving' | 'declining' | 'stable' {
+    // Similar logic to individual student trends but for overall dataset
+    return 'stable'; // Simplified implementation
+  }
+
   private calculateRelativeDateRange(period: string): { start: string; end: string } {
     const now = new Date();
     const today = now.toISOString().split('T')[0];
@@ -350,165 +564,139 @@ export class FileReportRepo {
     }
   }
 
-//attendance streaks logic
-  private calculateAttendanceStreaks(records: AttendanceRecord[], students: Student[]): any {
-    const streaks: any = {};
-    
+  private sortRecords(
+    records: ReportAttendanceRecord[],
+    sortOptions: { sortBy: string; sortOrder: string }
+  ): ReportAttendanceRecord[] {
+    return records.sort((a, b) => {
+      let comparison = 0;
 
-    const recordsByStudent = records.reduce((acc, record) => {
-      if (!acc[record.studentId]) {
-        acc[record.studentId] = [];
+      switch (sortOptions.sortBy) {
+        case 'name':
+          comparison = a.studentName.localeCompare(b.studentName);
+          break;
+        case 'date':
+          comparison = a.date.localeCompare(b.date);
+          break;
+        case 'status':
+          comparison = a.status.localeCompare(b.status);
+          break;
+        case 'grade':
+          comparison = (a.grade || '').localeCompare(b.grade || '');
+          break;
+        default:
+          comparison = a.date.localeCompare(b.date);
       }
-      acc[record.studentId].push(record);
-      return acc;
-    }, {} as Record<string, AttendanceRecord[]>);
 
-//streak calculation logic
-    Object.entries(recordsByStudent).forEach(([studentId, studentRecords]) => {
-      const student = students.find(s => s.id === studentId);
-      if (!student) return;
+      return sortOptions.sortOrder === 'desc' ? -comparison : comparison;
+    });
+  }
 
-      const sortedRecords = studentRecords.sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  private paginateRecords(
+    records: ReportAttendanceRecord[],
+    paginationOptions: { page: number; limit: number }
+  ): { records: ReportAttendanceRecord[]; pagination: PaginationInfo } {
+    const { page, limit } = paginationOptions;
+    const offset = (page - 1) * limit;
+    const paginatedRecords = records.slice(offset, offset + limit);
+
+    const pagination: PaginationInfo = {
+      currentPage: page,
+      totalPages: Math.ceil(records.length / limit),
+      totalItems: records.length,
+      itemsPerPage: limit,
+      hasNextPage: offset + limit < records.length,
+      hasPreviousPage: page > 1,
+      startIndex: offset,
+      endIndex: Math.min(offset + limit - 1, records.length - 1)
+    };
+
+    return { records: paginatedRecords, pagination };
+  }
+
+  private calculateComplexity(request: ReportRequest): 'simple' | 'moderate' | 'complex' {
+    let complexity = 0;
+    
+    if (request.filters.studentIds?.length) complexity++;
+    if (request.filters.dateFrom || request.filters.dateTo) complexity++;
+    if (request.filters.statuses?.length) complexity++;
+    if (request.aggregations) complexity += 2;
+    if (request.sorting) complexity++;
+    if (request.pagination) complexity++;
+    
+    if (complexity <= 2) return 'simple';
+    if (complexity <= 4) return 'moderate';
+    return 'complex';
+  }
+
+  private getOptimizationSuggestions(request: ReportRequest, executionTime: number): string[] {
+    const suggestions: string[] = [];
+    
+    if (executionTime > 1000) {
+      suggestions.push('Consider using pagination for large result sets');
+    }
+    
+    if (request.filters.studentName && !request.filters.studentIds) {
+      suggestions.push('Use specific student IDs instead of name search for better performance');
+    }
+    
+    return suggestions;
+  }
+
+  private determineReportType(request: ReportRequest): 'attendance' | 'tardiness' | 'summary' | 'comparative' | 'custom' {
+    if (request.filters.onlyLate) return 'tardiness';
+    if (request.aggregations?.includeComparative) return 'comparative';
+    if (Object.keys(request.filters).length <= 1) return 'summary';
+    return 'attendance';
+  }
+
+  // Cache management methods
+  private cacheReport(filters: ReportFilters, result: ReportQueryResult): void {
+    try {
+      const cacheId = this.generateCacheId(filters);
+      const expiresAt = Date.now() + (60 * 60 * 1000); // 1 hour
       
-      let currentStreak = 0;
-      let maxStreak = 0;
-      let streakType = 'present';
-
-      sortedRecords.forEach(record => {
-        if (record.status === AttendanceStatus.PRESENT) {
-          if (streakType === 'present') {
-            currentStreak++;
-          } else {
-            currentStreak = 1;
-            streakType = 'present';
-          }
-        } else {
-          if (streakType === 'absent') {
-            currentStreak++;
-          } else {
-            currentStreak = 1;
-            streakType = 'absent';
-          }
-        }
-        maxStreak = Math.max(maxStreak, currentStreak);
+      reportCache.set(cacheId, {
+        data: result.data,
+        expiresAt
       });
 
-      streaks[studentId] = {
-        studentName: `${student.firstName} ${student.lastName}`,
-        currentStreak,
-        maxStreak,
-        streakType
-      };
-    });
-
-    return streaks;
-  }
-
-//attendance trends over time logic
-  private calculateAttendanceTrends(records: AttendanceRecord[]): any {
-    const trends: any = {};
-    
-    
-    const recordsByDate = records.reduce((acc, record) => {
-      if (!acc[record.dateISO]) {
-        acc[record.dateISO] = [];
-      }
-      acc[record.dateISO].push(record);
-      return acc;
-    }, {} as Record<string, AttendanceRecord[]>);
-
-// Calculate daily attendance rates
-    const dailyRates = Object.entries(recordsByDate).map(([date, dayRecords]) => {
-      const total = dayRecords.length;
-      const present = dayRecords.filter(r => r.status === AttendanceStatus.PRESENT).length;
-      return {
-        date,
-        total,
-        present,
-        rate: total > 0 ? Math.round((present / total) * 100) : 0
-      };
-    }).sort((a, b) => a.date.localeCompare(b.date));
-
-    trends.daily = dailyRates;
-    trends.averageRate = dailyRates.length > 0 
-      ? Math.round(dailyRates.reduce((sum, day) => sum + day.rate, 0) / dailyRates.length)
-      : 0;
-
-    return trends;
-  }
-
-// Calculate comparative metrics across students
-  private calculateComparativeMetrics(records: AttendanceRecord[], students: Student[]): any {
-    const metrics: any = {};
-    
-// Calculate metrics by student
-    const studentMetrics = students.map(student => {
-      const studentRecords = records.filter(r => r.studentId === student.id);
-      const total = studentRecords.length;
-      const present = studentRecords.filter(r => r.status === AttendanceStatus.PRESENT).length;
-      
-      return {
-        studentId: student.id,
-        studentName: `${student.firstName} ${student.lastName}`,
-        totalDays: total,
-        presentDays: present,
-        attendanceRate: total > 0 ? Math.round((present / total) * 100) : 0
-      };
-    }).sort((a, b) => b.attendanceRate - a.attendanceRate);
-
-    metrics.byStudent = studentMetrics;
-    metrics.topPerformers = studentMetrics.slice(0, 5);
-    metrics.needsAttention = studentMetrics.filter(s => s.attendanceRate < 80).slice(0, 5);
-
-    return metrics;
-  }
-
-// Cache report result
-  private cacheReport(filters: ReportFilters, result: AggregatedReportResult, queryTime: number): void {
-    try {
-      const cache = this.getCachedReports();
-      const cacheId = this.generateCacheId(filters);
-      
-      const cacheEntry: ReportData = {
-        id: cacheId,
-        filters,
-        records: result.records,
-        metadata: result.metadata,
-        aggregations: result.aggregations,
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour expiry
-      };
-
-// Remove expired entries and add new one
-      const validCache = cache.filter(entry => new Date(entry.expiresAt) > new Date());
-      validCache.push(cacheEntry);
-
-// Keep only last 50 entries in cache
-      const limitedCache = validCache.slice(-50);
-
-      fs.writeFileSync(this.cacheFilePath, JSON.stringify(limitedCache, null, 2));
+      // Clean expired entries
+      this.cleanExpiredCache();
     } catch (error) {
       console.warn('Failed to cache report:', error);
     }
   }
 
-
-  private getCachedReport(filters: ReportFilters): AggregatedReportResult | null {
+  private getCachedReport(filters: ReportFilters): ReportQueryResult | null {
     try {
-      const cache = this.getCachedReports();
       const cacheId = this.generateCacheId(filters);
+      const cached = reportCache.get(cacheId);
       
-      const cachedEntry = cache.find(entry => 
-        entry.id === cacheId && new Date(entry.expiresAt) > new Date()
-      );
-
-      if (cachedEntry) {
+      if (cached && cached.expiresAt > Date.now()) {
         return {
-          records: cachedEntry.records,
-          totalRecords: cachedEntry.metadata.totalRecords,
-          filteredRecords: cachedEntry.metadata.filteredRecords,
-          aggregations: cachedEntry.aggregations || {},
-          metadata: cachedEntry.metadata
+          data: cached.data,
+          metrics: {
+            executionTimeMs: 0,
+            recordsProcessed: 0,
+            recordsFiltered: 0,
+            cacheHit: true,
+            queryComplexity: 'simple'
+          },
+          timestamp: new Date().toISOString(),
+          version: '1.0.0',
+          query: {
+            filters,
+            parameters: {},
+            hash: cacheId
+          },
+          status: 'success',
+          reportType: 'attendance',
+          generationTime: 0,
+          dataFreshness: new Date().toISOString(),
+          exportOptions: {
+            available: ['csv', 'json', 'pdf']
+          }
         };
       }
     } catch (error) {
@@ -518,75 +706,44 @@ export class FileReportRepo {
     return null;
   }
 
-// Read cached reports from file
-  private getCachedReports(): ReportData[] {
-    try {
-      const data = fs.readFileSync(this.cacheFilePath, 'utf-8');
-      return JSON.parse(data) as ReportData[];
-    } catch (error) {
-      return [];
-    }
-  }
-
-// Generate a unique cache ID based on filters
   private generateCacheId(filters: ReportFilters): string {
     const filterString = JSON.stringify(filters, Object.keys(filters).sort());
     return Buffer.from(filterString).toString('base64').replace(/[/+=]/g, '');
   }
 
-//clear expired cache entries
-  clearExpiredCache(): void {
-    try {
-      const cache = this.getCachedReports();
-      const validCache = cache.filter(entry => new Date(entry.expiresAt) > new Date());
-      fs.writeFileSync(this.cacheFilePath, JSON.stringify(validCache, null, 2));
-    } catch (error) {
-      console.warn('Failed to clear expired cache:', error);
-    }
-  }
-
-//save a report
-  saveReportConfig(name: string, request: ReportRequest): void {
-    try {
-      const reports = this.getAllReports();
-      const config = {
-        id: `config_${Date.now()}`,
-        name,
-        request,
-        createdAt: new Date().toISOString()
-      };
-      
-      reports.push(config);
-      fs.writeFileSync(this.reportsFilePath, JSON.stringify(reports, null, 2));
-    } catch (error) {
-      console.error('Failed to save report config:', error);
-    }
-  }
-
-// Get all saved report configurations
-  getAllReports(): any[] {
-    try {
-      const data = fs.readFileSync(this.reportsFilePath, 'utf-8');
-      return JSON.parse(data);
-    } catch (error) {
-      return [];
-    }
-  }
-
-// Delete a saved report configuration by ID
-  deleteReportConfig(configId: string): boolean {
-    try {
-      const reports = this.getAllReports();
-      const filteredReports = reports.filter(report => report.id !== configId);
-      
-      if (filteredReports.length !== reports.length) {
-        fs.writeFileSync(this.reportsFilePath, JSON.stringify(filteredReports, null, 2));
-        return true;
+  private cleanExpiredCache(): void {
+    const now = Date.now();
+    for (const [key, value] of reportCache.entries()) {
+      if (value.expiresAt <= now) {
+        reportCache.delete(key);
       }
-      return false;
-    } catch (error) {
-      console.error('Failed to delete report config:', error);
-      return false;
     }
+  }
+
+  // Report configuration management
+  saveReportConfig(name: string, request: ReportRequest): string {
+    const config = {
+      id: `config_${Date.now()}`,
+      name,
+      request,
+      createdAt: new Date().toISOString()
+    };
+    
+    savedReports.push(config);
+    return config.id;
+  }
+
+  getAllReportConfigs(): Array<{ id: string; name: string; request: ReportRequest; createdAt: string }> {
+    return [...savedReports];
+  }
+
+  deleteReportConfig(configId: string): boolean {
+    const initialLength = savedReports.length;
+    savedReports = savedReports.filter(report => report.id !== configId);
+    return savedReports.length !== initialLength;
+  }
+
+  clearCache(): void {
+    reportCache.clear();
   }
 }
