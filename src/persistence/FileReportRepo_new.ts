@@ -18,7 +18,6 @@ let reportCache: Map<string, { data: ReportData; expiresAt: number }> = new Map(
 let savedReports: Array<{ id: string; name: string; request: ReportRequest; createdAt: string }> = [];
 
 /**
- * FileReportRepo: Serverless-compatible repository for report data aggregation, caching, and persistence
  * Uses in-memory storage instead of file system for Vercel compatibility
  */
 export class FileReportRepo {
@@ -54,11 +53,11 @@ export class FileReportRepo {
       }
     }
 
-    // Get all data
+   
     const allRecords = this.attendanceRepo.allAttendance();
     const allStudents = this.studentRepo.allStudents();
 
-    // Apply filters
+  
     const filteredRecords = this.applyFilters(allRecords, allStudents, request.filters);
 
     // Build report data structure
@@ -147,12 +146,6 @@ export class FileReportRepo {
       );
     }
 
-    // Grade level filter - Note: Student interface doesn't have grade property yet
-    // This would need to be implemented when Student interface is extended
-    if (filters.grades && filters.grades.length > 0) {
-      // TODO: Implement when Student interface includes grade property
-      console.warn('Grade filtering not yet implemented - Student interface needs grade property');
-    }
 
     // Date filters
     if (filters.dateISO) {
@@ -194,8 +187,8 @@ export class FileReportRepo {
       );
     }
 
-    // Note: Attendance rate filters would be implemented here when added to ReportFilters interface
-    // This would allow filtering students by their overall attendance percentage
+    // TODO: Add attendance rate filtering when needed
+    // Currently disabled - attendanceRateMin/Max not in ReportFilters interface
 
     // Special condition filters
     if (filters.onlyLate) {
@@ -221,35 +214,35 @@ export class FileReportRepo {
     allStudents: Student[],
     request: ReportRequest
   ): Promise<ReportData> {
-    // Convert to report attendance records
-    const reportRecords: ReportAttendanceRecord[] = filteredRecords.map((record, index) => {
+// Convert to report attendance records
+    const reportRecords: ReportAttendanceRecord[] = filteredRecords.map(record => {
       const student = allStudents.find(s => s.id === record.studentId);
       return {
-        id: `${record.studentId}_${record.dateISO}_${index}`, // Generate unique ID
+        id: `${record.studentId}-${record.dateISO}`, // Generate ID from studentId + date
         studentId: record.studentId,
         studentName: student ? `${student.firstName} ${student.lastName}` : 'Unknown',
         studentFirstName: student?.firstName || '',
         studentLastName: student?.lastName || '',
-        grade: undefined, // Student interface doesn't have grade yet
+        grade: undefined,
         date: record.dateISO,
         status: record.status,
         late: record.late,
         earlyDismissal: record.earlyDismissal,
         excused: record.excused,
-        createdAt: new Date().toISOString() // Generate timestamp
+        createdAt: record.dateISO // Use date as createdAt fallback
       };
     });
-
-    // Calculate student statistics
+// Calculations
+    
     const studentStats = this.calculateStudentStats(filteredRecords, allStudents);
 
-    // Calculate date statistics
+    
     const dateStats = this.calculateDateStats(filteredRecords);
 
-    // Calculate summary
+    
     const summary = this.calculateSummary(filteredRecords, allStudents);
 
-    // Generate insights
+    
     const insights = this.generateInsights(filteredRecords, allStudents, studentStats);
 
     // Create metadata
@@ -287,7 +280,7 @@ export class FileReportRepo {
     if (request.pagination) {
       const paginatedResult = this.paginateRecords(sortedData.records, request.pagination);
       sortedData.records = paginatedResult.records;
-      // Add pagination info to metadata if needed
+     
     }
 
     return sortedData;
@@ -314,7 +307,7 @@ export class FileReportRepo {
       return {
         studentId: student.id,
         studentName: `${student.firstName} ${student.lastName}`,
-        grade: undefined, // Student interface doesn't have grade yet
+        grade: undefined, // Student model doesn't have grade property
         totalDays,
         presentDays,
         lateDays,
@@ -328,7 +321,7 @@ export class FileReportRepo {
         averageWeeklyAttendance: this.calculateAverageWeeklyAttendance(studentRecords),
         trend: this.calculateTrend(studentRecords)
       };
-    }).filter(stats => stats.totalDays > 0); // Only include students with attendance records
+    }).filter(stats => stats.totalDays > 0); 
   }
 
   /**
@@ -421,7 +414,7 @@ export class FileReportRepo {
     const alertStudents: any[] = [];
     const patterns: any[] = [];
 
-    // Analyze attendance patterns
+    // attendance patterns analysis
     const overallRate = records.length > 0 ? Math.round((records.filter(r => r.status === AttendanceStatus.PRESENT).length / records.length) * 100) : 0;
     
     if (overallRate < 85) {
@@ -429,7 +422,7 @@ export class FileReportRepo {
       recommendations.push('Consider implementing attendance intervention programs');
     }
 
-    // Identify at-risk students
+    // Identify bad attendance students
     const riskStudents = studentStats.filter(s => s.attendanceRate < 80);
     if (riskStudents.length > 0) {
       keyFindings.push(`${riskStudents.length} students have attendance rates below 80%`);
@@ -446,7 +439,7 @@ export class FileReportRepo {
       });
     }
 
-    // Analyze tardiness patterns
+    // Analyze late patterns
     const lateStudents = studentStats.filter(s => s.lateRate > 20);
     if (lateStudents.length > 0) {
       keyFindings.push(`${lateStudents.length} students have tardiness rates above 20%`);
@@ -513,7 +506,7 @@ export class FileReportRepo {
   }
 
   private calculateAverageWeeklyAttendance(records: AttendanceRecord[]): number {
-    // Simplified calculation - could be more sophisticated
+    // Simplified calculation
     const totalDays = records.length;
     const presentDays = records.filter(r => r.status === AttendanceStatus.PRESENT).length;
     return totalDays > 0 ? Math.round((presentDays / totalDays) * 5) : 0; // Assuming 5-day school week
@@ -539,8 +532,8 @@ export class FileReportRepo {
   }
 
   private calculateOverallTrend(records: AttendanceRecord[]): 'improving' | 'declining' | 'stable' {
-    // Similar logic to individual student trends but for overall dataset
-    return 'stable'; // Simplified implementation
+// Similar logic to individual student trends but for overall dataset
+    return 'stable'; 
   }
 
   private calculateRelativeDateRange(period: string): { start: string; end: string } {
@@ -650,7 +643,7 @@ export class FileReportRepo {
     return 'attendance';
   }
 
-  // Cache management methods
+// Cache management methods
   private cacheReport(filters: ReportFilters, result: ReportQueryResult): void {
     try {
       const cacheId = this.generateCacheId(filters);
@@ -661,7 +654,7 @@ export class FileReportRepo {
         expiresAt
       });
 
-      // Clean expired entries
+// Clean expired entries
       this.cleanExpiredCache();
     } catch (error) {
       console.warn('Failed to cache report:', error);
