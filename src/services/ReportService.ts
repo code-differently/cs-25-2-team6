@@ -90,7 +90,11 @@ export class ReportService {
   /**
    * Generate reports for natural language queries (foundation for RAG integration)
    */
-  async generateNaturalLanguageReport(query: string): Promise<NLQueryResult> {
+  async generateNaturalLanguageReport(query: string): Promise<NLQueryResult & {
+    interpretation: string;
+    summary: string;
+    insights: string[];
+  }> {
     // Parse natural language query into filters
     const interpretation = await this.parseNaturalLanguageQuery(query);
     
@@ -101,7 +105,8 @@ export class ReportService {
         includeCount: true,
         includePercentage: true,
         includeComparative: interpretation.intent === 'compare',
-        includeTrends: interpretation.intent === 'trend'
+        includeTrends: interpretation.intent === 'trend',
+        includeStreaks: interpretation.intent === 'alert'
       },
       useCache: true
     };
@@ -109,11 +114,19 @@ export class ReportService {
     // Generate the report
     const result = await this.reportRepo.generateReport(request);
 
+    // Generate human-readable interpretation and summary
+    const interpretationText = this.generateInterpretationText(query, interpretation);
+    const summary = this.generateQuerySummary(result.data, interpretation);
+    const insights = this.generateQueryInsights(result.data, interpretation);
+
     return {
       originalQuery: query,
       interpretedQuery: interpretation,
       confidence: interpretation.confidence,
-      result
+      result,
+      interpretation: interpretationText,
+      summary,
+      insights
     };
   }
 
@@ -676,50 +689,116 @@ export class ReportService {
     filters: ReportFilters;
     confidence: number;
   }> {
-    // Simplified NLP parsing - would be enhanced with proper NLP library
+    // Enhanced NLP parsing with more comprehensive patterns
     const lowerQuery = query.toLowerCase();
     let intent: 'summary' | 'filter' | 'compare' | 'trend' | 'alert' = 'summary';
     let confidence = 0.8;
     const entities: Array<{ type: 'student' | 'date' | 'status' | 'grade' | 'metric'; value: string; confidence: number }> = [];
     const filters: ReportFilters = {};
 
-    // Detect intent
-    if (lowerQuery.includes('compare') || lowerQuery.includes('versus') || lowerQuery.includes('vs')) {
+    // Enhanced intent detection with more patterns
+    if (lowerQuery.match(/\b(compare|versus|vs|between|against)\b/)) {
       intent = 'compare';
-    } else if (lowerQuery.includes('trend') || lowerQuery.includes('over time') || lowerQuery.includes('pattern')) {
+      confidence = 0.9;
+    } else if (lowerQuery.match(/\b(trend|over time|pattern|change|improve|decline|progress)\b/)) {
       intent = 'trend';
-    } else if (lowerQuery.includes('alert') || lowerQuery.includes('problem') || lowerQuery.includes('risk')) {
+      confidence = 0.9;
+    } else if (lowerQuery.match(/\b(alert|problem|risk|concern|intervention|help|struggle)\b/)) {
       intent = 'alert';
-    } else if (lowerQuery.includes('who') || lowerQuery.includes('which') || lowerQuery.includes('find')) {
+      confidence = 0.9;
+    } else if (lowerQuery.match(/\b(who|which|show|list|find|students?|names?)\b/)) {
       intent = 'filter';
+      confidence = 0.8;
+    } else if (lowerQuery.match(/\b(summary|report|total|count|how many|statistics)\b/)) {
+      intent = 'summary';
+      confidence = 0.8;
     }
 
-    // Extract date entities
-    if (lowerQuery.includes('today')) {
+    // Enhanced date entity extraction
+    if (lowerQuery.match(/\b(today|right now)\b/)) {
       filters.relativePeriod = 'today';
-      entities.push({ type: 'date', value: 'today', confidence: 0.9 });
-    } else if (lowerQuery.includes('this week') || lowerQuery.includes('week')) {
-      filters.relativePeriod = 'week';
+      entities.push({ type: 'date', value: 'today', confidence: 0.95 });
+    } else if (lowerQuery.match(/\b(yesterday)\b/)) {
+      // Set specific date for yesterday
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      filters.dateISO = yesterday.toISOString().split('T')[0];
+      entities.push({ type: 'date', value: 'yesterday', confidence: 0.9 });
+    } else if (lowerQuery.match(/\b(this week|past week|7 days?)\b/)) {
+      filters.relativePeriod = '7days';
       entities.push({ type: 'date', value: 'week', confidence: 0.9 });
-    } else if (lowerQuery.includes('this month') || lowerQuery.includes('month')) {
-      filters.relativePeriod = 'month';
+    } else if (lowerQuery.match(/\b(this month|past month|30 days?)\b/)) {
+      filters.relativePeriod = '30days';
       entities.push({ type: 'date', value: 'month', confidence: 0.9 });
+    } else if (lowerQuery.match(/\b(quarter|90 days?)\b/)) {
+      filters.relativePeriod = '90days';
+      entities.push({ type: 'date', value: 'quarter', confidence: 0.85 });
     }
 
-    // Extract status entities
-    if (lowerQuery.includes('absent') || lowerQuery.includes('missing')) {
+    // Enhanced status entity extraction
+    if (lowerQuery.match(/\b(absent|missing|out|not here|away)\b/)) {
       filters.statuses = [AttendanceStatus.ABSENT];
       entities.push({ type: 'status', value: 'absent', confidence: 0.9 });
-    } else if (lowerQuery.includes('late') || lowerQuery.includes('tardy')) {
+    } else if (lowerQuery.match(/\b(late|tardy|delayed|behind)\b/)) {
       filters.statuses = [AttendanceStatus.LATE];
       entities.push({ type: 'status', value: 'late', confidence: 0.9 });
+    } else if (lowerQuery.match(/\b(present|here|attended|showed up)\b/)) {
+      filters.statuses = [AttendanceStatus.PRESENT];
+      entities.push({ type: 'status', value: 'present', confidence: 0.9 });
+    } else if (lowerQuery.match(/\b(excused|authorized|approved)\b/)) {
+      filters.statuses = [AttendanceStatus.EXCUSED];
+      entities.push({ type: 'status', value: 'excused', confidence: 0.9 });
     }
 
-    // Extract student name entities (basic regex)
-    const nameMatch = lowerQuery.match(/\b([A-Z][a-z]+ [A-Z][a-z]+)\b/);
-    if (nameMatch) {
-      filters.studentName = nameMatch[1];
-      entities.push({ type: 'student', value: nameMatch[1], confidence: 0.7 });
+    // Enhanced attendance rate filtering
+    const rateMatch = lowerQuery.match(/\b(below|under|less than|above|over|more than)\s+(\d+)%?/);
+    if (rateMatch) {
+      const operator = rateMatch[1];
+      const percentage = parseInt(rateMatch[2]);
+      
+      // This would need to be implemented in the repo layer
+      // For now, we'll use status filtering as a proxy
+      if ((operator.includes('below') || operator.includes('under') || operator.includes('less')) && percentage <= 90) {
+        // Focus on students with poor attendance (absent + late)
+        filters.statuses = [AttendanceStatus.ABSENT, AttendanceStatus.LATE];
+      }
+      entities.push({ type: 'metric', value: `${operator} ${percentage}%`, confidence: 0.8 });
+    }
+
+    // Enhanced student name extraction with common patterns
+    const namePatterns = [
+      /\b([A-Z][a-z]+\s+[A-Z][a-z]+)\b/, // John Smith
+      /student\s+([A-Z][a-z]+\s+[A-Z][a-z]+)/i, // student John Smith
+      /([A-Z][a-z]+)\s+([A-Z][a-z]+)'s/i // John Smith's
+    ];
+    
+    for (const pattern of namePatterns) {
+      const match = query.match(pattern);
+      if (match) {
+        const studentName = match[1] || `${match[1]} ${match[2]}`;
+        filters.studentName = studentName;
+        entities.push({ type: 'student', value: studentName, confidence: 0.8 });
+        break;
+      }
+    }
+
+    // Special handling for specific query types
+    if (lowerQuery.match(/\b(perfect attendance|100%|no absences)\b/)) {
+      // This would filter for perfect attendance in the business logic
+      intent = 'filter';
+      entities.push({ type: 'metric', value: 'perfect attendance', confidence: 0.9 });
+    }
+
+    if (lowerQuery.match(/\b(frequently|often|always|usually)\s+(late|absent)\b/)) {
+      intent = 'alert';
+      confidence = 0.85;
+    }
+
+    // Adjust confidence based on entity extraction success
+    if (entities.length === 0) {
+      confidence = Math.max(0.5, confidence - 0.2);
+    } else if (entities.length >= 2) {
+      confidence = Math.min(0.95, confidence + 0.1);
     }
 
     return { intent, entities, filters, confidence };
@@ -759,6 +838,161 @@ export class ReportService {
       default:
         return 'Develop targeted strategies to address this attendance pattern';
     }
+  }
+
+  /**
+   * Generate human-readable interpretation of the query
+   */
+  private generateInterpretationText(query: string, interpretation: any): string {
+    const { intent, entities, confidence } = interpretation;
+    
+    let text = `I understood your question as a request for `;
+    
+    switch (intent) {
+      case 'summary':
+        text += 'a summary report';
+        break;
+      case 'filter':
+        text += 'filtered attendance data';
+        break;
+      case 'compare':
+        text += 'comparative analysis';
+        break;
+      case 'trend':
+        text += 'trend analysis';
+        break;
+      case 'alert':
+        text += 'attendance alerts and interventions';
+        break;
+    }
+    
+    // Add entity-specific context
+    const dateEntities = entities.filter((e: any) => e.type === 'date');
+    const statusEntities = entities.filter((e: any) => e.type === 'status');
+    const studentEntities = entities.filter((e: any) => e.type === 'student');
+    
+    if (dateEntities.length > 0) {
+      text += ` for ${dateEntities[0].value}`;
+    }
+    
+    if (statusEntities.length > 0) {
+      text += ` focusing on ${statusEntities.map((e: any) => e.value).join(' and ')} records`;
+    }
+    
+    if (studentEntities.length > 0) {
+      text += ` for ${studentEntities[0].value}`;
+    }
+    
+    text += `.`;
+    
+    if (confidence < 0.7) {
+      text += ` (Note: I'm ${Math.round(confidence * 100)}% confident in this interpretation - please let me know if this isn't what you meant!)`;
+    }
+    
+    return text;
+  }
+
+  /**
+   * Generate human-readable summary of query results
+   */
+  private generateQuerySummary(data: any, interpretation: any): string {
+    const { intent } = interpretation;
+    const { summary, studentStats } = data;
+    
+    if (!summary) {
+      return 'No data found matching your query criteria.';
+    }
+    
+    let summaryText = '';
+    
+    switch (intent) {
+      case 'summary':
+        summaryText = `Found ${summary.totalRecords} attendance records for ${summary.totalStudents} students. `;
+        summaryText += `Overall attendance rate is ${summary.overallStats?.averageAttendanceRate?.toFixed(1)}%. `;
+        if (summary.overallStats?.averageLateRate > 0) {
+          summaryText += `Late arrival rate is ${summary.overallStats.averageLateRate.toFixed(1)}%.`;
+        }
+        break;
+        
+      case 'filter':
+        if (studentStats && studentStats.length > 0) {
+          summaryText = `Found ${studentStats.length} students matching your criteria. `;
+          const avgRate = studentStats.reduce((sum: number, s: any) => sum + s.attendanceRate, 0) / studentStats.length;
+          summaryText += `Average attendance rate for these students is ${avgRate.toFixed(1)}%.`;
+        } else {
+          summaryText = 'No students found matching your filter criteria.';
+        }
+        break;
+        
+      case 'alert':
+        if (data.insights?.alertStudents) {
+          const alertCount = data.insights.alertStudents.length;
+          summaryText = `Found ${alertCount} students who may need attention. `;
+          const highAlerts = data.insights.alertStudents.filter((a: any) => a.severity === 'high').length;
+          if (highAlerts > 0) {
+            summaryText += `${highAlerts} students have high-priority attendance concerns.`;
+          }
+        } else {
+          summaryText = 'No significant attendance alerts detected.';
+        }
+        break;
+        
+      default:
+        summaryText = `Analysis complete. Found ${summary.totalRecords} records with an average attendance rate of ${summary.overallStats?.averageAttendanceRate?.toFixed(1)}%.`;
+    }
+    
+    return summaryText;
+  }
+
+  /**
+   * Generate key insights from query results
+   */
+  private generateQueryInsights(data: any, interpretation: any): string[] {
+    const insights: string[] = [];
+    const { intent, entities } = interpretation;
+    const { summary, studentStats, dateStats } = data;
+    
+    if (!summary) return insights;
+    
+    // General insights
+    if (summary.overallStats?.averageAttendanceRate < 85) {
+      insights.push('Overall attendance rate is below recommended 85% threshold');
+    }
+    
+    if (summary.overallStats?.averageLateRate > 10) {
+      insights.push('Late arrival rate is higher than typical 10% benchmark');
+    }
+    
+    // Student-specific insights
+    if (studentStats) {
+      const perfectAttendance = studentStats.filter((s: any) => s.attendanceRate === 100).length;
+      if (perfectAttendance > 0) {
+        insights.push(`${perfectAttendance} students have perfect attendance`);
+      }
+      
+      const lowAttendance = studentStats.filter((s: any) => s.attendanceRate < 80).length;
+      if (lowAttendance > 0) {
+        insights.push(`${lowAttendance} students have attendance below 80% and may need intervention`);
+      }
+    }
+    
+    // Date-based insights
+    if (dateStats && dateStats.length > 0) {
+      const sortedByRate = [...dateStats].sort((a, b) => a.attendanceRate - b.attendanceRate);
+      const lowestDay = sortedByRate[0];
+      if (lowestDay && lowestDay.attendanceRate < 85) {
+        insights.push(`${lowestDay.date} had the lowest attendance rate at ${lowestDay.attendanceRate.toFixed(1)}%`);
+      }
+    }
+    
+    // Intent-specific insights
+    if (intent === 'alert' && data.insights?.patterns) {
+      data.insights.patterns.forEach((pattern: any) => {
+        insights.push(`Pattern detected: ${pattern.description}`);
+      });
+    }
+    
+    return insights;
   }
 
   /**
