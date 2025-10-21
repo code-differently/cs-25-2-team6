@@ -5,6 +5,9 @@ import { FileAttendanceRepo } from '@/src/persistence/FileAttendanceRepo';
 import { FileStudentRepo } from '@/src/persistence/FileStudentRepo';
 import { AttendanceStatus } from '@/src/domains/AttendanceStatus';
 
+// Use standard Node.js runtime for better compatibility  
+export const runtime = 'nodejs';
+
 // Zod validation schema for batch attendance request
 const BatchAttendanceSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
@@ -16,16 +19,15 @@ const BatchAttendanceSchema = z.object({
   })).min(1, "At least one student must be selected")
 });
 
-// Initialize  attendance services 
+// Initialize attendance services 
 const attendanceService = new AttendanceService();
 
 export async function POST(request: NextRequest) {
   try {
-    
     const body = await request.json();
     const validatedData = BatchAttendanceSchema.parse(body);
 
-// Check for existing attendance records 
+    // Check for existing attendance records 
     const attendanceRepo = new FileAttendanceRepo();
     const existingRecords = [];
     for (const student of validatedData.students) {
@@ -42,12 +44,12 @@ export async function POST(request: NextRequest) {
           });
         }
       } catch (error) {
-// Student might not exist
+        // Student might not exist
         console.warn(`Could not check existing attendance for student ${student.id}:`, error);
       }
     }
 
-// If duplicates found, return conflict response for teacher confirmation 
+    // If duplicates found, return conflict response for teacher confirmation 
     if (existingRecords.length > 0) {
       return NextResponse.json({
         success: false,
@@ -66,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     for (const student of validatedData.students) {
       try {
-// Find student by ID to get their name for the service
+        // Find student by ID to get their name for the service
         const allStudents = studentRepo.allStudents();
         const studentRecord = allStudents.find(s => s.id === student.id);
         
@@ -80,7 +82,7 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-// Use the existing service method 
+        // Use the existing service method 
         const markAttendanceParams = {
           firstName: studentRecord.firstName,
           lastName: studentRecord.lastName,
@@ -110,7 +112,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    
     return NextResponse.json({
       success: true,
       message: `Batch attendance processed: ${successCount} successful, ${errorCount} failed`,
@@ -122,9 +123,8 @@ export async function POST(request: NextRequest) {
       results,
       date: validatedData.date
     }, { status: 200 });
-//Error handling
-  } catch (error) {
 
+  } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -137,7 +137,6 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-   
     if (error instanceof SyntaxError) {
       return NextResponse.json({
         success: false,
@@ -146,7 +145,6 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    
     console.error('Batch attendance API error:', error);
     return NextResponse.json({
       success: false,
@@ -155,7 +153,6 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
-
 
 export async function GET() {
   return NextResponse.json({

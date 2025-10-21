@@ -2,96 +2,81 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { FileStudentRepo } from '@/src/persistence/FileStudentRepo';
 
+// Use standard Node.js runtime for better compatibility
+export const runtime = 'nodejs';
 
 const StudentsQuerySchema = z.object({
   search: z.string().optional(), // Search by name
   grade: z.string().optional(),  // Filter by grade
-  limit: z.string().regex(/^\d+$/).optional().transform(val => val ? parseInt(val) : undefined),
-  offset: z.string().regex(/^\d+$/).optional().transform(val => val ? parseInt(val) : undefined)
+  limit: z.string().regex(/^\d+$/).optional().transform((val: string | undefined) => val ? parseInt(val) : undefined),
+  offset: z.string().regex(/^\d+$/).optional().transform((val: string | undefined) => val ? parseInt(val) : undefined)
 }).optional();
 
-// Validation schema for creating new students 
 const CreateStudentSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  grade: z.string().optional(),
-  id: z.string().min(1, "Student ID is required")
+  grade: z.string().optional()
 });
 
+const UpdateStudentSchema = z.object({
+  firstName: z.string().min(1, "First name is required").optional(),
+  lastName: z.string().min(1, "Last name is required").optional(),
+  grade: z.string().optional()
+});
+
+// GET /api/students - Retrieve students with optional filtering
 export async function GET(request: NextRequest) {
   try {
-    // Parse URL search parameters
     const { searchParams } = new URL(request.url);
-    const queryParams = {
-      search: searchParams.get('search') || undefined,
-      grade: searchParams.get('grade') || undefined,
-      limit: searchParams.get('limit') || undefined,
-      offset: searchParams.get('offset') || undefined
-    };
-
+    const queryParams = StudentsQuerySchema.parse(Object.fromEntries(searchParams));
     
-    const validatedQuery = StudentsQuerySchema.parse(queryParams);
-
-    // Initialize repository
     const studentRepo = new FileStudentRepo();
-    const allStudents = studentRepo.allStudents();
-
+    let students = studentRepo.allStudents();
     
-    let filteredStudents = allStudents;
-
-    // Search filter 
-    if (validatedQuery?.search) {
-      const searchTerm = validatedQuery.search.toLowerCase();
-      filteredStudents = filteredStudents.filter(student => 
-        `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchTerm) ||
-        student.id.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    // Grade filter (optional)
-    if (validatedQuery?.grade) {
-      filteredStudents = filteredStudents.filter(student => 
-        (student as any).grade === validatedQuery.grade
-      );
-    }
-
-    // Sort students alphabetically by last name, then first name
-    filteredStudents.sort((a, b) => {
-      const lastNameComparison = a.lastName.localeCompare(b.lastName);
-      if (lastNameComparison !== 0) return lastNameComparison;
-      return a.firstName.localeCompare(b.firstName);
-    });
-
-   
-    const limit = validatedQuery?.limit || 100;
-    const offset = validatedQuery?.offset || 0;
-    const paginatedStudents = filteredStudents.slice(offset, offset + limit);
-
-// Transform data for frontend
-    const studentList = paginatedStudents.map(student => ({
+    // Convert to API format with grade support (fallback to undefined if not available)
+    let studentsData = students.map(student => ({
       id: student.id,
       firstName: student.firstName,
       lastName: student.lastName,
       fullName: `${student.firstName} ${student.lastName}`,
-      grade: (student as any).grade || undefined
+      grade: undefined, // Student domain object doesn't have grade yet
+      buildingIds: ['MAIN'] // Default building for file-based students
     }));
-
+    
+    // Apply search filter
+    if (queryParams?.search) {
+      const searchTerm = queryParams.search.toLowerCase();
+      studentsData = studentsData.filter(student => 
+        student.firstName.toLowerCase().includes(searchTerm) ||
+        student.lastName.toLowerCase().includes(searchTerm) ||
+        student.fullName.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    // Apply grade filter (currently not supported by domain model)
+    if (queryParams?.grade) {
+      // For now, return empty array if grade filtering is requested
+      // TODO: Add grade support to Student domain object
+      studentsData = [];
+    }
+    
+    // Apply pagination
+    const limit = queryParams?.limit || 50;
+    const offset = queryParams?.offset || 0;
+    const paginatedStudents = studentsData.slice(offset, offset + limit);
     
     return NextResponse.json({
       success: true,
-      students: studentList,
+      data: paginatedStudents,
       pagination: {
-        total: filteredStudents.length,
+        total: studentsData.length,
         limit,
         offset,
-        hasMore: offset + limit < filteredStudents.length
+        hasMore: offset + limit < studentsData.length
       }
     }, { status: 200 });
-
-  } catch (error) {
-
-//Error handling
     
+  } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -103,68 +88,50 @@ export async function GET(request: NextRequest) {
         }))
       }, { status: 400 });
     }
-
     
-    console.error('Students list API error:', error);
+    console.error('Students GET API error:', error);
     return NextResponse.json({
       success: false,
       error: 'INTERNAL_SERVER_ERROR',
-      message: 'An unexpected error occurred while fetching students'
+      message: 'Failed to retrieve students'
     }, { status: 500 });
   }
 }
 
+// POST /api/students - Create a new student
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const validatedData = CreateStudentSchema.parse(body);
-
+    
     const studentRepo = new FileStudentRepo();
     
-    // Check if student ID already exists 
-    const existingStudents = studentRepo.allStudents();
-    const existingStudent = existingStudents.find(s => s.id === validatedData.id);
+    // Generate a unique ID for the new student
+    const allStudents = studentRepo.allStudents();
+    const nextId = `STU${String(allStudents.length + 1).padStart(3, '0')}`;
     
-    if (existingStudent) {
-      return NextResponse.json({
-        success: false,
-        error: 'DUPLICATE_ID',
-        message: 'A student with this ID already exists',
-        existingStudent: {
-          id: existingStudent.id,
-          firstName: existingStudent.firstName,
-          lastName: existingStudent.lastName,
-          grade: (existingStudent as any).grade || undefined
-        }
-      }, { status: 409 });
-    }
-
-   
-    const newStudent: any = {
-      id: validatedData.id,
+    // Create student using existing repo method
+    const newStudent = {
+      id: nextId,
       firstName: validatedData.firstName,
       lastName: validatedData.lastName
     };
-
-    // Add grade (optional)
-    if (validatedData.grade) {
-      newStudent.grade = validatedData.grade;
-    }
-
+    
     studentRepo.saveStudent(newStudent);
-
+    
     return NextResponse.json({
       success: true,
       message: 'Student created successfully',
-      student: {
+      data: {
         id: newStudent.id,
         firstName: newStudent.firstName,
         lastName: newStudent.lastName,
         fullName: `${newStudent.firstName} ${newStudent.lastName}`,
-        grade: newStudent.grade || undefined
+        grade: validatedData.grade || undefined, // Store in response but not in domain yet
+        buildingIds: ['MAIN'] // Default building
       }
     }, { status: 201 });
-
+    
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
@@ -177,38 +144,30 @@ export async function POST(request: NextRequest) {
         }))
       }, { status: 400 });
     }
-
-   
-    if (error instanceof SyntaxError) {
-      return NextResponse.json({
-        success: false,
-        error: 'INVALID_JSON',
-        message: 'Request body must be valid JSON'
-      }, { status: 400 });
-    }
-
-    console.error('Create student API error:', error);
+    
+    console.error('Students POST API error:', error);
     return NextResponse.json({
       success: false,
       error: 'INTERNAL_SERVER_ERROR',
-      message: 'An unexpected error occurred while creating student'
+      message: 'Failed to create student'
     }, { status: 500 });
   }
 }
 
-
-export async function PUT() {
+// PUT /api/students/[id] - Update an existing student  
+export async function PUT(request: NextRequest) {
   return NextResponse.json({
     success: false,
-    error: 'METHOD_NOT_ALLOWED',
-    message: 'PUT method not supported. Use POST to create students or GET to list students.'
-  }, { status: 405 });
+    error: 'METHOD_NOT_IMPLEMENTED',
+    message: 'Student updates not yet implemented'
+  }, { status: 501 });
 }
 
-export async function DELETE() {
+// DELETE /api/students/[id] - Delete a student
+export async function DELETE(request: NextRequest) {
   return NextResponse.json({
     success: false,
-    error: 'METHOD_NOT_ALLOWED',
-    message: 'DELETE method not supported. Use individual student endpoints for deletion.'
-  }, { status: 405 });
+    error: 'METHOD_NOT_IMPLEMENTED', 
+    message: 'Student deletion not yet implemented'
+  }, { status: 501 });
 }

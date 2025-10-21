@@ -3,6 +3,9 @@ import { z } from 'zod';
 import { FileAttendanceRepo } from '@/src/persistence/FileAttendanceRepo';
 import { FileStudentRepo } from '@/src/persistence/FileStudentRepo';
 
+// Use standard Node.js runtime for better compatibility
+export const runtime = 'nodejs';
+
 // Zod validation schema for duplicate check 
 const DuplicateCheckSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
@@ -11,21 +14,18 @@ const DuplicateCheckSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    
     const body = await request.json();
     const { date, studentIds } = DuplicateCheckSchema.parse(body);
 
-    
     const attendanceRepo = new FileAttendanceRepo();
     const studentRepo = new FileStudentRepo();
     const allStudents = studentRepo.allStudents();
 
-// Check each student for existing attendance and validity
+    // Check each student for existing attendance and validity
     const duplicates = [];
     const nonExistentStudents = [];
 
     for (const studentId of studentIds) {
-     
       const studentRecord = allStudents.find(s => s.id === studentId);
       
       if (!studentRecord) {
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-// Check for existing attendance record
+      // Check for existing attendance record
       try {
         const existingRecord = attendanceRepo.findAttendanceBy(studentId, date);
         
@@ -50,7 +50,6 @@ export async function POST(request: NextRequest) {
           });
         }
       } catch (error) {
-       
         console.log(`No existing attendance found for student ${studentId} on ${date}`);
       }
     }
