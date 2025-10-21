@@ -1,6 +1,21 @@
+'use client'
+import { useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
+import AttendanceForm from '@/components/AttendanceForm'
 
 export default function Home() {
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false)
+  const [selectedDate, setSelectedDate] = useState('')
+
+  const handleDateClick = (day: number) => {
+    if (day > 0) {
+      const currentMonth = new Date().getMonth() + 1
+      const currentYear = new Date().getFullYear()
+      const dateString = `${currentYear}-${currentMonth.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
+      setSelectedDate(dateString)
+      setShowAttendanceModal(true)
+    }
+  }
   return (
     <DashboardLayout>
       <div className="calendar-container">
@@ -26,16 +41,28 @@ export default function Home() {
                   <span>Sat</span>
                 </div>
                 <div className="calendar-body">
-                  {Array.from({ length: 35 }, (_, i) => (
-                    <div key={i} className="calendar-day">
-                      {i > 6 && i < 32 ? i - 6 : ''}
-                    </div>
-                  ))}
+                  {Array.from({ length: 35 }, (_, i) => {
+                    const dayNumber = i > 6 && i < 32 ? i - 6 : 0
+                    return (
+                      <div 
+                        key={i} 
+                        className={`calendar-day ${dayNumber > 0 ? 'clickable' : ''}`}
+                        onClick={() => handleDateClick(dayNumber)}
+                      >
+                        {dayNumber > 0 ? dayNumber : ''}
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             </div>
           </div>
         </div>
+        
+        <AttendanceForm 
+          isOpen={showAttendanceModal}
+          onClose={() => setShowAttendanceModal(false)}
+        />
       </div>
     </DashboardLayout>
   )
