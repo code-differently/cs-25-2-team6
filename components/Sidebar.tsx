@@ -26,6 +26,11 @@ export default function Sidebar() {
             </Link>
           </li>
           <li>
+            <Link href="/attendance" className={`nav-link ${isActive('/attendance') ? 'active' : ''}`}>
+              ✅ Attendance
+            </Link>
+          </li>
+          <li>
             <Link href="/reports" className={`nav-link ${isActive('/reports') ? 'active' : ''}`}>
               📊 Reports
             </Link>
