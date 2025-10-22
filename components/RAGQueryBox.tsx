@@ -4,10 +4,15 @@ import { useState } from 'react';
 
 interface RAGQueryResult {
   query: string;
-  interpretation: string;
-  summary: string;
-  insights: string[];
+  answer: string; // Updated from interpretation
   data?: any;
+  suggestedActions?: Array<{
+    type: string;
+    label: string;
+    params?: Record<string, any>;
+  }>;
+  confidence?: number;
+  success: boolean;
 }
 
 interface RAGQueryBoxProps {
@@ -29,7 +34,7 @@ export default function RAGQueryBox({ onResults, className = '' }: RAGQueryBoxPr
     setError(null);
 
     try {
-      const response = await fetch('/api/reports/natural-language', {
+      const response = await fetch('/api/ai/query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,10 +51,11 @@ export default function RAGQueryBox({ onResults, className = '' }: RAGQueryBoxPr
       if (data.success) {
         const queryResult: RAGQueryResult = {
           query: query.trim(),
-          interpretation: data.data.interpretation || 'Query processed successfully',
-          summary: data.data.summary || 'Results generated based on your query',
-          insights: data.data.insights || [],
-          data: data.data
+          answer: data.answer || 'Query processed successfully',
+          data: data.data,
+          suggestedActions: data.suggestedActions,
+          confidence: data.confidence,
+          success: true
         };
         
         setResults(queryResult);
@@ -71,32 +77,26 @@ export default function RAGQueryBox({ onResults, className = '' }: RAGQueryBoxPr
   };
 
   return (
-    <div className={`bg-white rounded-lg border shadow-sm p-6 ${className}`}>
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Ask About Attendance Data
-        </h3>
-        <p className="text-sm text-gray-600">
-          Ask natural language questions about attendance patterns, student data, or generate reports
-        </p>
-      </div>
-
+    <div className={`bg-white rounded-lg ${className}`}>
       <form onSubmit={handleSubmit} className="mb-4">
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask about attendance... (e.g., 'Show students absent this week')"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ask about attendance alerts or interventions..."
+            className="flex-1 px-3 py-2 focus:outline-none focus:ring-0 border-0"
             disabled={loading}
           />
           <button
             type="submit"
             disabled={loading || !query.trim()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
-            {loading ? 'Processing...' : 'Ask'}
+            {loading ? 'Processing...' : 'Ask AI'}
           </button>
         </div>
       </form>
@@ -126,26 +126,60 @@ export default function RAGQueryBox({ onResults, className = '' }: RAGQueryBoxPr
             </div>
 
             <div className="mb-3">
-              <p className="text-sm font-medium text-gray-700">Interpretation:</p>
-              <p className="text-sm text-gray-900">{results.interpretation}</p>
+              <p className="text-sm font-medium text-gray-700">Answer:</p>
+              <p className="text-sm text-gray-900">{results.answer}</p>
             </div>
 
-            <div className="mb-3">
-              <p className="text-sm font-medium text-gray-700">Summary:</p>
-              <p className="text-sm text-gray-900">{results.summary}</p>
-            </div>
+            {results.data && (
+              <div className="mb-3">
+                <p className="text-sm font-medium text-gray-700 mb-2">Data:</p>
+                <div className="overflow-auto max-h-64 bg-white border border-gray-200 rounded p-2">
+                  {Array.isArray(results.data) ? (
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        {results.data.length > 0 && (
+                          <tr>
+                            {Object.keys(results.data[0]).map((key) => (
+                              <th key={key} className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {key}
+                              </th>
+                            ))}
+                          </tr>
+                        )}
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {results.data.map((item, idx) => (
+                          <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                            {Object.values(item).map((value, valIdx) => (
+                              <td key={valIdx} className="px-3 py-2 text-xs text-gray-500">
+                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <pre className="text-xs overflow-auto">{JSON.stringify(results.data, null, 2)}</pre>
+                  )}
+                </div>
+              </div>
+            )}
 
-            {results.insights && results.insights.length > 0 && (
+            {results.suggestedActions && results.suggestedActions.length > 0 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Key Insights:</p>
-                <ul className="text-sm text-gray-900 space-y-1">
-                  {results.insights.map((insight, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="text-blue-600 mr-2">•</span>
-                      {insight}
-                    </li>
+                <p className="text-sm font-medium text-gray-700 mb-2">Suggested Actions:</p>
+                <div className="flex flex-wrap gap-2">
+                  {results.suggestedActions.map((action, index) => (
+                    <button
+                      key={index}
+                      className="px-3 py-1 bg-blue-50 text-blue-600 text-sm rounded-full border border-blue-200 hover:bg-blue-100"
+                      onClick={() => console.log('Action clicked:', action)}
+                    >
+                      {action.label}
+                    </button>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
           </div>

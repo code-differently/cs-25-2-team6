@@ -57,46 +57,34 @@ export default function Reports() {
           </p>
         </div>
 
-        {/* Mode Toggle */}
-        <div className="flex justify-center space-x-4 mb-6">
-          <button
-            onClick={() => setShowTraditionalFilters(false)}
-            className={`px-4 py-2 rounded-md font-medium ${
-              !showTraditionalFilters
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            💬 Ask Questions
-          </button>
-          <button
-            onClick={() => setShowTraditionalFilters(true)}
-            className={`px-4 py-2 rounded-md font-medium ${
-              showTraditionalFilters
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            🔍 Traditional Filters
-          </button>
-        </div>
-
-        {/* Natural Language Query Interface */}
-        {!showTraditionalFilters && (
-          <div className="space-y-6">
-            <RAGQueryBox
-              onResults={handleQueryResults}
-              className="w-full"
-            />
-            
-            {!queryResults && (
+        {/* Top Bar with Search and Filter Toggle */}
+        <div className="bg-white rounded-lg border shadow-sm p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 mr-4">
+              <RAGQueryBox
+                onResults={handleQueryResults}
+                className="w-full"
+              />
+            </div>
+            <div className="flex items-center">
+              <button
+                onClick={() => setShowTraditionalFilters(!showTraditionalFilters)}
+                className="px-4 py-2 rounded-md font-medium bg-blue-600 text-white hover:bg-blue-700"
+              >
+                {showTraditionalFilters ? '💬 Ask Questions' : '🔍 Filter Reports'}
+              </button>
+            </div>
+          </div>
+          
+          {!queryResults && !showTraditionalFilters && (
+            <div className="mt-4">
               <QuerySuggestions
                 onSelectQuery={handleSelectQuery}
                 className="w-full"
               />
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
 
         {/* Traditional Filters Interface */}
         {showTraditionalFilters && (
