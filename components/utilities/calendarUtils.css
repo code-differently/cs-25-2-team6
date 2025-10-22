@@ -1,0 +1,255 @@
+/* Calendar Day Content Styles */
+.calendar-day-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: white;
+  border-radius: 4px;
+}
+
+.calendar-day-content:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-day-content.invalid {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  cursor: not-allowed;
+}
+
+.calendar-day-content.weekend {
+  background-color: #fafafa;
+  border-left: 3px solid #e9ecef;
+}
+
+.calendar-day-content.scheduled-off {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+}
+
+.calendar-day-content[role="button"]:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Day Header */
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.day-number {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #212529;
+  line-height: 1;
+}
+
+.calendar-day-content.invalid .day-number {
+  color: #721c24;
+}
+
+.calendar-day-content.weekend .day-number {
+  color: #6c757d;
+}
+
+.calendar-day-content.scheduled-off .day-number {
+  color: #856404;
+}
+
+/* Event Badge */
+.event-badge {
+  padding: 0.125rem 0.375rem;
+  border-radius: 12px;
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Attendance Summary */
+.attendance-summary {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.attendance-dots {
+  display: flex;
+  gap: 0.125rem;
+  flex-wrap: wrap;
+}
+
+.attendance-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.attendance-total {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Weekend Indicator */
+.weekend-indicator {
+  font-size: 0.625rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: auto;
+  text-align: center;
+  padding: 0.125rem;
+  background-color: rgba(108, 117, 125, 0.1);
+  border-radius: 4px;
+}
+
+/* Scheduled Info */
+.scheduled-info {
+  margin-top: 0.25rem;
+  padding: 0.25rem;
+  background-color: rgba(255, 193, 7, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.affected-students {
+  font-size: 0.625rem;
+  color: #856404;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Error Message */
+.error-message {
+  font-size: 0.625rem;
+  color: #721c24;
+  text-align: center;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .calendar-day-content {
+    padding: 0.375rem;
+  }
+  
+  .day-number {
+    font-size: 0.875rem;
+  }
+  
+  .event-badge {
+    font-size: 0.5rem;
+    padding: 0.125rem 0.25rem;
+  }
+  
+  .attendance-dot {
+    width: 5px;
+    height: 5px;
+  }
+  
+  .attendance-total {
+    font-size: 0.625rem;
+  }
+  
+  .weekend-indicator,
+  .affected-students {
+    font-size: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-day-content {
+    padding: 0.25rem;
+  }
+  
+  .day-header {
+    margin-bottom: 0.25rem;
+  }
+  
+  .day-number {
+    font-size: 0.75rem;
+  }
+  
+  .event-badge {
+    font-size: 0.4rem;
+    padding: 0.125rem 0.1875rem;
+  }
+  
+  .attendance-dots {
+    gap: 0.0625rem;
+  }
+  
+  .attendance-dot {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* Animation for calendar day content */
+@keyframes dayContentFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.calendar-day-content {
+  animation: dayContentFadeIn 0.2s ease-out;
+}
+
+/* Hover effects for interactive elements */
+.calendar-day-content[role="button"]:hover .event-badge {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.calendar-day-content[role="button"]:hover .attendance-dot {
+  transform: scale(1.2);
+}
+
+/* Focus states for accessibility */
+.calendar-day-content[role="button"]:focus .day-number {
+  color: #007bff;
+}
+
+.calendar-day-content[role="button"]:focus .event-badge {
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Loading state for calendar day content */
+.calendar-day-content.loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.calendar-day-content.loading * {
+  visibility: hidden;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
