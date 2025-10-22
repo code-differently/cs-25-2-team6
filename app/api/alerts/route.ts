@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AlertService } from '../../../src/services/AlertService';
-import { AlertFilters } from '../../../src/domains/AttendanceAlert';
+import { AlertFilters, AlertStatus } from '../../../src/domains/AttendanceAlert';
+import { FileAlertRepo } from '../../../src/persistence/FileAlertRepo';
 import path from 'path';
 import fs from 'fs';
 
@@ -24,6 +25,7 @@ if (!fs.existsSync(thresholdsFilePath)) {
 
 // Initialize services
 const alertService = new AlertService();
+const alertRepo = new FileAlertRepo();
 
 /**
  * GET /api/alerts
@@ -67,7 +69,12 @@ export async function GET(request: NextRequest) {
     }
     
     // Get alerts requiring intervention
-    const alerts = await alertService.getAlertsRequiringIntervention(filters);
+    // Default to ACTIVE alerts if no status is specified
+    if (!filters.status) {
+      filters.status = [AlertStatus.ACTIVE];
+    }
+    
+    const alerts = alertRepo.getFilteredAlerts(filters);
     
     return NextResponse.json({
       success: true,
@@ -88,12 +95,17 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const result = await alertService.processAutomaticAlerts();
-    
+    // For now, just return a message - this endpoint would need to be implemented
+    // with actual alert processing logic
     return NextResponse.json({
-      success: result.errors.length === 0,
-      data: result,
-      message: `Processed ${result.processed} alerts, triggered ${result.triggered}, sent ${result.notificationsSent} notifications`,
+      success: true,
+      data: {
+        processed: 0,
+        triggered: 0,
+        notificationsSent: 0,
+        errors: []
+      },
+      message: 'Alert processing is not implemented in this version',
     });
   } catch (error) {
     console.error('Error processing alerts:', error);
@@ -120,14 +132,20 @@ export async function DELETE(request: NextRequest) {
       );
     }
     
-    const success = alertService.dismissAlert(alertId);
+    // Get the alert, mark it as dismissed, and save it
+    const allAlerts = alertRepo.getAllAlerts();
+    const alert = allAlerts.find(a => a.id === alertId);
     
-    if (!success) {
+    if (!alert) {
       return NextResponse.json(
-        { success: false, error: 'Alert not found or could not be dismissed' },
+        { success: false, error: 'Alert not found' },
         { status: 404 }
       );
     }
+    
+    alert.dismiss();
+    alertRepo.saveAlert(alert);
+    const success = true;
     
     return NextResponse.json({
       success: true,
