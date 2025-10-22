@@ -28,6 +28,7 @@
     "dev:alt": "next dev -p 3001",
     "build": "next build",
     "start:next": "next start",
+    "test:env": "ts-node src/scripts/test-openai-env.ts",
     "lint": "next lint",
     "check-server": "node scripts/check-server.js"
   },
