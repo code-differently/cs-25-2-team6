@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useScheduleCalendar } from '../../src/services/hooks/useScheduleCalendar';
+import { useScheduleApi } from '../../hooks/useScheduleApi';
+import ScheduleDayOffForm from './ScheduleDayOffForm';
 
 interface ScheduledEventsListProps {
   selectedDate: Date;
@@ -20,9 +22,21 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
     isLoading,
     refreshScheduleData
   } = useScheduleCalendar();
+  
+  // Connect to our Schedule API
+  const {
+    loading: apiLoading,
+    error: apiError,
+    createScheduledDay,
+    deleteScheduledDay,
+    applyToAllStudents
+  } = useScheduleApi();
 
   const [activeTab, setActiveTab] = useState<'events' | 'daysoff'>('events');
   const [filterStatus, setFilterStatus] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const selectedDateEvents = getEventsForDate(selectedDate);
   const selectedDateDaysOff = getDaysOffForDate(selectedDate);
@@ -31,6 +45,72 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
     if (filterStatus === 'all') return true;
     return dayOff.status === filterStatus;
   });
+  
+  // Handle creating a new scheduled day off
+  const handleCreateDayOff = async (date: string, reason: string, description: string) => {
+    try {
+      setActionError(null);
+      setActionInProgress('create');
+      const result = await createScheduledDay(date, reason, description);
+      
+      if (result.success) {
+        // Close the form and refresh data
+        setShowAddForm(false);
+        refreshScheduleData();
+      } else if (result.error) {
+        setActionError(`Failed to create: ${result.error}`);
+      }
+    } catch (error: any) {
+      console.error('Failed to create scheduled day off:', error);
+      setActionError(`Failed to create: ${error.message || 'Unknown error'}`);
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+  
+  // Handle deleting a scheduled day off
+  const handleDeleteDayOff = async (id: string) => {
+    if (confirm('Are you sure you want to delete this scheduled day off?')) {
+      try {
+        setActionError(null);
+        setActionInProgress(`delete-${id}`);
+        const result = await deleteScheduledDay(id);
+        
+        if (result.success) {
+          refreshScheduleData();
+        } else if (result.error) {
+          setActionError(`Failed to delete: ${result.error}`);
+        }
+      } catch (error: any) {
+        console.error('Failed to delete scheduled day off:', error);
+        setActionError(`Failed to delete: ${error.message || 'Unknown error'}`);
+      } finally {
+        setActionInProgress(null);
+      }
+    }
+  };
+  
+  // Handle applying a scheduled day off to all students' attendance
+  const handleApplyToAttendance = async (id: string) => {
+    if (confirm('Are you sure you want to apply this day off to all students\' attendance records?')) {
+      try {
+        setActionError(null);
+        setActionInProgress(`apply-${id}`);
+        const result = await applyToAllStudents(id);
+        
+        if (result.success) {
+          alert('Day off successfully applied to all students\' attendance records!');
+        } else if (result.error) {
+          setActionError(`Failed to apply: ${result.error}`);
+        }
+      } catch (error: any) {
+        console.error('Failed to apply day off to attendance:', error);
+        setActionError(`Failed to apply: ${error.message || 'Unknown error'}`);
+      } finally {
+        setActionInProgress(null);
+      }
+    }
+  };
 
   const formatTime = (time: string) => {
     const [hours, minutes] = time.split(':');
@@ -165,6 +245,35 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
         </p>
       </div>
 
+      {/* Error Message */}
+      {actionError && (
+        <div style={{ 
+          backgroundColor: '#fee2e2', 
+          color: '#b91c1c',
+          padding: '8px 12px',
+          borderRadius: '6px',
+          marginBottom: '16px',
+          fontSize: '14px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span>{actionError}</span>
+          <button 
+            onClick={() => setActionError(null)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '16px',
+              color: '#b91c1c'
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+      
       {/* Tab Navigation */}
       <div style={{ 
         display: 'flex', 
@@ -366,6 +475,53 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
         </div>
       ) : (
         <div>
+          {/* Add Day Off Button */}
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              style={{
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
+            >
+              {showAddForm ? 'Cancel' : '+ Add Day Off'}
+            </button>
+          </div>
+          
+          {/* Add Day Off Form */}
+          {showAddForm && (
+            <div style={{ 
+              backgroundColor: '#f9fafb', 
+              padding: '16px',
+              borderRadius: '8px',
+              marginBottom: '24px',
+              border: '1px solid #e5e7eb'
+            }}>
+              <h4 style={{ 
+                fontSize: '16px', 
+                fontWeight: '600', 
+                color: '#111827',
+                marginBottom: '16px' 
+              }}>
+                Add Scheduled Day Off
+              </h4>
+              <ScheduleDayOffForm 
+                onSubmit={handleCreateDayOff}
+                initialDate={selectedDate}
+                onCancel={() => setShowAddForm(false)}
+              />
+            </div>
+          )}
+          
           {/* Filter for days off */}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ 
@@ -395,6 +551,20 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
               <option value="rejected">Rejected</option>
             </select>
           </div>
+          
+          {/* API Error Display */}
+          {apiError && (
+            <div style={{ 
+              backgroundColor: '#fee2e2', 
+              color: '#b91c1c',
+              padding: '8px 12px',
+              borderRadius: '6px',
+              marginBottom: '16px',
+              fontSize: '14px'
+            }}>
+              Error: {apiError}
+            </div>
+          )}
 
           {/* Selected Date Days Off */}
           {selectedDateDaysOff.length > 0 && (
@@ -457,10 +627,55 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
                     <p style={{ 
                       fontSize: '12px', 
                       color: '#374151',
-                      margin: 0
+                      margin: '0 0 8px 0'
                     }}>
                       {dayOff.reason}
                     </p>
+
+                    <div style={{
+                      display: 'flex',
+                      gap: '8px',
+                      marginTop: '8px'
+                    }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApplyToAttendance(dayOff.id);
+                        }}
+                        disabled={actionInProgress === `apply-${dayOff.id}` || actionInProgress === `delete-${dayOff.id}`}
+                        style={{
+                          backgroundColor: actionInProgress === `apply-${dayOff.id}` ? '#6EE7B7' : '#10B981',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          cursor: actionInProgress === `apply-${dayOff.id}` ? 'wait' : 'pointer',
+                          opacity: actionInProgress === `delete-${dayOff.id}` ? 0.5 : 1
+                        }}
+                      >
+                        {actionInProgress === `apply-${dayOff.id}` ? 'Applying...' : 'Apply to All'}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteDayOff(dayOff.id);
+                        }}
+                        disabled={actionInProgress === `delete-${dayOff.id}` || actionInProgress === `apply-${dayOff.id}`}
+                        style={{
+                          backgroundColor: actionInProgress === `delete-${dayOff.id}` ? '#F87171' : '#EF4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          cursor: actionInProgress === `delete-${dayOff.id}` ? 'wait' : 'pointer',
+                          opacity: actionInProgress === `apply-${dayOff.id}` ? 0.5 : 1
+                        }}
+                      >
+                        {actionInProgress === `delete-${dayOff.id}` ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -532,10 +747,53 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
                     <p style={{ 
                       fontSize: '12px', 
                       color: '#6b7280',
-                      margin: 0
+                      margin: '0 0 8px 0'
                     }}>
                       {formatDate(dayOff.date)} • {dayOff.type} • {dayOff.reason}
                     </p>
+
+                    <div style={{
+                      display: 'flex',
+                      gap: '8px',
+                      marginTop: '8px'
+                    }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApplyToAttendance(dayOff.id);
+                        }}
+                        style={{
+                          backgroundColor: '#10B981',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Apply to All
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteDayOff(dayOff.id);
+                        }}
+                        disabled={actionInProgress === `delete-${dayOff.id}` || actionInProgress === `apply-${dayOff.id}`}
+                        style={{
+                          backgroundColor: actionInProgress === `delete-${dayOff.id}` ? '#F87171' : '#EF4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          cursor: actionInProgress === `delete-${dayOff.id}` ? 'wait' : 'pointer',
+                          opacity: actionInProgress === `apply-${dayOff.id}` ? 0.5 : 1
+                        }}
+                      >
+                        {actionInProgress === `delete-${dayOff.id}` ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </div>
                   </div>
                 ))}
             </div>
