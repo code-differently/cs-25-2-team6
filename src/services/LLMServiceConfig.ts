@@ -11,6 +11,7 @@ export interface OpenAIConfig {
   presencePenalty: number;
   maxRetries: number;
   retryDelay: number; // base delay in ms
+  timeout?: number;   // request timeout in ms
 }
 
 export interface LLMServiceConfig {
@@ -28,6 +29,7 @@ export const DEFAULT_CONFIG: LLMServiceConfig = {
     topP: 1.0,              // Default sampling parameter
     frequencyPenalty: 0.0,  // Default penalty for token frequency
     presencePenalty: 0.0,   // Default penalty for token presence
+    timeout: 30000,         // Default timeout (30 seconds)
     maxRetries: 3,          // Default number of retries
     retryDelay: 1000        // Default base delay between retries in ms
   },

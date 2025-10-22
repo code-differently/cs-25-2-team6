@@ -10,6 +10,25 @@ import { FileAttendanceRepo } from '../persistence/FileAttendanceRepo';
 import { Student } from '../persistence/FileStudentRepo';
 import { AttendanceAlert, AlertStatus } from '../domains/AttendanceAlert';
 import { LLMService, LLMRequest, getLLMService } from './LLMService';
+import { sanitizeQuery } from './QuerySanitizer';
+import { 
+  MAX_CONTEXT_ITEMS, 
+  truncateDataForContext,
+  validateResponse,
+  createErrorResponse,
+  DEFAULT_RAG_SCHEMA,
+  ResponseValidationErrorType
+} from '../utils/context-management';
+import {
+  validateAndFixRAGResponse,
+  adaptLLMToRAGResponse,
+  RAG_RESPONSE_SCHEMA
+} from '../utils/response-adapter';
+import { 
+  LLMError, 
+  LLMErrorCategory, 
+  getFallbackResponse 
+} from '../utils/llm-error-handler';
 
 // Response types
 export interface RAGResponse {

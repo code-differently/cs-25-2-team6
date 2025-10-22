@@ -10,6 +10,21 @@ import { LLMServiceConfig, DEFAULT_CONFIG, loadConfigFromEnvironment } from './L
 import { sanitizeQuery, isHarmfulQuery } from './QuerySanitizer';
 import { validateLLMResponse, sanitizeLLMResponse, extractLLMResponseFromText } from './LLMResponseValidator';
 import { retryAsync } from '../utils/retry';
+import { 
+  DEFAULT_LLM_TIMEOUT,
+  createErrorResponse as createStandardErrorResponse
+} from '../utils/context-management';
+import { 
+  formatLLMResponse, 
+  LLM_REQUEST_TIMEOUT 
+} from '../utils/response-formatter';
+import { 
+  LLMError, 
+  LLMErrorCategory, 
+  handleOpenAIError, 
+  getFallbackResponse
+} from '../utils/llm-error-handler';
+import { RAGResponse, SuggestedAction } from './RAGService';
 
 // Response type definitions
 export interface LLMResponse {
@@ -171,8 +186,8 @@ export class LLMService {
         content: msg.content
       }));
 
-      // Call OpenAI API with retry logic
-      const completion = await retryAsync(
+      // Create a promise that will resolve with the API response
+      const apiResponsePromise = retryAsync(
         async () => this.client.chat.completions.create({
           model: this.config.openai.model,
           messages,
@@ -192,31 +207,73 @@ export class LLMService {
         }
       );
 
-      // Extract response content
-      const responseContent = completion.choices[0].message.content;
-      
-      if (!responseContent) {
-        throw new Error('Empty response from OpenAI API');
-      }
-
-      // Add assistant response to history
-      this.addMessage('assistant', responseContent);
-
-      // Parse and validate response
-      const response = this.parseResponse(responseContent);
+      // Process the raw response with our formatting and validation utilities
+      const formattedResponse = await formatLLMResponse(
+        // This promise will extract and process the content from the API response
+        apiResponsePromise.then(completion => {
+          const responseContent = completion.choices[0].message.content;
+          
+          if (!responseContent) {
+            throw new Error('Empty response from OpenAI API');
+          }
+          
+          // Add assistant response to history
+          this.addMessage('assistant', responseContent);
+          
+          // Return the raw content for further processing
+          return responseContent;
+        }),
+        {
+          timeout: this.config.openai.timeout || LLM_REQUEST_TIMEOUT,
+          defaultConfidence: 0.7
+        }
+      );
       
       if (this.config.debug) {
-        console.log('[LLM] Response processed successfully with confidence:', response.confidence);
+        console.log('[LLM] Response processed successfully with confidence:', formattedResponse.confidence);
       }
-      return response;
+      
+      // Convert RAGResponse to LLMResponse format
+      const llmResponse: LLMResponse = {
+        naturalLanguageAnswer: formattedResponse.naturalLanguageAnswer,
+        structuredData: formattedResponse.structuredData || null,
+        suggestedActions: formattedResponse.actions ? 
+          formattedResponse.actions.map(action => action.label) : 
+          [],
+        confidence: formattedResponse.confidence
+      };
+      
+      return llmResponse;
 
     } catch (error) {
       console.error('[LLM] Error processing query:', error);
       
-      // Return graceful error response
-      return this.createErrorResponse(
-        error instanceof Error ? error.message : 'Unknown error occurred'
-      );
+      // Create a standardized error response
+      let llmError: LLMError;
+      
+      if (error instanceof LLMError) {
+        llmError = error;
+      } else if (error instanceof Error && error.cause && typeof error.cause === 'object') {
+        // Handle OpenAI API errors
+        llmError = handleOpenAIError(error.cause);
+      } else {
+        // Generic error handling
+        llmError = new LLMError(
+          error instanceof Error ? error.message : 'Unknown error occurred',
+          LLMErrorCategory.UNKNOWN
+        );
+      }
+      
+      // Get appropriate fallback message
+      const userMessage = getFallbackResponse(llmError);
+      
+      // Log the error for monitoring but don't expose sensitive details
+      if (this.config.debug) {
+        console.log(`[LLM] Providing fallback response for error category: ${llmError.category}`);
+      }
+      
+      // Return formatted error response
+      return this.createErrorResponse(userMessage);
     }
   }
 
