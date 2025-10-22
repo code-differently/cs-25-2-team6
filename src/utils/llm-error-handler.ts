@@ -8,6 +8,7 @@ import { ResponseValidationErrorType } from './context-management';
  * LLM Error Categories
  */
 export enum LLMErrorCategory {
+  // API and service errors
   CONNECTION = 'connection',
   AUTHORIZATION = 'authorization',
   RATE_LIMIT = 'rate_limit',
@@ -15,6 +16,14 @@ export enum LLMErrorCategory {
   CONTENT_FILTER = 'content_filter',
   VALIDATION = 'validation',
   PARSING = 'parsing',
+  
+  // Integration errors
+  DATA_RETRIEVAL = 'data_retrieval',
+  CONTEXT_PREPARATION = 'context_preparation',
+  QUERY_PROCESSING = 'query_processing',
+  SERVICE_INTEGRATION = 'service_integration',
+  
+  // Fallback
   UNKNOWN = 'unknown',
 }
 
@@ -182,6 +191,7 @@ export function handleValidationError(error: any): LLMError {
  */
 export function getFallbackResponse(error: LLMError): string {
   switch (error.category) {
+    // API-related errors
     case LLMErrorCategory.TIMEOUT:
       return "I'm sorry, but the request took too long to process. Please try again or simplify your query.";
       
@@ -193,7 +203,21 @@ export function getFallbackResponse(error: LLMError): string {
       
     case LLMErrorCategory.CONTENT_FILTER:
       return "I'm unable to provide a response to that query based on content guidelines.";
+    
+    // Integration-related errors  
+    case LLMErrorCategory.DATA_RETRIEVAL:
+      return "I couldn't retrieve the necessary attendance data to answer your question. Please verify the student records are available.";
       
+    case LLMErrorCategory.CONTEXT_PREPARATION:
+      return "I had trouble processing the attendance records. Please check that the date ranges and formats in your query are valid.";
+      
+    case LLMErrorCategory.QUERY_PROCESSING:
+      return "I couldn't properly interpret your question. Could you please rephrase it with specific dates, student names, or attendance types?";
+      
+    case LLMErrorCategory.SERVICE_INTEGRATION:
+      return "There was an issue connecting the attendance database with the analysis service. Please try again later.";
+    
+    // Other errors
     case LLMErrorCategory.AUTHORIZATION:
     case LLMErrorCategory.VALIDATION:
     case LLMErrorCategory.PARSING:
