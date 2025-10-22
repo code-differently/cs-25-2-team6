@@ -7,11 +7,13 @@ import CalendarGrid from './CalendarGrid';
 interface ScheduleCalendarProps {
   selectedDate: Date;
   onDateSelect: (date: Date) => void;
+  onDateClick?: (date: Date) => void;
 }
 
 const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({ 
   selectedDate, 
-  onDateSelect 
+  onDateSelect,
+  onDateClick 
 }) => {
   const {
     currentDate,
@@ -137,6 +139,7 @@ const ScheduleCalendar: React.FC<ScheduleCalendarProps> = ({
         currentDate={currentDate}
         selectedDate={selectedDate}
         onDateSelect={onDateSelect}
+        onDateClick={onDateClick}
         isLoading={isLoading}
       />
     </div>

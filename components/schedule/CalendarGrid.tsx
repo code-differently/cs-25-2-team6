@@ -7,6 +7,7 @@ interface CalendarGridProps {
   currentDate: Date;
   selectedDate: Date;
   onDateSelect: (date: Date) => void;
+  onDateClick?: (date: Date) => void;
   isLoading: boolean;
 }
 
@@ -14,6 +15,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   currentDate,
   selectedDate,
   onDateSelect,
+  onDateClick,
   isLoading
 }) => {
   const {
@@ -146,7 +148,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         return (
           <div
             key={index}
-            onClick={() => onDateSelect(date)}
+            onClick={() => {
+              onDateSelect(date);
+              if (onDateClick) {
+                onDateClick(date);
+              }
+            }}
             style={{
               backgroundColor: 'white',
               minHeight: '80px',
