@@ -11,7 +11,10 @@ import { RAGService } from '../../../../src/services/RAGService';
 export async function POST(request: NextRequest) {
   try {
     // Parse request body
-    const { query } = await request.json();
+    const body = await request.json();
+    const { query } = body;
+    
+    console.log('API received query:', query);
     
     if (!query) {
       return NextResponse.json(
@@ -22,6 +25,7 @@ export async function POST(request: NextRequest) {
     
     // Process the query
     const ragService = new RAGService();
+    console.log('Calling RAGService.processQuery...');
     const response = await ragService.processQuery(query);
     
     return NextResponse.json({
@@ -35,8 +39,13 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     console.error('Error processing query:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { success: false, error: 'Failed to process query' },
+      { 
+        success: false, 
+        error: `Failed to process query: ${errorMessage}`,
+        stack: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.stack : undefined) : undefined
+      },
       { status: 500 }
     );
   }
