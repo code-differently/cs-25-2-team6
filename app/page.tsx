@@ -2,10 +2,12 @@
 import { useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import AttendanceForm from '@/components/AttendanceForm'
+import { useScheduleModals } from '@/hooks/useScheduleModals'
 
 export default function Home() {
   const [showAttendanceModal, setShowAttendanceModal] = useState(false)
   const [selectedDate, setSelectedDate] = useState('')
+  const scheduleModals = useScheduleModals()
 
   const handleDateClick = (day: number) => {
     if (day > 0) {
@@ -55,6 +57,16 @@ export default function Home() {
                   })}
                 </div>
               </div>
+            </div>
+            
+            {/* Schedule Day Off Button - positioned underneath mock calendar */}
+            <div className="calendar-actions">
+              <button 
+                onClick={() => scheduleModals.setScheduleModal(true)}
+                className="primary-btn schedule-btn"
+              >
+                📅 Schedule Day Off
+              </button>
             </div>
           </div>
         </div>
