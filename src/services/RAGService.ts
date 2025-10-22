@@ -259,6 +259,8 @@ export class RAGService {
       const llmRequest: LLMRequest = {
         query,
         context,
+        // Map intent to appropriate query context for system prompt selection
+        queryContext: this.mapIntentToQueryContext(intent),
         attendanceData: this.extractAttendanceDataForLLM(data, intent),
         alertData: this.extractAlertDataForLLM(data, intent)
       };
@@ -631,5 +633,26 @@ export class RAGService {
     
     // Default to VIEW_ALERTS for anything else
     return 'VIEW_ALERTS';
+  }
+  
+  /**
+   * Map query intent to appropriate system prompt context
+   * @param intent The classified intent of the query
+   * @returns Context string for system prompt selection
+   */
+  private mapIntentToQueryContext(intent: QueryIntent): string {
+    switch (intent) {
+      case 'ALERT_QUERY':
+      case 'ALERT_EXPLANATION':
+        return 'alert';
+        
+      case 'ATTENDANCE_QUERY':
+      case 'STUDENT_QUERY':
+        return 'general';
+        
+      case 'GENERAL_QUERY':
+      default:
+        return 'general';
+    }
   }
 }

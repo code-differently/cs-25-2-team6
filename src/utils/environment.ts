@@ -49,11 +49,16 @@ export function getOpenAIModel(): string {
  * Gets the RAG system prompt
  * Falls back to a default if not specified
  */
-export function getRAGSystemPrompt(): string {
-  return process.env.RAG_SYSTEM_PROMPT || 
-    "You are an AI assistant for an Attendance Management System. " +
-    "Help users understand attendance data, generate reports, and provide insights " +
-    "about student attendance patterns.";
+import { ATTENDANCE_SYSTEM_PROMPT, getSystemPromptForContext } from './system-prompts';
+
+export function getRAGSystemPrompt(context: string = 'general'): string {
+  // If a custom prompt is provided in environment, use that
+  if (process.env.RAG_SYSTEM_PROMPT) {
+    return process.env.RAG_SYSTEM_PROMPT;
+  }
+  
+  // Otherwise use our system prompts based on context
+  return getSystemPromptForContext(context);
 }
 
 /**

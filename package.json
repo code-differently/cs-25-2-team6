@@ -31,6 +31,7 @@
     "start:next": "next start",
     "test:env": "ts-node src/scripts/test-openai-env.ts",
     "test:rag": "ts-node src/scripts/test-rag-llm-integration.ts",
+    "test:prompts": "ts-node src/scripts/test-system-prompts.ts",
     "lint": "next lint",
     "check-server": "node scripts/check-server.js"
   },

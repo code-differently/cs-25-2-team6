@@ -14,7 +14,8 @@ export interface LLMResponse {
 // Request type definitions
 export interface LLMRequest {
   query: string;
-  context?: string;
+  context?: string;       // Context information for the query
+  queryContext?: string;  // Context identifier for selecting the appropriate system prompt
   attendanceData?: any[];
   alertData?: any[];
 }
@@ -66,9 +67,10 @@ export class LLMService {
 
   /**
    * Initialize system prompt
+   * @param context Optional context to select the appropriate system prompt
    */
-  private initializeSystemPrompt(): void {
-    const systemPrompt = getRAGSystemPrompt();
+  private initializeSystemPrompt(context: string = 'general'): void {
+    const systemPrompt = getRAGSystemPrompt(context);
     
     const systemMessage: MessageHistoryEntry = {
       role: 'system',
@@ -78,6 +80,24 @@ export class LLMService {
 
     // Clear any existing history and set system prompt
     this.messageHistory = [systemMessage];
+  }
+  
+  /**
+   * Update system prompt based on context
+   * @param context Context identifier to select appropriate system prompt
+   */
+  public updateSystemPrompt(context: string): void {
+    // Get the first message which should be the system prompt
+    const firstMessage = this.messageHistory[0];
+    
+    if (firstMessage && firstMessage.role === 'system') {
+      // Replace the existing system prompt
+      firstMessage.content = getRAGSystemPrompt(context);
+      firstMessage.timestamp = Date.now();
+    } else {
+      // No system prompt found, initialize it
+      this.initializeSystemPrompt(context);
+    }
   }
 
   /**
@@ -92,6 +112,12 @@ export class LLMService {
       }
 
       console.log('[LLM] Processing query:', request.query);
+
+      // If a specific query context is provided, update the system prompt
+      if (request.queryContext) {
+        console.log(`[LLM] Updating system prompt with context: ${request.queryContext}`);
+        this.updateSystemPrompt(request.queryContext);
+      }
 
       // Build context-enhanced prompt
       const userMessage = this.buildContextualPrompt(request);
