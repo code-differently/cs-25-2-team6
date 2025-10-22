@@ -5,6 +5,7 @@ import FilterDropdown from './FilterDropdown';
 import FilterChips from './FilterChips';
 import AdvancedFiltersModal from './AdvancedFiltersModal';
 import SavedFiltersModal from './SavedFiltersModal';
+import RAGQueryBox, { RAGQueryResult } from '@/components/RAGQueryBox';
 import './FilterPanel.css';
 
 function FilterPanel() {
@@ -72,6 +73,15 @@ function FilterPanel() {
             Advanced
           </button>
         </div>
+      </div>
+      
+      {/* RAG Query Box - Integrated directly into the filter panel */}
+      <div className="mb-4">
+        <RAGQueryBox
+          onResults={(results) => console.log('RAG query results:', results)}
+          className="w-full"
+          placeholder="Ask about attendance data or alerts..."
+        />
       </div>
 
       <div className="filter-controls">

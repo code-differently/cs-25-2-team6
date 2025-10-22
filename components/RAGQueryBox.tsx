@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-interface RAGQueryResult {
+export interface RAGQueryResult {
   query: string;
   answer: string; // Updated from interpretation
   data?: any;
@@ -18,9 +18,14 @@ interface RAGQueryResult {
 interface RAGQueryBoxProps {
   onResults?: (results: RAGQueryResult) => void;
   className?: string;
+  placeholder?: string;
 }
 
-export default function RAGQueryBox({ onResults, className = '' }: RAGQueryBoxProps) {
+export default function RAGQueryBox({ 
+  onResults, 
+  className = '', 
+  placeholder = 'Ask about attendance alerts or interventions...'
+}: RAGQueryBoxProps) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<RAGQueryResult | null>(null);
@@ -87,7 +92,7 @@ export default function RAGQueryBox({ onResults, className = '' }: RAGQueryBoxPr
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask about attendance alerts or interventions..."
+            placeholder={placeholder}
             className="flex-1 px-3 py-2 focus:outline-none focus:ring-0 border-0"
             disabled={loading}
           />

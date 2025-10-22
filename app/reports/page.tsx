@@ -2,17 +2,12 @@
 
 import { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import RAGQueryBox from '@/components/RAGQueryBox';
-import QuerySuggestions from '@/components/QuerySuggestions';
 import FilterPanel from '@/components/reports/FilterPanel';
-import AttendanceDataTable, { type AttendanceRecord, type ExportFormat } from '@/components/reports/AttendanceDataTable';
+import AttendanceDataTable, { type ExportFormat } from '@/components/reports/AttendanceDataTable';
 import AttendanceChart, { type ChartType } from '@/components/reports/AttendanceChart';
 import ReportSummaryCards from '@/components/reports/ReportSummaryCards';
 
 export default function Reports() {
-  const [selectedQuery, setSelectedQuery] = useState('');
-  const [queryResults, setQueryResults] = useState(null);
-  const [showTraditionalFilters, setShowTraditionalFilters] = useState(false);
   const [chartType, setChartType] = useState<ChartType>('bar');
   const handleChartTypeChange = (type: ChartType) => {
     setChartType(type);
@@ -39,142 +34,83 @@ export default function Reports() {
     }))
   };
 
-  const handleSelectQuery = (query: string) => {
-    setSelectedQuery(query);
-  };
-
-  const handleQueryResults = (results: any) => {
-    setQueryResults(results);
-  };
-
   return (
     <DashboardLayout>
       <div className="reports-container space-y-6">
         <div>
           <h1 className="page-title">📊 Attendance Reports</h1>
           <p className="page-description">
-            Ask questions about attendance data or use traditional filters to analyze patterns.
+            Filter and analyze attendance patterns for all students
           </p>
         </div>
 
-        {/* Top Bar with Search and Filter Toggle */}
-        <div className="bg-white rounded-lg border shadow-sm p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex-1 mr-4">
-              <RAGQueryBox
-                onResults={handleQueryResults}
-                className="w-full"
-              />
-            </div>
-            <div className="flex items-center">
-              <button
-                onClick={() => setShowTraditionalFilters(!showTraditionalFilters)}
-                className="px-4 py-2 rounded-md font-medium bg-blue-600 text-white hover:bg-blue-700"
-              >
-                {showTraditionalFilters ? '💬 Ask Questions' : '🔍 Filter Reports'}
-              </button>
+        {/* Filter Panel includes the AI search bar now */}
+        <FilterPanel />
+        
+        <ReportSummaryCards
+          totalStudents={mockData.totalStudents}
+          presentCount={mockData.presentCount}
+          absentCount={mockData.absentCount}
+          lateCount={mockData.lateCount}
+          attendanceRate={mockData.attendanceRate}
+          isLoading={false}
+        />
+
+        <div className="bg-white rounded-lg border shadow-sm p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Attendance Trends</h3>
+            <div className="flex space-x-2">
+              {(['bar', 'line', 'area'] as ChartType[]).map(type => (
+                <button
+                  key={type}
+                  onClick={() => setChartType(type)}
+                  className={`px-3 py-1 text-sm rounded capitalize ${
+                    chartType === type
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
             </div>
           </div>
-          
-          {!queryResults && !showTraditionalFilters && (
-            <div className="mt-4">
-              <QuerySuggestions
-                onSelectQuery={handleSelectQuery}
-                className="w-full"
-              />
-            </div>
-          )}
+          <AttendanceChart
+            data={mockData.records}
+            chartType={chartType}
+            onChartTypeChange={handleChartTypeChange}
+          />
         </div>
 
-        {/* Traditional Filters Interface */}
-        {showTraditionalFilters && (
-          <div className="space-y-6">
-            <FilterPanel />
-            
-            <ReportSummaryCards
-              totalStudents={mockData.totalStudents}
-              presentCount={mockData.presentCount}
-              absentCount={mockData.absentCount}
-              lateCount={mockData.lateCount}
-              attendanceRate={mockData.attendanceRate}
-              isLoading={false}
-            />
-
-            <div className="bg-white rounded-lg border shadow-sm p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Attendance Trends</h3>
-                <div className="flex space-x-2">
-                  {(['bar', 'line', 'area'] as ChartType[]).map(type => (
-                    <button
-                      key={type}
-                      onClick={() => setChartType(type)}
-                      className={`px-3 py-1 text-sm rounded capitalize ${
-                        chartType === type
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <AttendanceChart
-                data={mockData.records}
-                chartType={chartType}
-                onChartTypeChange={handleChartTypeChange}
-              />
-            </div>
-
-            <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold text-gray-900">Attendance Records</h3>
-                <p className="text-sm text-gray-600 mt-1">Detailed view of all attendance records</p>
-              </div>
-              <AttendanceDataTable
-                data={mockData.records}
-                isLoading={false}
-                onSort={(column, direction) => {
-                  console.log('Sort:', column, direction);
-                }}
-                onPageChange={(page, pageSize) => {
-                  console.log('Page change:', page, pageSize);
-                }}
-                onExport={(format) => {
-                  console.log('Export:', format);
-                }}
-                totalRecords={mockData.records.length}
-                currentPage={1}
-                pageSize={25}
-              />
-            </div>
+        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+          <div className="p-6 border-b">
+            <h3 className="text-lg font-semibold text-gray-900">Attendance Records</h3>
+            <p className="text-sm text-gray-600 mt-1">Detailed view of all attendance records</p>
           </div>
-        )}
-
-        {/* Query Results Display */}
-        {queryResults && !showTraditionalFilters && (
-          <div className="bg-white rounded-lg border shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Detailed Results</h3>
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium text-gray-700 mb-2">Data Summary</h4>
-                <div className="bg-gray-50 rounded p-4">
-                  <p className="text-sm text-gray-600">
-                    Additional detailed data visualization and tables will be displayed here based on your query results.
-                  </p>
-                  {/* Future: Add charts, tables, and detailed breakdowns */}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+          <AttendanceDataTable
+            data={mockData.records}
+            isLoading={false}
+            onSort={(column, direction) => {
+              console.log('Sort:', column, direction);
+            }}
+            onPageChange={(page, pageSize) => {
+              console.log('Page change:', page, pageSize);
+            }}
+            onExport={(format) => {
+              console.log('Export:', format);
+            }}
+            totalRecords={mockData.records.length}
+            currentPage={1}
+            pageSize={25}
+          />
+        </div>
 
         {/* Help Section */}
         <div className="bg-blue-50 rounded-lg p-4">
-          <h4 className="font-medium text-blue-900 mb-2">🚀 New AI-Powered Queries</h4>
+          <h4 className="font-medium text-blue-900 mb-2">🚀 AI-Powered Attendance Insights</h4>
           <p className="text-sm text-blue-800">
-            Try asking questions in plain English! Our AI can understand queries like "Show me students with low attendance" 
-            or "Which students were absent yesterday?" and automatically generate the right reports for you.
+            Try asking questions in plain English using the search bar above! Our AI can understand queries like 
+            "Show me students with low attendance" or "Which students were absent yesterday?" and help you find the information you need.
           </p>
         </div>
       </div>

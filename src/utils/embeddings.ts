@@ -1,6 +1,6 @@
 /**
  * Simple embedding utilities for the RAG system.
- * This lightweight implementation avoids using external vector databases.
+ * This lightweight implementation avoids using external vector DBs.
  */
 
 // Simple text normalization
