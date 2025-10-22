@@ -15,7 +15,7 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <h2>Dashboard</h2>
+        <h2>Presence</h2>
       </div>
       
       <nav className="sidebar-nav">
