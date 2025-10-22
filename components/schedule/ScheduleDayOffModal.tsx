@@ -139,10 +139,6 @@ export default function ScheduleDayOffModal({
                     <span className="summary-value">{formData.affectedStudentCount || 250}</span>
                   </div>
                   <div className="summary-item">
-                    <span className="summary-label">All Grade Levels:</span>
-                    <span className="summary-value">K-12</span>
-                  </div>
-                  <div className="summary-item">
                     <span className="summary-label">Date:</span>
                     <span className="summary-value">
                       {new Date(formData.date).toLocaleDateString('en-US', {
