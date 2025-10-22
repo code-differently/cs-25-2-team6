@@ -79,7 +79,11 @@ export default function AlertSummaryStats({ alerts, loading }: AlertSummaryStats
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '16px'
+      }}>
         {[...Array(4)].map((_, i) => (
           <div key={i} style={{
             backgroundColor: 'white',
@@ -108,7 +112,12 @@ export default function AlertSummaryStats({ alerts, loading }: AlertSummaryStats
         Alerts Overview
       </h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '16px',
+        marginBottom: '24px'
+      }}>
         {statCards.map((stat, index) => (
           <div key={index} style={{
             backgroundColor: 'white',
@@ -181,7 +190,11 @@ export default function AlertSummaryStats({ alerts, loading }: AlertSummaryStats
             Alert Severity Breakdown
           </h3>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+          gap: '16px'
+        }}>
           {[
             { label: 'Critical', count: stats.critical, color: '#ef4444', bgColor: '#fee2e2' },
             { label: 'High', count: stats.high, color: '#f59e0b', bgColor: '#fef3c7' },

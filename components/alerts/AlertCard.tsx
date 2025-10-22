@@ -11,17 +11,14 @@ interface AlertCardProps {
 }
 
 export default function AlertCard({ alert, selected, onSelect, onStudentSelect }: AlertCardProps) {
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'critical': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-blue-600 bg-blue-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const getTypeIcon = (type: string) => {
+const getSeverityColor = (severity: AttendanceAlert['severity']) => {
+  switch (severity) {
+    case 'high': return { border: '1px solid #fecaca', backgroundColor: '#fef2f2', color: '#991b1b' };
+    case 'medium': return { border: '1px solid #fde68a', backgroundColor: '#fffbeb', color: '#92400e' };
+    case 'low': return { border: '1px solid #bfdbfe', backgroundColor: '#eff6ff', color: '#1e40af' };
+    default: return { border: '1px solid #d1d5db', backgroundColor: '#f9fafb', color: '#374151' };
+  }
+};  const getTypeIcon = (type: string) => {
     switch (type) {
       case 'absence': return '📅';
       case 'tardy': return '⏰';
@@ -49,11 +46,26 @@ export default function AlertCard({ alert, selected, onSelect, onStudentSelect }
         e.currentTarget.style.backgroundColor = 'white';
       }
     }}>
-      <div className="flex items-start space-x-4">
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '16px'
+      }}>
         {/* Alert Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+        <div style={{
+          flex: '1',
+          minWidth: '0'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}>
               {/* Checkbox */}
               <input
                 type="checkbox"
@@ -74,12 +86,10 @@ export default function AlertCard({ alert, selected, onSelect, onStudentSelect }
                 borderRadius: '20px',
                 fontSize: '12px',
                 fontWeight: '600',
-                backgroundColor: getSeverityColor(alert.severity).includes('red') ? '#fee2e2' : 
-                               getSeverityColor(alert.severity).includes('orange') ? '#fed7aa' :
-                               getSeverityColor(alert.severity).includes('yellow') ? '#fef3c7' : '#dbeafe',
-                color: getSeverityColor(alert.severity).includes('red') ? '#dc2626' : 
-                       getSeverityColor(alert.severity).includes('orange') ? '#ea580c' :
-                       getSeverityColor(alert.severity).includes('yellow') ? '#d97706' : '#2563eb'
+                backgroundColor: alert.severity === 'high' ? '#fee2e2' : 
+                               alert.severity === 'medium' ? '#fef3c7' : '#dbeafe',
+                color: alert.severity === 'high' ? '#dc2626' : 
+                       alert.severity === 'medium' ? '#d97706' : '#2563eb'
               }}>
                 {alert.severity.toUpperCase()}
               </span>

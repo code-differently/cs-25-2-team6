@@ -169,9 +169,15 @@ export default function StudentInterventionPanel({
               New Intervention
             </h5>
             
-            <div className="space-y-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#111827' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  marginBottom: '8px',
+                  color: '#111827'
+                }}>
                   Type
                 </label>
                 <select
@@ -180,17 +186,36 @@ export default function StudentInterventionPanel({
                     ...newIntervention,
                     type: e.target.value as Intervention['type']
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: 'white',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                    color: '#111827',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
                 >
-                  <option value="email">Email</option>
-                  <option value="phone">Phone Call</option>
-                  <option value="meeting">Meeting</option>
-                  <option value="letter">Letter</option>
+                  <option value="email">📧 Email</option>
+                  <option value="phone">📞 Phone Call</option>
+                  <option value="meeting">👥 Meeting</option>
+                  <option value="letter">📄 Letter</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#111827' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  marginBottom: '8px',
+                  color: '#111827'
+                }}>
                   Notes
                 </label>
                 <textarea
@@ -200,13 +225,34 @@ export default function StudentInterventionPanel({
                     notes: e.target.value
                   })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: 'white',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                    color: '#111827',
+                    resize: 'vertical',
+                    minHeight: '80px',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
                   placeholder="Enter intervention details..."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#111827' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  marginBottom: '8px',
+                  color: '#111827'
+                }}>
                   Assigned To
                 </label>
                 <input
@@ -216,12 +262,33 @@ export default function StudentInterventionPanel({
                     ...newIntervention,
                     assignedTo: e.target.value
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    backgroundColor: 'white',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                    color: '#111827',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
                   placeholder="Staff member name"
                 />
               </div>
 
-              <div className="flex items-center">
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                backgroundColor: '#f8fafc',
+                borderRadius: '8px',
+                border: '1px solid #e2e8f0'
+              }}>
                 <input
                   type="checkbox"
                   id="followUp"
@@ -230,26 +297,74 @@ export default function StudentInterventionPanel({
                     ...newIntervention,
                     followUpRequired: e.target.checked
                   })}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    accentColor: '#3b82f6'
+                  }}
                 />
-                <label htmlFor="followUp" className="ml-2 text-sm" style={{ color: '#111827' }}>
+                <label htmlFor="followUp" style={{
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#111827'
+                }}>
                   Follow-up required
                 </label>
               </div>
 
-              <div className="flex space-x-3">
+              <div style={{
+                display: 'flex',
+                gap: '12px',
+                marginTop: '8px'
+              }}>
                 <button
                   onClick={handleAddIntervention}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  style={{
+                    padding: '12px 20px',
+                    backgroundColor: '#3b82f6',
+                    color: 'white',
+                    borderRadius: '8px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#2563eb';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#3b82f6';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
                 >
-                  Add Intervention
+                  ✅ Add Intervention
                 </button>
                 <button
                   onClick={() => setShowAddForm(false)}
-                  className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
-                  style={{ color: '#111827' }}
+                  style={{
+                    padding: '12px 20px',
+                    backgroundColor: '#f3f4f6',
+                    color: '#111827',
+                    borderRadius: '8px',
+                    border: '2px solid #e2e8f0',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#e5e7eb';
+                    e.currentTarget.style.borderColor = '#d1d5db';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    e.currentTarget.style.borderColor = '#e2e8f0';
+                  }}
                 >
-                  Cancel
+                  ❌ Cancel
                 </button>
               </div>
             </div>
@@ -258,37 +373,123 @@ export default function StudentInterventionPanel({
 
         {/* Interventions List */}
         <div>
-          <h5 className="font-medium mb-4" style={{ color: '#111827' }}>
+          <h5 style={{
+            fontSize: '16px',
+            fontWeight: '600',
+            marginBottom: '16px',
+            color: '#111827',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span>📋</span>
             Intervention History ({interventions.length})
           </h5>
           
           {interventions.length === 0 ? (
-            <p className="text-sm" style={{ color: '#111827' }}>No interventions recorded yet.</p>
+            <div style={{
+              padding: '32px 24px',
+              textAlign: 'center',
+              backgroundColor: '#f8fafc',
+              borderRadius: '12px',
+              border: '2px dashed #e2e8f0'
+            }}>
+              <div style={{ fontSize: '32px', marginBottom: '12px' }}>📝</div>
+              <p style={{
+                fontSize: '14px',
+                color: '#6b7280',
+                fontWeight: '500'
+              }}>
+                No interventions recorded yet. Add your first intervention above.
+              </p>
+            </div>
           ) : (
-            <div className="space-y-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {interventions.map((intervention) => (
-                <div key={intervention.id} className="p-3 border border-gray-200 rounded-lg">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-lg">{getInterventionIcon(intervention.type)}</span>
-                      <span className="font-medium capitalize">{intervention.type}</span>
+                <div key={intervention.id} style={{
+                  padding: '16px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '12px',
+                  backgroundColor: 'white',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#3b82f6';
+                  e.currentTarget.style.boxShadow = '0 4px 6px rgba(59, 130, 246, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '8px'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{ fontSize: '18px' }}>{getInterventionIcon(intervention.type)}</span>
+                      <span style={{
+                        fontWeight: '600',
+                        textTransform: 'capitalize',
+                        color: '#111827',
+                        fontSize: '14px'
+                      }}>
+                        {intervention.type}
+                      </span>
                       {intervention.followUpRequired && (
-                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                          Follow-up Required
+                        <span style={{
+                          padding: '4px 8px',
+                          backgroundColor: '#fef3c7',
+                          color: '#d97706',
+                          fontSize: '12px',
+                          borderRadius: '12px',
+                          fontWeight: '600'
+                        }}>
+                          ⚡ Follow-up Required
                         </span>
                       )}
                     </div>
-                    <span className="text-sm" style={{ color: '#111827' }}>
+                    <span style={{
+                      fontSize: '12px',
+                      color: '#6b7280',
+                      fontWeight: '500'
+                    }}>
                       {intervention.date.toLocaleDateString()}
                     </span>
                   </div>
                   
                   {intervention.notes && (
-                    <p className="mt-2 text-sm" style={{ color: '#111827' }}>{intervention.notes}</p>
+                    <p style={{
+                      marginTop: '8px',
+                      fontSize: '14px',
+                      color: '#374151',
+                      lineHeight: '1.5',
+                      padding: '8px 12px',
+                      backgroundColor: '#f8fafc',
+                      borderRadius: '6px',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      {intervention.notes}
+                    </p>
                   )}
                   
                   {intervention.assignedTo && (
-                    <p className="mt-1 text-xs" style={{ color: '#111827' }}>
+                    <p style={{
+                      marginTop: '8px',
+                      fontSize: '12px',
+                      color: '#6b7280',
+                      fontWeight: '500',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      <span>👤</span>
                       Assigned to: {intervention.assignedTo}
                     </p>
                   )}

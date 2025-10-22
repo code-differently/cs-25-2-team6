@@ -28,11 +28,26 @@ export default function AlertsDashboard() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div style={{
+        backgroundColor: '#fef2f2',
+        border: '1px solid #fecaca',
+        borderRadius: '8px',
+        padding: '16px'
+      }}>
         <p style={{ color: '#111827' }}>Error loading alerts: {error}</p>
         <button 
           onClick={refreshAlertData}
-          className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          style={{
+            marginTop: '8px',
+            padding: '8px 16px',
+            backgroundColor: '#dc2626',
+            color: 'white',
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
         >
           Retry
         </button>

@@ -67,7 +67,11 @@ export default function AlertsList({
         border: '1px solid #e5e7eb'
       }}>
         <div style={{ padding: '24px' }}>
-          <div className="animate-pulse space-y-4">
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}>
             {[...Array(5)].map((_, i) => (
               <div key={i} style={{
                 height: '80px',
@@ -96,7 +100,11 @@ export default function AlertsList({
         borderBottom: '1px solid #e5e7eb',
         background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
       }}>
-        <div className="flex items-center justify-between">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
           <h2 style={{ 
             fontSize: '18px', 
             fontWeight: '600',
@@ -105,7 +113,11 @@ export default function AlertsList({
           }}>
             🚨 Active Alerts ({alerts.length})
           </h2>
-          <div className="flex items-center space-x-2">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
             <button
               onClick={() => setShowFilters(!showFilters)}
               style={{
@@ -134,7 +146,11 @@ export default function AlertsList({
             borderRadius: '8px',
             border: '1px solid #3b82f620'
           }}>
-            <div className="flex items-center justify-between">
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
               <span style={{
                 fontSize: '14px',
                 fontWeight: '500',
@@ -142,7 +158,10 @@ export default function AlertsList({
               }}>
                 ✓ {selectedAlerts.size} alert(s) selected
               </span>
-              <div className="space-x-2">
+              <div style={{
+                display: 'flex',
+                gap: '8px'
+              }}>
                 <button
                   onClick={() => handleBulkAction('acknowledge')}
                   style={{
@@ -239,7 +258,10 @@ export default function AlertsList({
               backgroundColor: '#f8fafc',
               borderBottom: '1px solid #e2e8f0'
             }}>
-              <label className="flex items-center">
+              <label style={{
+                display: 'flex',
+                alignItems: 'center'
+              }}>
                 <input
                   type="checkbox"
                   checked={selectedAlerts.size === alerts.length && alerts.length > 0}
