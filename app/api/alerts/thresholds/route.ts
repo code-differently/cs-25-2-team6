@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const studentId = searchParams.get('studentId');
-    const type = searchParams.get('type') as AlertType | null;
+    const typeStr = searchParams.get('type');
+    const type = typeStr ? typeStr as AlertType : null;
     
     let thresholds;
     

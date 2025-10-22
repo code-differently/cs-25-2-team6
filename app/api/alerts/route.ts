@@ -36,28 +36,34 @@ export async function GET(request: NextRequest) {
     // Parse filters from query params
     const filters: AlertFilters = {};
     
-    if (searchParams.has('studentId')) {
-      filters.studentId = searchParams.get('studentId') as string;
+    const studentId = searchParams.get('studentId');
+    if (studentId) {
+      filters.studentId = studentId;
     }
     
-    if (searchParams.has('status')) {
-      filters.status = searchParams.get('status')?.split(',') as any[];
+    const status = searchParams.get('status');
+    if (status) {
+      filters.status = status.split(',') as any[];
     }
     
-    if (searchParams.has('type')) {
-      filters.type = searchParams.get('type')?.split(',') as any[];
+    const type = searchParams.get('type');
+    if (type) {
+      filters.type = type.split(',') as any[];
     }
     
-    if (searchParams.has('period')) {
-      filters.period = searchParams.get('period') as any;
+    const period = searchParams.get('period');
+    if (period) {
+      filters.period = period as any;
     }
     
-    if (searchParams.has('dateFrom')) {
-      filters.dateFrom = new Date(searchParams.get('dateFrom') as string);
+    const dateFrom = searchParams.get('dateFrom');
+    if (dateFrom) {
+      filters.dateFrom = new Date(dateFrom);
     }
     
-    if (searchParams.has('dateTo')) {
-      filters.dateTo = new Date(searchParams.get('dateTo') as string);
+    const dateTo = searchParams.get('dateTo');
+    if (dateTo) {
+      filters.dateTo = new Date(dateTo);
     }
     
     // Get alerts requiring intervention

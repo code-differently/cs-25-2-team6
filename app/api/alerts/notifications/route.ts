@@ -27,9 +27,9 @@ const alertRepo = new FileAlertRepo();
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const parentId = searchParams.get('parentId');
-    const studentId = searchParams.get('studentId');
-    const status = searchParams.get('status');
+    const parentId = searchParams.get('parentId') || undefined;
+    const studentId = searchParams.get('studentId') || undefined;
+    const status = searchParams.get('status') || undefined;
     
     const notifications = notificationService.getNotifications({
       parentId,
