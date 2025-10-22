@@ -60,4 +60,14 @@ export class FileStudentRepo {
   clearAll(): void {
     fs.writeFileSync(this.filePath, JSON.stringify([]));
   }
+
+  /**
+   * Find a student by ID
+   * @param id The student's ID
+   * @returns The student if found, undefined otherwise
+   */
+  findStudentById(id: string): Student | undefined {
+    const students = this.allStudents();
+    return students.find(student => student.id === id);
+  }
 }
