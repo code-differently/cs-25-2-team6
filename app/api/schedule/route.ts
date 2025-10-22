@@ -34,10 +34,25 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
+    const year = searchParams.get('year');
+    const month = searchParams.get('month');
     
     let scheduledDays;
     
     if (startDate && endDate) {
+      scheduledDays = scheduleService.listPlannedDays({ start: startDate, end: endDate });
+    } else if (year && month) {
+      // Calculate start and end dates for the specified month and year
+      const numMonth = parseInt(month);
+      const numYear = parseInt(year);
+      
+      // Create start date (first day of month)
+      const startDate = `${numYear}-${numMonth.toString().padStart(2, '0')}-01`;
+      
+      // Create end date (last day of month)
+      const lastDay = new Date(numYear, numMonth, 0).getDate();
+      const endDate = `${numYear}-${numMonth.toString().padStart(2, '0')}-${lastDay}`;
+      
       scheduledDays = scheduleService.listPlannedDays({ start: startDate, end: endDate });
     } else {
       // Get current year's start and end dates
@@ -66,7 +81,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { dateISO, reason, description } = body;
+    const { date, reason, description } = body;
+    const dateISO = date; // Map client 'date' parameter to 'dateISO'
     
     
     // Validate required fields

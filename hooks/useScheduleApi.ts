@@ -135,7 +135,7 @@ export function useScheduleApi(): UseScheduleApiReturn {
     setError(null);
 
     try {
-      const response = await fetch(`/api/schedule?id=${id}`, {
+      const response = await fetch(`/api/schedule?dateISO=${id}`, {
         method: 'DELETE',
       });
       
