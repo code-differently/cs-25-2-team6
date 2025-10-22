@@ -2,6 +2,15 @@
 import { useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import AttendanceForm from '@/components/AttendanceForm'
+import { useScheduleModals } from '@/hooks/useScheduleModals'
+import ScheduleDayOffModal from '@/components/schedule/ScheduleDayOffModal'
+import ReasonSelectionModal from '@/components/schedule/ReasonSelectionModal'
+import ScheduleConfirmationModal from '@/components/schedule/ScheduleConfirmationModal'
+
+export default function Home() {
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false)
+  const [selectedDate, setSelectedDate] = useState('')
+  const scheduleModals = useScheduleModals()
 import ScheduleDashboard from '@/components/schedule/ScheduleDashboard'
 import ScheduleCalendar from '@/components/schedule/ScheduleCalendar'
 import ScheduledEventsList from '@/components/schedule/ScheduledEventsList'
@@ -125,6 +134,16 @@ export default function Home() {
                 onDateSelect={handleDateSelect}
               />
             </div>
+            
+            {/* Schedule Day Off Button - positioned underneath mock calendar */}
+            <div className="calendar-actions">
+              <button 
+                onClick={() => scheduleModals.setScheduleModal(true)}
+                className="primary-btn schedule-btn"
+              >
+                📅 Schedule Day Off
+              </button>
+            </div>
           </div>
         </div>
         
@@ -132,6 +151,38 @@ export default function Home() {
         <AttendanceForm 
           isOpen={showAttendanceModal}
           onClose={() => setShowAttendanceModal(false)}
+        />
+
+        {/* Schedule Day Off Modal System */}
+        <ScheduleDayOffModal 
+          isOpen={scheduleModals.scheduleModal}
+          formData={scheduleModals.formData}
+          reasonOptions={scheduleModals.reasonOptions}
+          onFormChange={scheduleModals.setFormData}
+          onSubmit={() => scheduleModals.handleScheduleSubmit(scheduleModals.formData)}
+          onCancel={() => scheduleModals.setScheduleModal(false)}
+          onReasonSelect={() => scheduleModals.setReasonModal(true)}
+        />
+        <ReasonSelectionModal 
+          isOpen={scheduleModals.reasonModal}
+          reasonOptions={scheduleModals.reasonOptions}
+          selectedReason={scheduleModals.formData.reason}
+          onReasonSelect={scheduleModals.handleReasonSelection}
+          onCancel={() => scheduleModals.setReasonModal(false)}
+          onConfirm={() => scheduleModals.setReasonModal(false)}
+        />
+        <ScheduleConfirmationModal 
+          isOpen={scheduleModals.confirmationModal}
+          onClose={() => {
+            scheduleModals.setConfirmationModal(false);
+            // Reset form data after confirmation
+            scheduleModals.setFormData({
+              date: '',
+              reason: '',
+              customReason: '',
+              affectedStudentCount: 0
+            });
+          }}
         />
       </div>
     </DashboardLayout>
