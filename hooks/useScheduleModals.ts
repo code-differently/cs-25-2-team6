@@ -36,6 +36,7 @@ export function useScheduleModals() {
   const [bulkExcuseModal, setBulkExcuseModal] = useState(false);       // Bulk excuse confirmation
   const [editModal, setEditModal] = useState(false);                   // Edit existing schedule
   const [deleteModal, setDeleteModal] = useState(false);               // Delete confirmation
+  const [confirmationModal, setConfirmationModal] = useState(false);   // Success confirmation modal
 
   // Form data state - holds the current form information
   const [formData, setFormData] = useState<ScheduleFormData>({
@@ -92,14 +93,9 @@ export function useScheduleModals() {
     // Save to localStorage for persistence
     localStorage.setItem('scheduledDaysOff', JSON.stringify(updatedScheduledDays));
 
-    // Close the modal and reset form
+    // Close the main modal and show confirmation
     setScheduleModal(false);
-    setFormData({
-      date: '',
-      reason: '',
-      customReason: '',
-      affectedStudentCount: 0
-    });
+    setConfirmationModal(true);
 
     console.log('Day off scheduled successfully:', newSchedule);
   };
@@ -187,6 +183,7 @@ export function useScheduleModals() {
     bulkExcuseModal,
     editModal,
     deleteModal,
+    confirmationModal,
     
     // State setters for opening/closing modals
     setScheduleModal,
@@ -194,6 +191,7 @@ export function useScheduleModals() {
     setBulkExcuseModal,
     setEditModal,
     setDeleteModal,
+    setConfirmationModal,
     
     // Form data and related state
     formData,

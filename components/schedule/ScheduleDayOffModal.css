@@ -249,6 +249,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  min-width: 120px;
 }
 
 .cancel-btn:hover {
@@ -307,7 +308,8 @@
   
   .cancel-btn,
   .submit-btn {
-    width: 100%;
+    width: auto;
+    min-width: 120px;
   }
 }
 

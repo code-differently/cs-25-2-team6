@@ -5,6 +5,7 @@ import AttendanceForm from '@/components/AttendanceForm'
 import { useScheduleModals } from '@/hooks/useScheduleModals'
 import ScheduleDayOffModal from '@/components/schedule/ScheduleDayOffModal'
 import ReasonSelectionModal from '@/components/schedule/ReasonSelectionModal'
+import ScheduleConfirmationModal from '@/components/schedule/ScheduleConfirmationModal'
 
 export default function Home() {
   const [showAttendanceModal, setShowAttendanceModal] = useState(false)
@@ -95,6 +96,19 @@ export default function Home() {
           onReasonSelect={scheduleModals.handleReasonSelection}
           onCancel={() => scheduleModals.setReasonModal(false)}
           onConfirm={() => scheduleModals.setReasonModal(false)}
+        />
+        <ScheduleConfirmationModal 
+          isOpen={scheduleModals.confirmationModal}
+          onClose={() => {
+            scheduleModals.setConfirmationModal(false);
+            // Reset form data after confirmation
+            scheduleModals.setFormData({
+              date: '',
+              reason: '',
+              customReason: '',
+              affectedStudentCount: 0
+            });
+          }}
         />
       </div>
     </DashboardLayout>
