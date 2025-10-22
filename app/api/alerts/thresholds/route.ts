@@ -118,15 +118,10 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Validate and save threshold
-    const valid = alertService.saveThreshold(threshold);
+    // Save threshold
+    alertRepo.saveThreshold(threshold);
     
-    if (!valid) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid threshold settings' },
-        { status: 400 }
-      );
-    }
+    // No validation needed as FileAlertRepo doesn't return any validation status
     
     return NextResponse.json({
       success: true,
