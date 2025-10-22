@@ -6,11 +6,6 @@ import { useScheduleModals } from '@/hooks/useScheduleModals'
 import ScheduleDayOffModal from '@/components/schedule/ScheduleDayOffModal'
 import ReasonSelectionModal from '@/components/schedule/ReasonSelectionModal'
 import ScheduleConfirmationModal from '@/components/schedule/ScheduleConfirmationModal'
-
-export default function Home() {
-  const [showAttendanceModal, setShowAttendanceModal] = useState(false)
-  const [selectedDate, setSelectedDate] = useState('')
-  const scheduleModals = useScheduleModals()
 import ScheduleDashboard from '@/components/schedule/ScheduleDashboard'
 import ScheduleCalendar from '@/components/schedule/ScheduleCalendar'
 import ScheduledEventsList from '@/components/schedule/ScheduledEventsList'
@@ -19,6 +14,7 @@ export default function Home() {
   const [showAttendanceModal, setShowAttendanceModal] = useState(false)
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [view, setView] = useState<'calendar' | 'list'>('calendar')
+  const scheduleModals = useScheduleModals()
   // Removed activeTab since we only have Schedule Management now
 
   const handleDateClick = (day: number) => {
