@@ -9,6 +9,7 @@ import { FileStudentRepo } from '../persistence/FileStudentRepo';
 import { FileAttendanceRepo } from '../persistence/FileAttendanceRepo';
 import { Student } from '../persistence/FileStudentRepo';
 import { AttendanceAlert, AlertStatus } from '../domains/AttendanceAlert';
+import { LLMService, LLMRequest, getLLMService } from './LLMService';
 
 // Response types
 export interface RAGResponse {
@@ -247,17 +248,52 @@ export class RAGService {
     intent: QueryIntent, 
     data: any
   ): Promise<RAGResponse> {
-    switch (intent) {
-      case 'ALERT_QUERY':
-        return this.generateAlertQueryResponse(query, data);
-      case 'ALERT_EXPLANATION':
-        return this.generateAlertExplanationResponse(query, data);
-      case 'ATTENDANCE_QUERY':
-        return this.generateAttendanceQueryResponse(query, data);
-      case 'STUDENT_QUERY':
-        return this.generateStudentQueryResponse(query, data);
-      default:
-        return this.generateGeneralQueryResponse(query, data);
+    try {
+      // Get LLM service instance
+      const llmService = getLLMService();
+      
+      // Build context based on intent
+      let context = `Query intent: ${intent}`;
+      
+      // Create LLM request
+      const llmRequest: LLMRequest = {
+        query,
+        context,
+        attendanceData: this.extractAttendanceDataForLLM(data, intent),
+        alertData: this.extractAlertDataForLLM(data, intent)
+      };
+      
+      console.log('[RAGService] Sending request to LLM service:', {
+        query,
+        intent,
+        dataSize: JSON.stringify(data).length,
+      });
+      
+      // Process query using LLM service
+      const llmResponse = await llmService.processQuery(llmRequest);
+      
+      console.log('[RAGService] Received LLM response with confidence:', llmResponse.confidence);
+      
+      // Convert LLM response to RAG response format
+      return this.convertLLMResponseToRAGResponse(llmResponse, data);
+      
+    } catch (error) {
+      console.error('[RAGService] Error generating response with LLM:', error);
+      
+      // Fall back to template-based responses if LLM fails
+      console.log('[RAGService] Falling back to template responses');
+      switch (intent) {
+        case 'ALERT_QUERY':
+          return this.generateAlertQueryResponse(query, data);
+        case 'ALERT_EXPLANATION':
+          return this.generateAlertExplanationResponse(query, data);
+        case 'ATTENDANCE_QUERY':
+          return this.generateAttendanceQueryResponse(query, data);
+        case 'STUDENT_QUERY':
+          return this.generateStudentQueryResponse(query, data);
+        default:
+          return this.generateGeneralQueryResponse(query, data);
+      }
     }
   }
   
@@ -502,5 +538,98 @@ export class RAGService {
       structuredData: data,
       confidence: 0.7
     };
+  }
+  
+  /**
+   * Extract attendance data from retrieved data for LLM processing
+   * Formats data to be more suitable for LLM consumption
+   */
+  private extractAttendanceDataForLLM(data: any, intent: QueryIntent): any[] {
+    if (!data) return [];
+    
+    // For attendance queries, extract attendance records
+    if (intent === 'ATTENDANCE_QUERY' && data.attendanceRecords) {
+      return data.attendanceRecords.slice(0, 50); // Limit to avoid token limits
+    }
+    
+    // For student queries, extract attendance for that student
+    if (intent === 'STUDENT_QUERY' && data.student && data.student.attendanceRecords) {
+      return data.student.attendanceRecords.slice(0, 50);
+    }
+    
+    // Extract any attendance data we find in the object
+    if (data.attendance) return data.attendance.slice(0, 50);
+    
+    return [];
+  }
+  
+  /**
+   * Extract alert data from retrieved data for LLM processing
+   * Formats data to be more suitable for LLM consumption
+   */
+  private extractAlertDataForLLM(data: any, intent: QueryIntent): any[] {
+    if (!data) return [];
+    
+    // For alert queries, extract alert details
+    if ((intent === 'ALERT_QUERY' || intent === 'ALERT_EXPLANATION') && data.alerts) {
+      return data.alerts.slice(0, 20); // Limit to avoid token limits
+    }
+    
+    // For student queries, extract alerts for that student
+    if (intent === 'STUDENT_QUERY' && data.student && data.student.alerts) {
+      return data.student.alerts.slice(0, 20);
+    }
+    
+    // Extract any alert data we find in the object
+    if (data.alerts) return data.alerts.slice(0, 20);
+    
+    return [];
+  }
+  
+  /**
+   * Convert LLM response format to RAG response format
+   */
+  private convertLLMResponseToRAGResponse(llmResponse: any, originalData: any): RAGResponse {
+    // Convert suggested actions to the format expected by RAG consumers
+    const actions = Array.isArray(llmResponse.suggestedActions)
+      ? llmResponse.suggestedActions.map((action: string) => {
+          // Extract action type from text (e.g., "View student" -> "VIEW_STUDENT")
+          const actionType = this.inferActionTypeFromText(action);
+          return {
+            type: actionType,
+            label: action,
+            params: {} // Default empty params - in real impl we'd extract from action text
+          };
+        })
+      : [];
+    
+    return {
+      naturalLanguageAnswer: llmResponse.naturalLanguageAnswer,
+      structuredData: llmResponse.structuredData || originalData,
+      actions,
+      confidence: llmResponse.confidence
+    };
+  }
+  
+  /**
+   * Infer action type from text description
+   */
+  private inferActionTypeFromText(actionText: string): 'VIEW_STUDENT' | 'SEND_NOTIFICATION' | 'SCHEDULE_MEETING' | 'VIEW_ALERTS' {
+    const text = actionText.toLowerCase();
+    
+    if (text.includes('view student') || text.includes('check student')) {
+      return 'VIEW_STUDENT';
+    }
+    
+    if (text.includes('notification') || text.includes('notify') || text.includes('email') || text.includes('message')) {
+      return 'SEND_NOTIFICATION';
+    }
+    
+    if (text.includes('meeting') || text.includes('schedule') || text.includes('appointment')) {
+      return 'SCHEDULE_MEETING';
+    }
+    
+    // Default to VIEW_ALERTS for anything else
+    return 'VIEW_ALERTS';
   }
 }

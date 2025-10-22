@@ -153,17 +153,30 @@ export default function RAGQueryBox({
           {/* Show suggested actions as command suggestions */}
           {results.suggestedActions && results.suggestedActions.length > 0 && (
             <div className="mt-4">
-              <div className="text-yellow-400 text-sm">SUGGESTED COMMANDS:</div>
+              {/* Show confidence level */}
+              {results.confidence !== undefined && (
+                <div className={`mb-2 text-sm ${
+                  results.confidence > 0.8 ? 'text-green-400' : 
+                  results.confidence > 0.5 ? 'text-yellow-400' : 'text-red-400'
+                }`}>
+                  Confidence: {Math.round(results.confidence * 100)}%
+                </div>
+              )}
+              
+              <div className="text-yellow-400 text-sm">SUGGESTED ACTIONS:</div>
               <div className="mt-1 space-y-1">
-                {results.suggestedActions.map((action, index) => (
+                {results.suggestedActions && results.suggestedActions.map((action, index) => (
                   <div 
                     key={index} 
                     className="text-blue-400 cursor-pointer hover:underline"
                     onClick={() => console.log('Action clicked:', action)}
                   >
-                    $ {action.label}
+                    → {action.label}
                   </div>
                 ))}
+                {(!results.suggestedActions || results.suggestedActions.length === 0) && (
+                  <div className="text-gray-400 italic">No suggested actions</div>
+                )}
               </div>
             </div>
           )}

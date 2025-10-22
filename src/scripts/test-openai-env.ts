@@ -2,11 +2,14 @@
  * Script to test OpenAI environment setup
  * This is just for testing purposes and can be removed after setup verification
  */
-import dotenv from 'dotenv';
+// Use require for compatibility with both ESM and CommonJS
+// This avoids issues in different environments (local vs Vercel)
+const dotenv = require('dotenv');
 
 // Load environment variables from .env.local
 dotenv.config({ path: '.env.local' });
 
+// Import after environment is loaded
 import { logEnvironmentValidation, validateEnvironment } from '../utils/environment';
 
 // Log environment validation status

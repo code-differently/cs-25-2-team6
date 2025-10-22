@@ -35,9 +35,14 @@ export function validateEnvironment(): {
 /**
  * Gets the appropriate OpenAI model to use
  * Falls back to a default if not specified
+ * 
+ * Available models:
+ * - gpt-4-turbo: Most capable model, but more expensive
+ * - gpt-4: Older version of GPT-4, still very capable
+ * - gpt-3.5-turbo: Less capable but faster and cheaper
  */
 export function getOpenAIModel(): string {
-  return process.env.OPENAI_MODEL || 'gpt-4-turbo';
+  return process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
 }
 
 /**

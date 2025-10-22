@@ -1,3 +1,8 @@
+// Load .env.local file for development
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ path: '.env.local' });
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // App directory is now stable in Next.js 15
