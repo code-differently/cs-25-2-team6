@@ -77,6 +77,7 @@
   transition: background-color 0.2s;
   width: auto;
   min-width: 120px;
+  text-align: center;
 }
 
 .primary-btn:hover {
