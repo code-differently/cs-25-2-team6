@@ -1,7 +1,15 @@
 
+/**
+ * LLMService: Core service for OpenAI interactions
+ * Implements singleton pattern for efficient API client management
+ */
 
 import OpenAI from 'openai';
-import { validateEnvironment, getOpenAIModel, getRAGSystemPrompt } from '../utils/environment';
+import { validateEnvironment, getRAGSystemPrompt } from '../utils/environment';
+import { LLMServiceConfig, DEFAULT_CONFIG, loadConfigFromEnvironment } from './LLMServiceConfig';
+import { sanitizeQuery, isHarmfulQuery } from './QuerySanitizer';
+import { validateLLMResponse, sanitizeLLMResponse, extractLLMResponseFromText } from './LLMResponseValidator';
+import { retryAsync } from '../utils/retry';
 
 // Response type definitions
 export interface LLMResponse {
@@ -18,6 +26,12 @@ export interface LLMRequest {
   queryContext?: string;  // Context identifier for selecting the appropriate system prompt
   attendanceData?: any[];
   alertData?: any[];
+  options?: {
+    priority?: 'high' | 'normal' | 'low';  // Priority for processing
+    bypassSanitization?: boolean;          // Whether to bypass query sanitization
+    maxTokens?: number;                    // Override default max tokens
+    temperature?: number;                  // Override default temperature
+  };
 }
 
 // Message history interfaces
@@ -35,6 +49,7 @@ export class LLMService {
   private client: OpenAI;
   private messageHistory: MessageHistoryEntry[] = [];
   private initialized: boolean = false;
+  private config: LLMServiceConfig;
 
   /**
    * Private constructor to enforce singleton pattern
@@ -46,9 +61,21 @@ export class LLMService {
       throw new Error(`LLMService initialization failed: ${message}`);
     }
 
+    // Load configuration
+    this.config = loadConfigFromEnvironment();
+
+    // Initialize OpenAI client
     this.client = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
+
+    if (this.config.debug) {
+      console.log('[LLM] Service initialized with config:', {
+        model: this.config.openai.model,
+        temperature: this.config.openai.temperature,
+        maxTokens: this.config.openai.maxTokens
+      });
+    }
 
     // Initialize system prompt
     this.initializeSystemPrompt();
@@ -111,33 +138,59 @@ export class LLMService {
         throw new Error('LLMService not properly initialized');
       }
 
-      console.log('[LLM] Processing query:', request.query);
+      // Sanitize input query
+      const sanitizedQuery = sanitizeQuery(request.query);
+      
+      // Check for harmful content
+      if (isHarmfulQuery(sanitizedQuery)) {
+        return this.createErrorResponse('I cannot process queries that may have harmful intent.');
+      }
+
+      if (this.config.debug) {
+        console.log('[LLM] Processing query:', sanitizedQuery);
+      }
 
       // If a specific query context is provided, update the system prompt
       if (request.queryContext) {
-        console.log(`[LLM] Updating system prompt with context: ${request.queryContext}`);
+        if (this.config.debug) {
+          console.log(`[LLM] Updating system prompt with context: ${request.queryContext}`);
+        }
         this.updateSystemPrompt(request.queryContext);
       }
 
-      // Build context-enhanced prompt
-      const userMessage = this.buildContextualPrompt(request);
+      // Build context-enhanced prompt with sanitized query
+      const modifiedRequest = { ...request, query: sanitizedQuery };
+      const userMessage = this.buildContextualPrompt(modifiedRequest);
       
       // Add to message history
       this.addMessage('user', userMessage);
 
-      // Call OpenAI API
+      // Prepare messages for API call
       const messages = this.messageHistory.map(msg => ({
         role: msg.role,
         content: msg.content
       }));
 
-      const completion = await this.client.chat.completions.create({
-        model: getOpenAIModel(),
-        messages,
-        temperature: 0.7,
-        max_tokens: 2000,
-        response_format: { type: "json_object" }
-      });
+      // Call OpenAI API with retry logic
+      const completion = await retryAsync(
+        async () => this.client.chat.completions.create({
+          model: this.config.openai.model,
+          messages,
+          temperature: this.config.openai.temperature,
+          max_tokens: this.config.openai.maxTokens,
+          top_p: this.config.openai.topP,
+          frequency_penalty: this.config.openai.frequencyPenalty,
+          presence_penalty: this.config.openai.presencePenalty,
+          response_format: { type: "json_object" }
+        }),
+        {
+          maxRetries: this.config.openai.maxRetries,
+          baseDelay: this.config.openai.retryDelay,
+          onRetry: (attempt, delay, error) => {
+            console.warn(`[LLM] Retry attempt ${attempt} after ${delay}ms delay:`, error.message);
+          }
+        }
+      );
 
       // Extract response content
       const responseContent = completion.choices[0].message.content;
@@ -152,7 +205,9 @@ export class LLMService {
       // Parse and validate response
       const response = this.parseResponse(responseContent);
       
-      console.log('[LLM] Response processed successfully');
+      if (this.config.debug) {
+        console.log('[LLM] Response processed successfully with confidence:', response.confidence);
+      }
       return response;
 
     } catch (error) {
@@ -183,8 +238,14 @@ export class LLMService {
    * Trim message history if it exceeds max length
    * Keeps the system prompt and most recent messages
    */
-  private trimMessageHistoryIfNeeded(maxMessages: number = 10): void {
+  private trimMessageHistoryIfNeeded(): void {
+    const maxMessages = this.config.maxHistoryMessages;
+    
     if (this.messageHistory.length > maxMessages) {
+      if (this.config.debug) {
+        console.log(`[LLM] Trimming message history from ${this.messageHistory.length} to ${maxMessages} messages`);
+      }
+      
       const systemMessage = this.messageHistory.find(msg => msg.role === 'system');
       const recentMessages = this.messageHistory
         .filter(msg => msg.role !== 'system')
@@ -233,23 +294,26 @@ Please provide a helpful response in JSON format with these fields:
    */
   private parseResponse(responseContent: string): LLMResponse {
     try {
-      // Parse JSON response
-      const parsedResponse = JSON.parse(responseContent);
+      // Try to extract and validate the response
+      const extractedResponse = extractLLMResponseFromText(responseContent);
       
-      // Validate required fields with fallbacks
-      return {
-        naturalLanguageAnswer: parsedResponse.naturalLanguageAnswer || 'No answer provided',
-        structuredData: parsedResponse.structuredData || null,
-        suggestedActions: Array.isArray(parsedResponse.suggestedActions) 
-          ? parsedResponse.suggestedActions 
-          : [],
-        confidence: typeof parsedResponse.confidence === 'number' 
-          ? Math.max(0, Math.min(1, parsedResponse.confidence)) // Ensure between 0-1
-          : 0.5 // Default confidence
-      };
+      // Check if the response is valid
+      if (!validateLLMResponse(extractedResponse)) {
+        if (this.config.debug) {
+          console.warn('[LLM] Invalid response structure, sanitizing:', responseContent);
+        }
+        
+        // Sanitize the response if it's invalid
+        return sanitizeLLMResponse(extractedResponse);
+      }
+      
+      return extractedResponse;
     } catch (error) {
       console.error('[LLM] Error parsing response:', error);
-      console.error('Raw response content:', responseContent);
+      
+      if (this.config.debug) {
+        console.error('Raw response content:', responseContent);
+      }
       
       // Return graceful error response
       return this.createErrorResponse('Failed to parse LLM response');
