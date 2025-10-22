@@ -1,14 +1,26 @@
-const { createDefaultPreset } = require("ts-jest");
-
-const tsJestTransformCfg = createDefaultPreset().transform;
-
 /** @type {import("jest").Config} **/
 module.exports = {
-  testEnvironment: "node",
+  preset: 'ts-jest/presets/js-with-babel',
+  testEnvironment: "jsdom",
   transform: {
-    ...tsJestTransformCfg,
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.json',
+        babelConfig: {
+          presets: [
+            ['@babel/preset-env', { targets: { node: 'current' } }],
+            '@babel/preset-typescript',
+            ['@babel/preset-react', { runtime: 'automatic' }]
+          ]
+        }
+      }
+    ]
   },
-  testMatch: ["**/*.test.ts"],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1'
+  },
+  testMatch: ["**/*.test.ts", "**/*.test.tsx"],
   collectCoverage: true,
   coverageDirectory: "coverage",
   coverageThreshold: {
