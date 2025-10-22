@@ -136,6 +136,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
       )}
     </div>
   );
+  // End of CalendarDay component
 };
 
 export default CalendarDay;
