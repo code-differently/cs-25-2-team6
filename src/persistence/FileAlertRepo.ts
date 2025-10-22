@@ -247,4 +247,13 @@ export class FileAlertRepo {
     const threshold = thresholds.find(t => t.id === thresholdId);
     return threshold || null;
   }
+
+  /**
+   * Get an alert by ID
+   */
+  getAlertById(alertId: string): AttendanceAlert | null {
+    const alerts = this.getAllAlerts();
+    const alert = alerts.find(a => a.id === alertId);
+    return alert || null;
+  }
 }

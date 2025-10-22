@@ -271,17 +271,17 @@ export class AlertService {
   validateThresholdSettings(threshold: AlertThreshold): ValidationResult {
     const errors: string[] = [];
     
-    // Count must be positive
+    
     if (threshold.count <= 0) {
       errors.push('Threshold count must be greater than zero');
     }
     
-    // Must have a valid type
+    
     if (!Object.values(AlertType).includes(threshold.type)) {
       errors.push('Invalid alert type');
     }
     
-    // Must have a valid period
+    
     if (!Object.values(AlertPeriod).includes(threshold.period)) {
       errors.push('Invalid alert period');
     }
@@ -364,7 +364,7 @@ export class AlertService {
       const thirtyDaysAgo = new Date(today);
       thirtyDaysAgo.setDate(today.getDate() - 30);
       
-      // Format dates as ISO strings (YYYY-MM-DD)
+      // Format dates (YYYY-MM-DD)
       const startDate = this.formatDateISO(thirtyDaysAgo);
       const endDate = this.formatDateISO(today);
       
@@ -384,16 +384,16 @@ export class AlertService {
   /**
    * Check if a date is a scheduled day off
    * 
-   * @param dateISO Date in ISO format (YYYY-MM-DD)
+   * @param dateISO Date in (YYYY-MM-DD)
    * @returns Whether the date is a scheduled day off
    */
   private isScheduledDayOff(dateISO: string): boolean {
-    // Use schedule repository to check if this is a planned day off
+   
     return this.scheduleRepo.hasDayOff(dateISO);
   }
 
   /**
-   * Format a date as ISO string (YYYY-MM-DD)
+   * Format a date (YYYY-MM-DD)
    * 
    * @param date Date to format
    * @returns Formatted date string
