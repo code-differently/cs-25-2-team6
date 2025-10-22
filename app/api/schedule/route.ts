@@ -5,10 +5,22 @@ import { FileStudentRepo } from '../../../src/persistence/FileStudentRepo';
 import { FileAttendanceRepo } from '../../../src/persistence/FileAttendanceRepo';
 import { AttendanceService } from '../../../src/services/AttendanceService';
 import path from 'path';
+import fs from 'fs';
+
+// Ensure data directory exists
+const dataPath = path.join(process.cwd(), 'data');
+if (!fs.existsSync(dataPath)) {
+  fs.mkdirSync(dataPath, { recursive: true });
+}
+
+// Ensure schedule.json file exists
+const scheduleFilePath = path.join(dataPath, 'schedule.json');
+if (!fs.existsSync(scheduleFilePath)) {
+  fs.writeFileSync(scheduleFilePath, JSON.stringify([]), 'utf8');
+}
 
 // Initialize services
-const dataPath = path.join(process.cwd(), 'data');
-const scheduleRepo = new FileScheduleRepo(path.join(dataPath, 'schedule.json'));
+const scheduleRepo = new FileScheduleRepo(scheduleFilePath);
 const studentRepo = new FileStudentRepo();
 const attendanceRepo = new FileAttendanceRepo();
 const attendanceService = new AttendanceService();

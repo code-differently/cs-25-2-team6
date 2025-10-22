@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ScheduleService } from '../../../../src/services/ScheduleService';
+import path from 'path';
+import fs from 'fs';
+
+// Ensure data directory exists
+const dataPath = path.join(process.cwd(), 'data');
+if (!fs.existsSync(dataPath)) {
+  fs.mkdirSync(dataPath, { recursive: true });
+}
+
+// Ensure schedule.json file exists
+const scheduleFilePath = path.join(dataPath, 'schedule.json');
+if (!fs.existsSync(scheduleFilePath)) {
+  fs.writeFileSync(scheduleFilePath, JSON.stringify([]), 'utf8');
+}
 
 // Initialize services
 const scheduleService = new ScheduleService();
