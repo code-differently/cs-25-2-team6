@@ -57,9 +57,19 @@ export async function POST(request: NextRequest) {
     const { dateISO, reason, description } = body;
     
     
+    // Validate required fields
     if (!dateISO || !reason) {
       return NextResponse.json(
         { success: false, error: 'Date and reason are required' },
+        { status: 400 }
+      );
+    }
+    
+    // Validate reason is a valid DayOffReason
+    const validReasons = ['HOLIDAY', 'PROF_DEV', 'REPORT_CARD', 'OTHER'];
+    if (!validReasons.includes(reason)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid reason. Must be one of: HOLIDAY, PROF_DEV, REPORT_CARD, OTHER' },
         { status: 400 }
       );
     }
@@ -130,8 +140,16 @@ export async function DELETE(request: NextRequest) {
       );
     }
     
-    // Delete implementation would go here
-    // For now, we'll just return a placeholder response
+    // Remove from the schedule repository
+    const scheduleRepo = new FileScheduleRepo();
+    
+    // Since there's no explicit delete method, we need to get all days and filter out the one to delete
+    const allDaysOff = scheduleRepo.allDaysOff();
+    const updatedDaysOff = allDaysOff.filter(day => day.dateISO !== dateISO);
+    
+    // Write back the filtered array
+    const fs = require('fs');
+    fs.writeFileSync(scheduleRepo['filePath'], JSON.stringify(updatedDaysOff, null, 2));
     
     return NextResponse.json({
       success: true,
