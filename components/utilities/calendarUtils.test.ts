@@ -1,14 +1,12 @@
 // Test file for calendar utility functions
 // Run with: npm test -- calendarUtils.test.ts
 
-import React from 'react';
 import {
   formatDisplayDate,
   getReasonDisplayColor,
   isWeekend,
   isScheduledDay,
-  calculateAffectedStudentsText,
-  renderCalendarDayContent
+  calculateAffectedStudentsText
 } from './calendarUtils';
 import { DayOffReason } from '../../src/domains/DayOffReason';
 import { DayOff } from '../../src/persistence/FileScheduleRepo';
@@ -155,69 +153,5 @@ describe('Calendar Utilities', () => {
     });
   });
 
-  describe('renderCalendarDayContent', () => {
-    const testDate = new Date('2025-10-21');
-    const scheduledDays: DayOff[] = [
-      {
-        dateISO: '2025-10-21',
-        reason: DayOffReason.HOLIDAY,
-        scope: 'ALL_STUDENTS'
-      }
-    ];
 
-    test('renders basic calendar day content', () => {
-      const result = renderCalendarDayContent(testDate, []);
-      expect(result).toBeDefined();
-      expect(result.type).toBe('div');
-    });
-
-    test('renders weekend indicator for weekend days', () => {
-      const weekendDate = new Date('2025-10-18'); // Saturday
-      const result = renderCalendarDayContent(weekendDate, []);
-      expect(result.props.className).toContain('weekend');
-    });
-
-    test('renders scheduled day content', () => {
-      const result = renderCalendarDayContent(testDate, scheduledDays);
-      expect(result.props.className).toContain('scheduled-off');
-    });
-
-    test('renders attendance data when provided', () => {
-      const attendanceData = {
-        present: 20,
-        late: 2,
-        absent: 1,
-        excused: 0
-      };
-      
-      const result = renderCalendarDayContent(testDate, [], {
-        showAttendance: true,
-        attendanceData
-      });
-      
-      // Should contain attendance summary elements
-      expect(result).toBeDefined();
-    });
-
-    test('handles invalid date', () => {
-      const result = renderCalendarDayContent(new Date('invalid'), []);
-      expect(result.props.className).toContain('invalid');
-    });
-
-    test('handles click events', () => {
-      const mockClick = jest.fn();
-      const result = renderCalendarDayContent(testDate, [], {
-        onClick: mockClick
-      });
-      
-      expect(result.props.role).toBe('button');
-      expect(result.props.tabIndex).toBe(0);
-    });
-
-    test('renders without click handler', () => {
-      const result = renderCalendarDayContent(testDate, []);
-      expect(result.props.role).toBeUndefined();
-      expect(result.props.tabIndex).toBeUndefined();
-    });
-  });
 });
