@@ -8,15 +8,13 @@ interface AlertDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDismiss: () => void;
-  onNotificationSettings: () => void;
 }
 
 export default function AlertDetailsModal({ 
   alert, 
   isOpen, 
   onClose, 
-  onDismiss, 
-  onNotificationSettings 
+  onDismiss 
 }: AlertDetailsModalProps) {
   const [activeTab, setActiveTab] = useState<'details' | 'history'>('details');
   
@@ -125,9 +123,6 @@ export default function AlertDetailsModal({
         <div className="modal-footer">
           <button className="secondary-btn" onClick={onClose}>
             Close
-          </button>
-          <button className="action-btn" onClick={onNotificationSettings}>
-            Notify Parents
           </button>
           {!alert.isDismissed && (
             <button className="dismiss-btn" onClick={onDismiss}>

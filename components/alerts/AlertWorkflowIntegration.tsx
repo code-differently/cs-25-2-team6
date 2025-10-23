@@ -7,7 +7,6 @@ import { AttendanceAlert } from '../utilities/alertUtils';
 import ThresholdSettingsModal from './ThresholdSettingsModal';
 import AlertDropdown from './AlertDropdown';
 import DismissAlertModal from './DismissAlertModal';
-import NotificationSettingsModal from './NotificationSettingsModal';
 import AlertDetailsModal from './AlertDetailsModal';
 
 // TODO: Integration with L's utilities when available:
@@ -56,7 +55,6 @@ export default function AlertWorkflowIntegration() {
     thresholdModal,
     alertDropdown,
     dismissModal,
-    notificationModal,
     detailsModal,
     
     // Modal controls
@@ -69,7 +67,6 @@ export default function AlertWorkflowIntegration() {
     // Workflow functions
     handleThresholdUpdate,
     handleAlertDismiss,
-    showNotificationConfirmation,
     showAlertDetails,
     handleDropdownToggle,
     closeAllModals
@@ -79,12 +76,6 @@ export default function AlertWorkflowIntegration() {
     closeAllModals();
     if (selectedAlert) {
       showAlertDetails(selectedAlert);
-    }
-  };
-
-  const handleNotificationFromDetails = () => {
-    if (selectedAlert) {
-      showNotificationConfirmation(selectedAlert);
     }
   };
 
@@ -114,13 +105,6 @@ export default function AlertWorkflowIntegration() {
             style={{ padding: '8px 16px', backgroundColor: '#059669', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
           >
             View John's Alert Details
-          </button>
-          
-          <button 
-            onClick={() => showNotificationConfirmation(sampleAlerts[1])}
-            style={{ padding: '8px 16px', backgroundColor: '#d97706', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-          >
-            Send Jane's Parent Notification
           </button>
         </div>
       </div>
@@ -152,12 +136,6 @@ export default function AlertWorkflowIntegration() {
                 style={{ marginRight: '8px', padding: '4px 8px', backgroundColor: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer' }}
               >
                 View Details
-              </button>
-              <button 
-                onClick={() => showNotificationConfirmation(alert)}
-                style={{ padding: '4px 8px', backgroundColor: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '4px', cursor: 'pointer' }}
-              >
-                Notify Parents
               </button>
             </div>
           </div>
@@ -192,22 +170,11 @@ export default function AlertWorkflowIntegration() {
             onCancel={closeAllModals}
           />
 
-          <NotificationSettingsModal
-            alert={selectedAlert}
-            isOpen={notificationModal}
-            onConfirm={(alert, settings) => {
-              console.log('Sending notification:', settings);
-              closeAllModals();
-            }}
-            onCancel={closeAllModals}
-          />
-
           <AlertDetailsModal
             alert={selectedAlert}
             isOpen={detailsModal}
             onClose={closeAllModals}
             onDismiss={handleDismissFromDetails}
-            onNotificationSettings={handleNotificationFromDetails}
           />
         </>
       )}
