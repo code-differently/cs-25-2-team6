@@ -1,34 +1,33 @@
 "use client"
 
 import { useState } from 'react';
+import { AttendanceAlert } from '../components/utilities/alertUtils';
 
-// Alert modal interfaces - simple and beginner-friendly
+// TODO: Replace with L's interfaces when available
+// These temporary interfaces will be replaced by:
+// - L's types/thresholds.ts for ThresholdFormData 
+// - L's types/alerts.ts for AlertThreshold
+// - L's utils/thresholdValidation.ts for validation logic
+
+// Temporary interface - will use L's types/thresholds.ts
 export interface ThresholdFormData {
   absenceThreshold: number;
   latenessThreshold: number;
   timeframe: '30-day' | 'cumulative';
 }
 
+// Temporary interface - will use L's types/alerts.ts  
 export interface AlertThreshold {
   id: string;
-  studentId?: string;
+  teacherId: string;
   absenceLimit: number;
   latenessLimit: number;
   timeframe: '30-day' | 'cumulative';
   createdAt: Date;
 }
 
-export interface AttendanceAlert {
-  id: string;
-  studentId: string;
-  studentName: string;
-  type: 'absence' | 'lateness';
-  count: number;
-  threshold: number;
-  severity: 'low' | 'medium' | 'high';
-  createdAt: Date;
-  dismissed: boolean;
-}
+// Re-export the existing AttendanceAlert interface for compatibility
+export type { AttendanceAlert };
 
 // Alert modal management hook - handles all modal workflows
 export function useAlertModals() {
@@ -53,8 +52,11 @@ export function useAlertModals() {
   // Form validation errors
   const [errors, setErrors] = useState<any>({});
 
-  // Validate threshold form - simple validation
+  // TODO: Replace with L's validation utilities
+  // This validation logic will be replaced by L's utils/thresholdValidation.ts
+  // Will use: validateAlertThreshold(), validateTimeframe(), sanitizeThresholdInput()
   const validateThresholdForm = (data: ThresholdFormData) => {
+    // Temporary basic validation - will use L's utils/thresholdValidation.ts
     const newErrors: any = {};
     
     if (data.absenceThreshold < 1) {
@@ -76,6 +78,8 @@ export function useAlertModals() {
 
   // Handle threshold update workflow
   const handleThresholdUpdate = async (thresholds: ThresholdFormData) => {
+    // TODO: Replace validation with L's utilities
+    // Will use: sanitizeThresholdInput(thresholds) before validation
     if (!validateThresholdForm(thresholds)) return;
 
     try {
@@ -115,6 +119,12 @@ export function useAlertModals() {
     setAlertDropdown(!alertDropdown);
   };
 
+  // Show alert details modal
+  const showAlertDetails = (alert: AttendanceAlert) => {
+    setSelectedAlert(alert);
+    setDetailsModal(true);
+  };
+
   // Close all modals - cleanup function
   const closeAllModals = () => {
     setThresholdModal(false);
@@ -152,6 +162,7 @@ export function useAlertModals() {
     handleThresholdUpdate,
     handleAlertDismiss,
     showNotificationConfirmation,
+    showAlertDetails,
     handleDropdownToggle,
     validateThresholdForm,
     closeAllModals
