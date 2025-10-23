@@ -1,15 +1,17 @@
 'use client';
 
 import React from 'react';
+import DashboardLayout from '@/components/DashboardLayout';
 import StudentsDashboard from '@/components/students/StudentsDashboard';
 
 export default function SettingsPage() {
   return (
-    <div style={{
-      maxWidth: '1152px',
-      margin: '0 auto',
-      padding: '32px 16px'
-    }}>
+    <DashboardLayout>
+      <div style={{
+        maxWidth: '1152px',
+        margin: '0 auto',
+        padding: '32px 16px'
+      }}>
       <h1 style={{
         fontSize: '30px',
         fontWeight: 'bold',
@@ -252,5 +254,6 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+    </DashboardLayout>
   );
 }
