@@ -91,7 +91,7 @@ export default function StudentsDashboard() {
           marginBottom: '16px'
         }}>
           <h2 style={{
-            fontSize: '20px',
+            fontSize: '24px',
             fontWeight: 'bold',
             color: '#111827',
             margin: 0
