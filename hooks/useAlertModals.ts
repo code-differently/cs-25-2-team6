@@ -36,7 +36,6 @@ export function useAlertModals() {
   const [thresholdModal, setThresholdModal] = useState(false);
   const [alertDropdown, setAlertDropdown] = useState(false);
   const [dismissModal, setDismissModal] = useState(false);
-  const [notificationModal, setNotificationModal] = useState(false);
   const [detailsModal, setDetailsModal] = useState(false);
 
   // Form data states
@@ -108,12 +107,6 @@ export function useAlertModals() {
     }
   };
 
-  // Show parent notification confirmation
-  const showNotificationConfirmation = (alert: AttendanceAlert) => {
-    setSelectedAlert(alert);
-    setNotificationModal(true);
-  };
-
   // Handle dropdown toggle
   const handleDropdownToggle = () => {
     setAlertDropdown(!alertDropdown);
@@ -130,7 +123,6 @@ export function useAlertModals() {
     setThresholdModal(false);
     setAlertDropdown(false);
     setDismissModal(false);
-    setNotificationModal(false);
     setDetailsModal(false);
     setSelectedAlert(null);
     setErrors({});
@@ -141,14 +133,12 @@ export function useAlertModals() {
     thresholdModal,
     alertDropdown,
     dismissModal,
-    notificationModal,
     detailsModal,
     
     // Modal controls
     setThresholdModal,
     setAlertDropdown,
     setDismissModal,
-    setNotificationModal,
     setDetailsModal,
     
     // Form data
@@ -161,7 +151,6 @@ export function useAlertModals() {
     // Workflow functions
     handleThresholdUpdate,
     handleAlertDismiss,
-    showNotificationConfirmation,
     showAlertDetails,
     handleDropdownToggle,
     validateThresholdForm,
