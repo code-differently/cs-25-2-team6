@@ -1,6 +1,11 @@
 /**
- * Alert validation utilities for User Story 4
- * Simple validation functions for alert data integrity
+ * Validation utilities for alert data and forms
+ * 
+ * This module provides comprehensive validation for the alert system,
+ * ensuring data integrity and consistent error handling across the application.
+ * 
+ * @fileoverview Alert validation utilities for User Story 4
+ * @version 1.0.0
  */
 
 import { AlertType, AlertPeriod } from '../domains/AlertThreshold';
@@ -11,67 +16,86 @@ import { VALIDATION_LIMITS, VALIDATION_MESSAGES } from '../constants/alertConsta
 /**
  * Validates basic alert data structure
  */
-export function validateAlertData(alertData: Partial<SimpleAlertData>): ValidationResult<SimpleAlertData> {
+/**
+ * Validates complete alert data structure for integrity and business rules
+ * 
+ * @param data - The alert data to validate
+ * @returns ValidationResult with validation status and any errors
+ * 
+ * @example
+ * ```typescript
+ * const result = validateAlertData({
+ *   studentId: 'student123',
+ *   alertType: AlertType.ABSENCE,
+ *   period: AlertPeriod.THIRTY_DAYS
+ * });
+ * 
+ * if (!result.isValid) {
+ *   console.error('Validation errors:', result.errors);
+ * }
+ * ```
+ */
+export function validateAlertData(data: SimpleAlertData): ValidationResult<SimpleAlertData> {
   const errors: string[] = [];
 
   // Check required fields
-  if (!alertData.studentId?.trim()) {
+  if (!data.studentId?.trim()) {
     errors.push(VALIDATION_MESSAGES.REQUIRED_FIELD + ': Student ID');
   }
 
-  if (!alertData.studentName?.trim()) {
+  if (!data.studentName?.trim()) {
     errors.push(VALIDATION_MESSAGES.REQUIRED_FIELD + ': Student Name');
   }
 
-  if (!alertData.type) {
+  if (!data.type) {
     errors.push(VALIDATION_MESSAGES.REQUIRED_FIELD + ': Alert Type');
   }
 
-  if (alertData.currentCount === undefined || alertData.currentCount === null) {
+  if (data.currentCount === undefined || data.currentCount === null) {
     errors.push(VALIDATION_MESSAGES.REQUIRED_FIELD + ': Current Count');
   }
 
-  if (alertData.thresholdCount === undefined || alertData.thresholdCount === null) {
+  if (data.thresholdCount === undefined || data.thresholdCount === null) {
     errors.push(VALIDATION_MESSAGES.REQUIRED_FIELD + ': Threshold Count');
   }
 
-  if (!alertData.period) {
+  if (!data.period) {
     errors.push(VALIDATION_MESSAGES.REQUIRED_FIELD + ': Period');
   }
 
   // Validate alert type
-  if (alertData.type && !Object.values(AlertType).includes(alertData.type)) {
+  if (data.type && !Object.values(AlertType).includes(data.type)) {
     errors.push('Invalid alert type');
   }
 
   // Validate period
-  if (alertData.period && !Object.values(AlertPeriod).includes(alertData.period)) {
+  if (data.period && !Object.values(AlertPeriod).includes(data.period)) {
     errors.push('Invalid time period');
   }
 
   // Validate status
-  if (alertData.status && !Object.values(AlertStatus).includes(alertData.status)) {
+  if (data.status && !Object.values(AlertStatus).includes(data.status)) {
     errors.push('Invalid alert status');
   }
 
   // Validate counts are non-negative
-  if (alertData.currentCount !== undefined && alertData.currentCount < 0) {
+  if (data.currentCount !== undefined && data.currentCount < 0) {
     errors.push('Current count cannot be negative');
   }
 
-  if (alertData.thresholdCount !== undefined && alertData.thresholdCount < 0) {
+  if (data.thresholdCount !== undefined && data.thresholdCount < 0) {
     errors.push('Threshold count cannot be negative');
   }
 
   // Validate that current count doesn't exceed reasonable limits
-  if (alertData.currentCount !== undefined && alertData.currentCount > 1000) {
+  if (data.currentCount !== undefined && data.currentCount > 1000) {
     errors.push('Current count seems unreasonably high (>1000)');
   }
 
   return {
     isValid: errors.length === 0,
     errors,
-    data: errors.length === 0 ? alertData as SimpleAlertData : undefined
+    data: errors.length === 0 ? data as SimpleAlertData : undefined
   };
 }
 

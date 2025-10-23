@@ -1,6 +1,11 @@
 /**
- * Alert calculation utilities for User Story 4
- * Core business logic for counting attendance and checking thresholds
+ * Alert calculation engine for attendance threshold monitoring
+ * 
+ * This module provides the core business logic for calculating student alerts
+ * based on attendance patterns and configured thresholds.
+ * 
+ * @fileoverview Attendance alert calculation utilities for User Story 4
+ * @version 1.0.0
  */
 
 import { AttendanceRecord } from '../domains/AttendanceRecords';
