@@ -77,12 +77,19 @@ export class FileAlertRepo {
           const nameParts = alert.studentName.split(' ');
           firstName = nameParts[0];
           lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+        } else {
+          firstName = alert.studentFirstName || '';
+          lastName = alert.studentLastName || '';
         }
         
-        // Extract details if present
+        // Extract details if present, ensure ISO format for absence/tardy dates
         const details = alert.details ? {
-          absenceDates: alert.details.absenceDates || [],
-          tardyDates: alert.details.tardyDates || [],
+          absenceDates: Array.isArray(alert.details.absenceDates)
+            ? alert.details.absenceDates.map((d: string) => new Date(d).toISOString().split('T')[0])
+            : [],
+          tardyDates: Array.isArray(alert.details.tardyDates)
+            ? alert.details.tardyDates.map((d: string) => new Date(d).toISOString().split('T')[0])
+            : [],
           threshold: alert.details.threshold,
           currentValue: alert.details.currentValue,
           averageMinutesLate: alert.details.averageMinutesLate,

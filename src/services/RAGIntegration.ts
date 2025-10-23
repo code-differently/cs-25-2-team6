@@ -238,10 +238,10 @@ export class RAGIntegration implements RAGIntegrationAdapter {
         // For alert queries, add the enriched alert data to the context
         const alertContext = JSON.stringify(enrichedAlerts);
         const enhancedContext = `${context}\n\nALERT DATA: ${alertContext}`;
-        return await this.ragService.processQuery(sanitizedQuery + "\n\nCONTEXT: " + enhancedContext);
+        return await this.ragService.processQuery(sanitizedQuery, enhancedContext, { alerts: enrichedAlerts, total: enrichedAlerts.length });
       } else {
-        // For other queries, just use the standard context
-        return await this.ragService.processQuery(sanitizedQuery + "\n\nCONTEXT: " + context);
+        // For other queries, just use the standard context and data
+        return await this.ragService.processQuery(sanitizedQuery, context, { attendance: domainRecords, students: studentData });
       }
     } catch (error) {
       console.error('Error in RAG integration processQuery:', error);

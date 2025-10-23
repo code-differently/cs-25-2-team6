@@ -59,8 +59,9 @@ export class RAGService {
   
   /**
    * Main entry point for processing natural language queries
+   * Accepts optional context and data for direct LLM injection
    */
-  async processQuery(query: string): Promise<RAGResponse> {
+  async processQuery(query: string, context?: string, dataOverride?: any): Promise<RAGResponse> {
     try {
       // 1. Classify query intent
       const intent = this.queryProcessor.classifyQuery(query);
@@ -68,11 +69,11 @@ export class RAGService {
       // 2. Convert to API filters
       const filters = await this.queryProcessor.queryToFilters(query, intent);
       
-      // 3. Fetch data based on intent
-      const data = await this.fetchRelevantData(intent, filters);
+      // 3. Fetch data based on intent, unless dataOverride is provided
+      const data = dataOverride !== undefined ? dataOverride : await this.fetchRelevantData(intent, filters);
       
-      // 4. Generate natural language response
-      const response = await this.generateResponse(query, intent, data);
+      // 4. Generate natural language response, passing context if provided
+      const response = await this.generateResponse(query, intent, data, context);
       
       return response;
     } catch (error) {
@@ -273,46 +274,41 @@ export class RAGService {
   
   /**
    * Generate a natural language response based on the query and data
+   * Accepts optional context for direct LLM injection
    */
   private async generateResponse(
     query: string, 
     intent: QueryIntent, 
-    data: any
+    data: any,
+    contextOverride?: string
   ): Promise<RAGResponse> {
     try {
       // Get LLM service instance
       const llmService = getLLMService();
-      
-      // Build context based on intent
-      let context = `Query intent: ${intent}`;
-      
+      // Build context based on intent or use override
+      let fullContext = contextOverride !== undefined ? contextOverride : `Query intent: ${intent}`;
       // Create LLM request
       const llmRequest: LLMRequest = {
         query,
-        context,
+        context: fullContext,
         // Map intent to appropriate query context for system prompt selection
         queryContext: this.mapIntentToQueryContext(intent),
         attendanceData: this.extractAttendanceDataForLLM(data, intent),
-        alertData: this.extractAlertDataForLLM(data, intent)
+        alertData: this.extractAlertDataForLLM(data, intent),
+        ...(intent === 'STUDENT_QUERY' && data.students ? { students: data.students } : {})
       };
-      
       console.log('[RAGService] Sending request to LLM service:', {
         query,
         intent,
         dataSize: JSON.stringify(data).length,
       });
-      
       // Process query using LLM service
       const llmResponse = await llmService.processQuery(llmRequest);
-      
       console.log('[RAGService] Received LLM response with confidence:', llmResponse.confidence);
-      
       // Convert LLM response to RAG response format
       return this.convertLLMResponseToRAGResponse(llmResponse, data);
-      
     } catch (error) {
       console.error('[RAGService] Error generating response with LLM:', error);
-      
       // Fall back to template-based responses if LLM fails
       console.log('[RAGService] Falling back to template responses');
       switch (intent) {

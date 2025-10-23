@@ -128,30 +128,38 @@ export function enhanceNaturalLanguageAnswer(response: RAGResponse): RAGResponse
  */
 function extractStudentData(structuredData: any): any[] {
   if (!structuredData) return [];
-  
-  // Check for various possible formats of student data
+  // Prefer students array, but also extract from alerts if present
   if (Array.isArray(structuredData.students)) {
-    return structuredData.students;
+    return structuredData.students.map((student: any) => ({
+      ...student,
+      // Ensure ISO format for absence dates
+      absenceDates: Array.isArray(student.absenceDates)
+        ? student.absenceDates.map((date: string) => new Date(date).toISOString().split('T')[0])
+        : [],
+    }));
   } else if (Array.isArray(structuredData)) {
-    return structuredData.filter(item => 
-      item && typeof item === 'object' && (item.studentId || item.studentName));
+    return structuredData.filter((item: any) => item && typeof item === 'object' && (item.studentId || item.studentName));
   } else if (structuredData.student) {
-    return [structuredData.student];
+    return [{
+      ...structuredData.student,
+      absenceDates: Array.isArray(structuredData.student.absenceDates)
+        ? structuredData.student.absenceDates.map((date: string) => new Date(date).toISOString().split('T')[0])
+        : [],
+    }];
   } else if (structuredData.alerts) {
-    // Try to extract student info from alerts
+    // Extract student info from alerts
     return structuredData.alerts
       .filter((alert: any) => alert && typeof alert === 'object')
       .map((alert: any) => {
-        // Extract student info from alert
         return {
           studentId: alert.studentId,
           firstName: alert.studentFirstName || (alert.studentName ? alert.studentName.split(' ')[0] : undefined),
           lastName: alert.studentLastName || (alert.studentName ? alert.studentName.split(' ').slice(1).join(' ') : undefined),
+          absenceDates: alert.details?.absenceDates?.map((date: string) => new Date(date).toISOString().split('T')[0]) || [],
           alerts: [alert]
         };
       });
   }
-  
   return [];
 }
 
@@ -181,11 +189,9 @@ function extractAlertData(structuredData: any): any[] {
  */
 function formatAlertDescription(alert: any): string {
   if (!alert) return '';
-  
   const alertType = alert.type || 'attendance';
   const studentId = alert.studentId || 'unknown student';
   const status = alert.status || 'ACTIVE';
-  
   // Format student name
   let studentName = '';
   if (alert.studentFirstName && alert.studentLastName) {
@@ -195,61 +201,42 @@ function formatAlertDescription(alert: any): string {
   } else {
     studentName = `Student ${studentId}`;
   }
-  
   // Start with basic alert information including full name
-  let description = `An ${alertType.toLowerCase()} alert has been triggered for ${studentName} (ID: ${studentId})`;
-  
+  let description = `${studentName} (ID: ${studentId}) has triggered an ${alertType.toLowerCase()} alert.`;
   // Add count information if available
   if (typeof alert.count === 'number') {
-    description += ` with ${alert.count} occurrences`;
+    description += ` This occurred ${alert.count} time${alert.count !== 1 ? 's' : ''}.`;
   }
-  
-  // Add specific dates if available
+  // Add specific absence dates in ISO format if available
   if (alert.details?.absenceDates && alert.details.absenceDates.length > 0) {
-    description += `. The student was absent on the following dates: ${alert.details.absenceDates.join(', ')}`;
+    const isoDates = alert.details.absenceDates.map((d: string) => new Date(d).toISOString().split('T')[0]);
+    description += ` Absent on: ${isoDates.join(', ')}.`;
   } else if (alert.details?.tardyDates && alert.details.tardyDates.length > 0) {
-    description += `. The student was late on the following dates: ${alert.details.tardyDates.join(', ')}`;
+    const isoDates = alert.details.tardyDates.map((d: string) => new Date(d).toISOString().split('T')[0]);
+    description += ` Late on: ${isoDates.join(', ')}.`;
   }
-  
   // Add pattern information if available
   if (alert.details?.pattern) {
-    description += `. A pattern was identified: ${alert.details.pattern}`;
+    description += ` Pattern identified: ${alert.details.pattern}.`;
   }
-  
   // Add threshold information if available
   if (alert.details?.threshold) {
-    description += `. This exceeded the threshold of ${alert.details.threshold}`;
+    description += ` Threshold exceeded: ${alert.details.threshold}.`;
   } else if (alert.thresholdId) {
-    description += ` and was triggered by threshold ${alert.thresholdId}`;
+    description += ` Triggered by threshold ${alert.thresholdId}.`;
   }
-  
   // Add status information
-  description += `. This alert is currently ${status.toLowerCase()}`;
-  
+  description += ` Status: ${status.toLowerCase()}.`;
   // Add date information if available
   if (alert.createdAt) {
-    const date = new Date(alert.createdAt);
-    const formattedDate = date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-    description += `. The alert was created on ${formattedDate}`;
+    const date = new Date(alert.createdAt).toISOString().split('T')[0];
+    description += ` Alert created on ${date}.`;
   }
-  
   // Add notification status
   if (typeof alert.notificationSent === 'boolean') {
-    description += alert.notificationSent ? 
-      `. A notification has been sent to parents/guardians.` : 
-      `. No notification has been sent yet.`;
+    description += alert.notificationSent ? ` Notification sent to parents/guardians.` : ` No notification sent yet.`;
   }
-  
-  // End with a period if not already present
-  if (!description.endsWith('.')) {
-    description += '.';
-  }
-  
-  return description;
+  return description.trim();
 }
 
 /**
@@ -257,7 +244,6 @@ function formatAlertDescription(alert: any): string {
  */
 function formatStudentDescription(student: any): string {
   if (!student) return '';
-  
   // Get the full name, prioritizing firstName/lastName fields
   let name;
   if (student.firstName && student.lastName) {
@@ -269,75 +255,47 @@ function formatStudentDescription(student: any): string {
   } else {
     name = `Student ID: ${student.studentId || student.id || 'unknown'}`;
   }
-  
   // Always include student ID
   const studentId = student.studentId || student.id || 'unknown';
-  
   // Start with the basic information
   let description = `${name} (ID: ${studentId}) is a student`;
-  
   // Add grade level if available
   if (student.grade) {
     description += ` in grade ${student.grade}`;
   }
-  
   // Add class/section if available
   if (student.class || student.section) {
     description += ` in ${student.class || student.section}`;
   }
-  
   // Add attendance information if available
   if (typeof student.attendanceRate === 'number' || student.absences || student.attendance) {
-    description += `. Their attendance record shows`;
-    
-    if (typeof student.attendanceRate === 'number') {
-      description += ` an attendance rate of ${student.attendanceRate * 100}%`;
-    }
-    
+    description += `. Attendance rate: ${typeof student.attendanceRate === 'number' ? (student.attendanceRate * 100).toFixed(1) + '%' : 'N/A'}`;
     if (student.absences) {
-      description += `${typeof student.attendanceRate === 'number' ? ' with' : ''} ${student.absences} total absences`;
+      description += `, Total absences: ${student.absences}`;
     }
-    
     if (student.lateArrivals || student.tardies) {
-      description += ` and ${student.lateArrivals || student.tardies} late arrivals`;
+      description += `, Late arrivals: ${student.lateArrivals || student.tardies}`;
     }
   }
-  
   // Add absence dates if available
   if (student.absenceDates && Array.isArray(student.absenceDates) && student.absenceDates.length > 0) {
-    description += `. They were absent on the following dates: ${student.absenceDates.join(', ')}`;
+    const isoDates = student.absenceDates.map((d: string) => new Date(d).toISOString().split('T')[0]);
+    description += `. Absent on: ${isoDates.join(', ')}`;
   }
-  
   // Add alert information if available
   if (student.alerts && Array.isArray(student.alerts) && student.alerts.length > 0) {
-    description += `. They currently have ${student.alerts.length} attendance alert${student.alerts.length > 1 ? 's' : ''}`;
-    
+    description += `. ${student.alerts.length} attendance alert${student.alerts.length > 1 ? 's' : ''} present.`;
     // Add details for the first few alerts
     const alertsToDescribe = student.alerts.slice(0, 2);
     alertsToDescribe.forEach((alert: any, index: number) => {
       if (index === 0) {
-        description += `: ${alert.type || 'attendance'} alert`;
+        description += ` Example: ${formatAlertDescription(alert)}`;
       } else {
-        description += ` and ${alert.type || 'attendance'} alert`;
-      }
-      
-      if (alert.count) {
-        description += ` with ${alert.count} occurrences`;
+        description += `; ${formatAlertDescription(alert)}`;
       }
     });
-    
-    // Indicate if there are more alerts
-    if (student.alerts.length > 2) {
-      description += `, and ${student.alerts.length - 2} more`;
-    }
   }
-  
-  // End with a period if not already present
-  if (!description.endsWith('.')) {
-    description += '.';
-  }
-  
-  return description;
+  return description.trim();
 }
 
 export function adaptRAGToLLMResponse(ragResponse: RAGResponse): LLMResponse {

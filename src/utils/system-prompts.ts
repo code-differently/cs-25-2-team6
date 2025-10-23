@@ -209,17 +209,43 @@ When generating reports, focus on actionable insights rather than just presentin
  * @param context The context of the query (e.g., 'alert', 'report', 'general')
  * @returns The appropriate system prompt
  */
+/**
+ * Validation requirements injected into system prompts
+ * This ensures LLM outputs follow our standards and can be validated
+ */
+export const VALIDATION_REQUIREMENTS = `
+IMPORTANT OUTPUT VALIDATION REQUIREMENTS:
+1. When referencing students in naturalLanguageAnswer, ALWAYS include:
+   - Full name with proper capitalization (First Last)
+   - Student ID in parentheses when first mentioned: e.g., "John Smith (S1001)"
+   - Consistent naming across the entire response
+
+2. The structuredData field MUST:
+   - Include complete student records that match all students mentioned in the narrative
+   - Always provide firstName, lastName, and studentId fields for each student
+   - Use proper data types (e.g., attendanceRate as a number, absences as an array)
+   - NEVER include placeholders like "Unknown Student" or "N/A" for real student data
+   - Include absence dates in ISO format (YYYY-MM-DD) when dates are mentioned in the narrative
+
+3. Maintain strict consistency between:
+   - Students mentioned in naturalLanguageAnswer
+   - Student records in structuredData
+   - Alert information in both sections
+`;
+
 export function getSystemPromptForContext(context: string = 'general'): string {
   const lowercaseContext = context.toLowerCase();
   
+  let basePrompt = '';
+  
   if (lowercaseContext.includes('alert') || lowercaseContext.includes('intervention')) {
-    return ALERT_SYSTEM_PROMPT;
+    basePrompt = ALERT_SYSTEM_PROMPT;
+  } else if (lowercaseContext.includes('report') || lowercaseContext.includes('analysis')) {
+    basePrompt = REPORT_SYSTEM_PROMPT;
+  } else {
+    basePrompt = ATTENDANCE_SYSTEM_PROMPT;
   }
   
-  if (lowercaseContext.includes('report') || lowercaseContext.includes('analysis')) {
-    return REPORT_SYSTEM_PROMPT;
-  }
-  
-  // Default to the general attendance system prompt
-  return ATTENDANCE_SYSTEM_PROMPT;
+  // Inject validation requirements into all prompts
+  return basePrompt + VALIDATION_REQUIREMENTS;
 }

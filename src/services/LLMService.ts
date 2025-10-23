@@ -1,4 +1,3 @@
-
 /**
  * LLMService: Core service for OpenAI interactions
  * Implements singleton pattern for efficient API client management
@@ -195,7 +194,7 @@ export class LLMService {
       // Check if we're in mock mode
       if (process.env.ENABLE_MOCK_LLM === 'true' || !this.client) {
         console.log('[LLM] Using mock response mode - OpenAI API will not be called');
-        return this.generateMockResponse(sanitizedQuery);
+        return this.generateMockResponse(request);
       }
 
       // If a specific query context is provided, update the system prompt
@@ -289,13 +288,26 @@ export class LLMService {
       }
       
       // Convert RAGResponse to LLMResponse format
+      // Ensure we have a valid confidence score (>0)
+      let confidenceScore = formattedResponse.confidence;
+      
+      // If confidence is 0, missing, or invalid, provide a sensible default
+      if (confidenceScore === undefined || 
+          confidenceScore === null || 
+          confidenceScore === 0 || 
+          isNaN(confidenceScore)) {
+        // Calculate confidence based on response quality
+        confidenceScore = this.calculateConfidenceScore(formattedResponse);
+        console.log(`[LLM] Fixed invalid confidence score to: ${confidenceScore}`);
+      }
+      
       const llmResponse: LLMResponse = {
         naturalLanguageAnswer: formattedResponse.naturalLanguageAnswer,
         structuredData: formattedResponse.structuredData || null,
         suggestedActions: formattedResponse.actions ? 
           formattedResponse.actions.map(action => action.label) : 
           [],
-        confidence: formattedResponse.confidence
+        confidence: confidenceScore
       };
       
       return llmResponse;
@@ -452,6 +464,50 @@ DO NOT include any text outside the JSON object. Your entire response must be pa
   }
 
   /**
+   * Calculate a confidence score based on response quality
+   * This provides a heuristic estimate when the model doesn't return a confidence value
+   */
+  private calculateConfidenceScore(response: any): number {
+    // Default moderate confidence
+    let confidence = 0.7;
+    
+    // Check for quality indicators
+    if (!response.naturalLanguageAnswer || response.naturalLanguageAnswer.length < 20) {
+      confidence = 0.4; // Lower confidence for very short answers
+    }
+    
+    // Check for detailed structured data
+    if (response.structuredData) {
+      // More detailed structured data means higher confidence
+      const hasStudents = response.structuredData.students || 
+                          (Array.isArray(response.structuredData) && 
+                          response.structuredData.length > 0 && 
+                          response.structuredData[0].firstName);
+                          
+      const hasAlerts = response.structuredData.alerts || 
+                        (Array.isArray(response.structuredData) && 
+                        response.structuredData.length > 0 && 
+                        response.structuredData[0].alertType);
+      
+      if (hasStudents || hasAlerts) {
+        confidence = Math.min(confidence + 0.2, 0.9); // Boost confidence for detailed data
+      }
+    }
+    
+    // Lower confidence if no structured data at all
+    if (!response.structuredData) {
+      confidence = Math.max(confidence - 0.2, 0.5);
+    }
+    
+    // Lower confidence if no suggested actions
+    if (!response.actions || !Array.isArray(response.actions) || response.actions.length === 0) {
+      confidence = Math.max(confidence - 0.1, 0.5);
+    }
+    
+    return confidence;
+  }
+  
+  /**
    * Create error response
    */
   private createErrorResponse(errorMessage: string): LLMResponse {
@@ -471,60 +527,77 @@ DO NOT include any text outside the JSON object. Your entire response must be pa
    * Generate a mock response for testing without API
    * This is used when ENABLE_MOCK_LLM=true or when OpenAI API key is missing
    */
-  private generateMockResponse(query: string): LLMResponse {
+  private generateMockResponse(request: LLMRequest): LLMResponse {
     // Log that we're using a mock response
-    console.log('[LLM] Generating mock response for query:', query);
-    
-    // Simple keyword matching for different types of mock responses
+    console.log('[LLM] Generating mock response for request:', request);
+
     let response = '';
     let suggestedActions: string[] = [];
     let structuredData: any = {};
-    let confidence = 0.9;
-    
-    const lowerQuery = query.toLowerCase();
-    
-    // Generate response based on query keywords
-    if (lowerQuery.includes('attendance') || lowerQuery.includes('present') || lowerQuery.includes('absent')) {
-      response = 'Based on the attendance records, the overall attendance rate is 85%. There were 5 absences last week.';
-      suggestedActions = ['View detailed attendance reports', 'Check student absences', 'Set up attendance alerts'];
-      structuredData = {
-        attendanceRate: "85%",
-        absences: 5,
-        period: "last week"
-      };
-    } else if (lowerQuery.includes('student') || lowerQuery.includes('performance')) {
-      response = 'Student performance data shows an average score of 78% across all subjects. Mathematics has the highest average at 82%.';
-      suggestedActions = ['View student details', 'Generate performance report', 'Compare to previous term'];
-      structuredData = {
-        averageScore: "78%",
-        highestSubject: "Mathematics",
-        highestScore: "82%"
-      };
-    } else if (lowerQuery.includes('report') || lowerQuery.includes('summary')) {
-      response = 'I\'ve prepared a summary report for you. The data indicates normal attendance patterns with no significant anomalies this month.';
-      suggestedActions = ['Download full report', 'Share with staff', 'Schedule regular reports'];
-      structuredData = {
-        reportType: "summary",
-        period: "current month",
-        status: "normal"
-      };
-    } else if (lowerQuery.includes('alert') || lowerQuery.includes('notification')) {
-      response = 'There are 3 active alerts in the system. One student has triggered the attendance threshold alert.';
+    let confidence = 0.95;
+
+    // Use alertData if present
+    if (request.alertData && request.alertData.length > 0) {
+      response = `There are ${request.alertData.length} alerts in the system.\n` +
+        request.alertData.map((a: any) => `${a.studentFirstName || a.studentName || ''} ${a.studentLastName || ''}: ${a.type} (${a.description || ''})`).join('\n');
       suggestedActions = ['Review all alerts', 'Modify alert thresholds', 'Disable notifications'];
-      structuredData = {
-        alertCount: 3,
-        criticalAlerts: 1,
-        type: "attendance threshold"
-      };
+      structuredData = { alerts: request.alertData, total: request.alertData.length };
+    } else if (request.attendanceData && request.attendanceData.length > 0) {
+      response = `There are ${request.attendanceData.length} attendance records.\n` +
+        request.attendanceData.slice(0, 5).map((rec: any) => `${rec.studentFirstName || ''} ${rec.studentLastName || ''}: ${rec.status} on ${rec.dateISO || rec.date}`).join('\n');
+      suggestedActions = ['View detailed attendance reports', 'Check student absences', 'Set up attendance alerts'];
+      structuredData = { records: request.attendanceData, total: request.attendanceData.length };
+    } else if ((request as any).students && (request as any).students.length > 0) {
+      const students = (request as any).students;
+      response = `There are ${students.length} students in the system.\n` +
+        students.slice(0, 10).map((s: any) => `${s.firstName} ${s.lastName} (ID: ${s.id})`).join('\n');
+      suggestedActions = ['View student details', 'Generate performance report', 'Compare to previous term'];
+      structuredData = { students, total: students.length };
     } else {
-      response = 'I\'m here to help with attendance and student performance data. How can I assist you today?';
-      suggestedActions = ['Check attendance records', 'Generate reports', 'Set up alerts'];
-      confidence = 0.7;
+      // Fallback to keyword-based mock
+      const lowerQuery = request.query.toLowerCase();
+      if (lowerQuery.includes('attendance') || lowerQuery.includes('present') || lowerQuery.includes('absent')) {
+        response = 'Based on the attendance records, the overall attendance rate is 85%. There were 5 absences last week.';
+        suggestedActions = ['View detailed attendance reports', 'Check student absences', 'Set up attendance alerts'];
+        structuredData = {
+          attendanceRate: "85%",
+          absences: 5,
+          period: "last week"
+        };
+      } else if (lowerQuery.includes('student') || lowerQuery.includes('performance')) {
+        response = 'Student performance data shows an average score of 78% across all subjects. Mathematics has the highest average at 82%.';
+        suggestedActions = ['View student details', 'Generate performance report', 'Compare to previous term'];
+        structuredData = {
+          averageScore: "78%",
+          highestSubject: "Mathematics",
+          highestScore: "82%"
+        };
+      } else if (lowerQuery.includes('report') || lowerQuery.includes('summary')) {
+        response = 'I\'ve prepared a summary report for you. The data indicates normal attendance patterns with no significant anomalies this month.';
+        suggestedActions = ['Download full report', 'Share with staff', 'Schedule regular reports'];
+        structuredData = {
+          reportType: "summary",
+          period: "current month",
+          status: "normal"
+        };
+      } else if (lowerQuery.includes('alert') || lowerQuery.includes('notification')) {
+        response = 'There are 3 active alerts in the system. One student has triggered the attendance threshold alert.';
+        suggestedActions = ['Review all alerts', 'Modify alert thresholds', 'Disable notifications'];
+        structuredData = {
+          alertCount: 3,
+          criticalAlerts: 1,
+          type: "attendance threshold"
+        };
+      } else {
+        response = 'I\'m here to help with attendance and student performance data. How can I assist you today?';
+        suggestedActions = ['Check attendance records', 'Generate reports', 'Set up alerts'];
+        confidence = 0.7;
+      }
     }
-    
+
     // Add a disclaimer about mock mode
     response += '\n\n[Note: This is a mock response for testing. OpenAI API is not being used.]';
-    
+
     return {
       naturalLanguageAnswer: response,
       structuredData,
@@ -548,7 +621,7 @@ DO NOT include any text outside the JSON object. Your entire response must be pa
   }
 }
 
-// Export singleton instance accessor
+// Export singleton instance
 /**
  * Gets the LLM service instance with error handling
  * @returns LLM service instance or throws an error if initialization fails
