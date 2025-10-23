@@ -127,3 +127,73 @@ export interface BatchAlertResult {
   notificationsSent: number;
   errors: string[];
 }
+
+/**
+ * Notification result for parent alerts
+ */
+export interface NotificationResult {
+  success: boolean;
+  alertId: string;
+  method: 'email' | 'sms' | 'app';
+  sentAt: Date;
+  recipientId: string;
+  error?: string;
+}
+
+/**
+ * Alert statistics for dashboard display
+ */
+export interface AlertStatistics {
+  totalActive: number;
+  newToday: number;
+  resolvedToday: number;
+  byType: Record<AlertType, number>;
+  studentsWithAlerts: number;
+  pendingNotifications: number;
+  averageResolutionTime: number; // in hours
+}
+
+/**
+ * Alert trend data for analytics
+ */
+export interface AlertTrend {
+  period: string; // ISO date
+  newAlerts: number;
+  resolvedAlerts: number;
+  activeAlerts: number;
+  byType: Record<AlertType, number>;
+}
+
+/**
+ * Extended AttendanceAlert methods for User Story 4 functionality
+ */
+declare module './AttendanceAlert' {
+  namespace AttendanceAlert {
+    interface AttendanceAlert {
+      /**
+       * Check if this alert requires immediate attention
+       */
+      isUrgent(): boolean;
+      
+      /**
+       * Get the number of days this alert has been active
+       */
+      getDaysActive(): number;
+      
+      /**
+       * Check if parent notification is overdue
+       */
+      isNotificationOverdue(): boolean;
+      
+      /**
+       * Get severity level based on count vs threshold
+       */
+      getSeverityLevel(): import('../types/alerts').AlertSeverity;
+      
+      /**
+       * Calculate priority score for sorting
+       */
+      getPriorityScore(): number;
+    }
+  }
+}
