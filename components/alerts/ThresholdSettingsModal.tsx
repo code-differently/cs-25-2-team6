@@ -1,7 +1,8 @@
 "use client"
 
 import React from 'react';
-import './ThresholdSettingsModal.css';
+import './Alerts.css';
+// TODO: Replace with L's types/thresholds.ts interface
 import { ThresholdFormData } from '@/hooks/useAlertModals';
 
 interface ThresholdSettingsModalProps {

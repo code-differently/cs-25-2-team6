@@ -1,8 +1,9 @@
 "use client"
 
 import React, { useState } from 'react';
-import './DismissAlertModal.css';
-import { AttendanceAlert } from '@/hooks/useAlertModals';
+import './Alerts.css';
+import { AttendanceAlert, getAlertSeverityColor } from '../utilities/alertUtils';
+import DismissButton from '../ui/DismissButton';
 
 interface DismissAlertModalProps {
   isOpen: boolean;
@@ -41,15 +42,7 @@ export default function DismissAlertModal({
     setCustomReason('');
   };
 
-  // Get severity color
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return '#dc2626';
-      case 'medium': return '#f59e0b';
-      case 'low': return '#10b981';
-      default: return '#6b7280';
-    }
-  };
+  // Use existing utility function
 
   return (
     <div className="modal-overlay">
@@ -64,14 +57,14 @@ export default function DismissAlertModal({
           
           <div className="alert-summary">
             <div className="alert-info">
-              <div className="alert-student">{alert.studentName}</div>
+              <div className="alert-student">{alert.title}</div>
               <div className="alert-details">
-                {alert.count} {alert.type}s • Threshold: {alert.threshold}
+                {alert.message}
               </div>
             </div>
             <div 
               className="alert-severity-badge"
-              style={{ backgroundColor: getSeverityColor(alert.severity) }}
+              style={{ backgroundColor: getAlertSeverityColor(alert.severity) }}
             >
               {alert.severity}
             </div>
@@ -115,13 +108,12 @@ export default function DismissAlertModal({
           <button type="button" className="cancel-btn" onClick={onCancel}>
             Cancel
           </button>
-          <button 
-            type="button" 
-            className="dismiss-btn"
-            onClick={handleConfirm}
-          >
-            Dismiss Alert
-          </button>
+          <DismissButton
+            label="Dismiss Alert"
+            variant="danger"
+            onDismiss={handleConfirm}
+            requireConfirmation={false}
+          />
         </div>
 
       </div>

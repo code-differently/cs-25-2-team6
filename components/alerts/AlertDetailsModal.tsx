@@ -1,6 +1,6 @@
 /* AlertDetailsModal.tsx */
 import React, { useState } from 'react';
-import { AttendanceAlert } from '../utilities/alertUtils';
+import { AttendanceAlert, getAlertSeverityColor } from '../utilities/alertUtils';
 import './Alerts.css';
 
 interface AlertDetailsModalProps {
@@ -22,13 +22,7 @@ export default function AlertDetailsModal({
   
   if (!isOpen) return null;
   
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return '#dc2626';
-      case 'medium': return '#d97706';
-      default: return '#059669';
-    }
-  };
+  // Use existing utility function
   
   const formatDate = (date: Date) => {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { 
@@ -45,7 +39,7 @@ export default function AlertDetailsModal({
             <h2>Alert Details</h2>
             <div 
               className="severity-badge"
-              style={{ backgroundColor: getSeverityColor(alert.severity) }}
+              style={{ backgroundColor: getAlertSeverityColor(alert.severity) }}
             >
               {alert.severity} Priority
             </div>

@@ -1,8 +1,8 @@
 "use client"
 
 import React from 'react';
-import './AlertDropdown.css';
-import { AttendanceAlert } from '@/hooks/useAlertModals';
+import './Alerts.css';
+import { AttendanceAlert, getAlertSeverityColor } from '../utilities/alertUtils';
 
 interface AlertDropdownProps {
   isOpen: boolean;
@@ -25,15 +25,7 @@ export default function AlertDropdown({
 
   if (!isOpen) return null;
 
-  // Get severity badge color
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return '#dc2626';
-      case 'medium': return '#f59e0b';
-      case 'low': return '#10b981';
-      default: return '#6b7280';
-    }
-  };
+  // Use existing utility function for consistency
 
   // Format alert date
   const formatDate = (date: Date) => {
@@ -66,14 +58,14 @@ export default function AlertDropdown({
                 onClick={() => onAlertClick(alert)}
               >
                 <div className="alert-content">
-                  <div className="alert-student">{alert.studentName}</div>
+                  <div className="alert-student">{alert.title}</div>
                   <div className="alert-details">
-                    {alert.count} {alert.type}s • {formatDate(alert.createdAt)}
+                    {alert.message} • {formatDate(alert.date)}
                   </div>
                 </div>
                 <div 
                   className="alert-badge"
-                  style={{ backgroundColor: getSeverityColor(alert.severity) }}
+                  style={{ backgroundColor: getAlertSeverityColor(alert.severity) }}
                 >
                   {alert.severity}
                 </div>
