@@ -71,45 +71,17 @@ export class FileAlertRepo {
 
       // Convert dates from strings back to Date objects
       return alerts.map((alert: any) => {
-        // Extract first and last name if studentName is present
-        let firstName, lastName;
-        if (alert.studentName) {
-          const nameParts = alert.studentName.split(' ');
-          firstName = nameParts[0];
-          lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
-        } else {
-          firstName = alert.studentFirstName || '';
-          lastName = alert.studentLastName || '';
-        }
-        
-        // Extract details if present, ensure ISO format for absence/tardy dates
-        const details = alert.details ? {
-          absenceDates: Array.isArray(alert.details.absenceDates)
-            ? alert.details.absenceDates.map((d: string) => new Date(d).toISOString().split('T')[0])
-            : [],
-          tardyDates: Array.isArray(alert.details.tardyDates)
-            ? alert.details.tardyDates.map((d: string) => new Date(d).toISOString().split('T')[0])
-            : [],
-          threshold: alert.details.threshold,
-          currentValue: alert.details.currentValue,
-          averageMinutesLate: alert.details.averageMinutesLate,
-          pattern: alert.details.pattern
-        } : undefined;
-        
         return new AttendanceAlert(
           alert.id,
           alert.studentId,
-          alert.thresholdId || '',
+          alert.thresholdId,
           alert.type,
-          alert.count || 0,
-          alert.status || AlertStatus.ACTIVE,
-          alert.period || 'ROLLING_30',
-          alert.notificationSent || false,
-          alert.timestamp ? new Date(alert.timestamp) : new Date(),
-          alert.updatedAt ? new Date(alert.updatedAt) : new Date(),
-          firstName,
-          lastName,
-          details
+          alert.count,
+          alert.status,
+          alert.period,
+          alert.notificationSent,
+          new Date(alert.createdAt),
+          new Date(alert.updatedAt)
         );
       });
     } catch (error) {

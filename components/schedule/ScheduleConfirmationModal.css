@@ -1,0 +1,89 @@
+/* ScheduleConfirmationModal.css */
+
+/* Modal overlay - same as other modals for consistency */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Main confirmation modal container */
+.confirmation-modal {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Success header with green background */
+.confirmation-header {
+  background-color: #16a34a; /* Green background */
+  color: white;
+  padding: 20px;
+  border-radius: 8px 8px 0 0;
+}
+
+.success-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.confirmation-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Main content area */
+.confirmation-content {
+  padding: 30px 20px;
+}
+
+.confirmation-content p {
+  margin: 0 0 15px 0;
+  color: #374151;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.confirmation-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Footer with close button */
+.confirmation-footer {
+  padding: 0 20px 20px 20px;
+}
+
+/* Primary button styling - matches app theme */
+.primary-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: auto;
+  min-width: 120px;
+  text-align: center;
+}
+
+.primary-btn:hover {
+  background-color: #2563eb;
+}
+
+.primary-btn:active {
+  background-color: #1d4ed8;
+}

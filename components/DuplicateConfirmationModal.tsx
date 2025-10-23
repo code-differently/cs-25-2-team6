@@ -75,7 +75,7 @@ export default function DuplicateConfirmationModal({
             </button>
           </div>
         )}
-        </div>
       </div>
+    </div>
   );
 }
