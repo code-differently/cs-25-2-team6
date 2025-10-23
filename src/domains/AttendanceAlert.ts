@@ -188,7 +188,7 @@ declare module './AttendanceAlert' {
       /**
        * Get severity level based on count vs threshold
        */
-      getSeverityLevel(): import('../types/alerts').AlertSeverity;
+      getSeverityLevel(): string;
       
       /**
        * Calculate priority score for sorting
