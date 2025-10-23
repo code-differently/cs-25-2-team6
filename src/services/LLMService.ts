@@ -4,7 +4,7 @@
  * Implements singleton pattern for efficient API client management
  */
 
-import OpenAI from 'openai';
+import { OpenAI } from 'openai';
 import { validateEnvironment, getRAGSystemPrompt } from '../utils/environment';
 import { LLMServiceConfig, DEFAULT_CONFIG, loadConfigFromEnvironment } from './LLMServiceConfig';
 import { sanitizeQuery, isHarmfulQuery } from './QuerySanitizer';

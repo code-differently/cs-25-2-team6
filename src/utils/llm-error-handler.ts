@@ -223,6 +223,6 @@ export function getFallbackResponse(error: LLMError): string {
     case LLMErrorCategory.PARSING:
     case LLMErrorCategory.UNKNOWN:
     default:
-      return "I apologize, but I'm unable to process that request right now. Our team has been notified of the issue.";
+      return "I'm sorry, but I'm unable to process that request right now. Our team has been notified of the issue.";
   }
 }
