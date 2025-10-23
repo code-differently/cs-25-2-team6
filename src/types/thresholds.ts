@@ -1,9 +1,7 @@
 /**
- * Simple threshold-related TypeScript interfaces for User Story 4
- * Basic threshold configuration for attendance monitoring
+ * Threshold type definitions for User Story 4
+ * Simple form data structures for alert threshold configuration
  */
-
-import { AlertType, AlertPeriod } from '../domains/AlertThreshold';
 import { ValidationResult } from './alerts';
 
 /**

@@ -3,7 +3,6 @@
  * Validation logic for attendance threshold configuration
  */
 
-import { AlertType, AlertPeriod } from '../domains/AlertThreshold';
 import { ValidationResult } from '../types/alerts';
 import { SimpleThresholdFormData, SimpleThresholdValidationResult } from '../types/thresholds';
 import { VALIDATION_LIMITS, VALIDATION_MESSAGES, DEFAULT_THRESHOLDS } from '../constants/alertConstants';
@@ -150,7 +149,7 @@ export function sanitizeThresholdInput(input: Partial<SimpleThresholdFormData>):
 /**
  * Helper function to sanitize individual number values
  */
-function sanitizeNumber(value: any, defaultValue: number): number {
+function sanitizeNumber(value: unknown, defaultValue: number): number {
   // Convert string numbers to actual numbers
   if (typeof value === 'string') {
     const parsed = parseInt(value.trim(), 10);

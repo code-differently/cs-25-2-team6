@@ -1,9 +1,7 @@
 /**
- * Simple alert constants and default values for User Story 4
- * Basic configuration for attendance threshold monitoring
+ * Alert constants for User Story 4
+ * Contains default values and validation limits for alert system
  */
-
-import { AlertType, AlertPeriod } from '../domains/AlertThreshold';
 
 /**
  * Default threshold values - simple numerical limits

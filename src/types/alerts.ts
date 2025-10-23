@@ -9,7 +9,7 @@ import { AlertStatus } from '../domains/AttendanceAlert';
 /**
  * Validation result pattern used across all validation functions
  */
-export interface ValidationResult<T = any> {
+export interface ValidationResult<T = unknown> {
   isValid: boolean;
   errors: string[];
   data?: T;
