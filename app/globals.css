@@ -118,3 +118,42 @@ body {
 .calendar-day:nth-child(7n) {
   border-right: none;
 }
+
+/* Calendar Actions Section */
+.calendar-actions {
+  margin-top: 2rem;
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Primary Button Styling */
+.primary-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.primary-btn:hover {
+  background-color: #2563eb;
+}
+
+.primary-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Schedule Button Specific Styling */
+.schedule-btn {
+  font-size: 16px;
+  padding: 14px 28px;
+}
