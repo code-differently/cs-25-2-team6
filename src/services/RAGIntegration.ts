@@ -163,6 +163,16 @@ export class RAGIntegration implements RAGIntegrationAdapter {
     options?: RAGQueryOptions
   ): Promise<RAGResponse> {
     try {
+      // Add a fallback response in case of timeouts or other errors
+      if (!query || query.trim() === '') {
+        return {
+          naturalLanguageAnswer: "I need a question to help you. Please ask me something about student attendance or alerts.",
+          structuredData: null,
+          actions: [],
+          confidence: 0.5
+        };
+      }
+
       // Sanitize the query
       const sanitizedQuery = sanitizeQuery(query);
       
@@ -185,14 +195,54 @@ export class RAGIntegration implements RAGIntegrationAdapter {
         await this.getFormattedStudentData(filters.studentId) :
         [];
       
+      // Get alert data if this is an alert-related query
+      let alertData: AttendanceAlert[] = [];
+      if (intent === QueryIntentType.ALERT_QUERY) {
+        alertData = this.alertRepo.getAllAlerts();
+        console.log(`[RAGIntegration] Found ${alertData.length} alerts for query about alerts`);
+      }
+      
       // Prepare context - convert AttendanceRecordContext back to domain records if needed
       const domainRecords = this.attendanceRepo.allAttendance().filter(record => 
         attendanceData.some(ctx => ctx.studentId === record.studentId && ctx.date === record.dateISO)
       );
       const context = prepareAttendanceContext(domainRecords, studentData, sanitizedQuery);
       
+      // Log data sizes for debugging
+      console.log(`[RAGService] Sending request to LLM service:`, {
+        query: sanitizedQuery + "\n\nCONTEXT: " + context,
+        intent: intent,
+        dataSize: domainRecords.length + studentData.length + alertData.length
+      });
+      
       // Process with RAG service
-      return await this.ragService.processQuery(sanitizedQuery + "\n\nCONTEXT: " + context);
+      if (intent === QueryIntentType.ALERT_QUERY && alertData.length > 0) {
+        // Get full student data for all students with alerts
+        const studentIds = alertData.map(alert => alert.studentId);
+        const allStudents = this.studentRepo.allStudents();
+        const alertStudents = allStudents.filter((student: Student) => studentIds.includes(student.id));
+        
+        // Combine student data with alert data for richer context
+        const enrichedAlerts = alertData.map(alert => {
+          const student = alertStudents.find((s: Student) => s.id === alert.studentId);
+          if (student) {
+            return {
+              ...alert,
+              studentFirstName: student.firstName || alert.studentFirstName,
+              studentLastName: student.lastName || alert.studentLastName
+            };
+          }
+          return alert;
+        });
+        
+        // For alert queries, add the enriched alert data to the context
+        const alertContext = JSON.stringify(enrichedAlerts);
+        const enhancedContext = `${context}\n\nALERT DATA: ${alertContext}`;
+        return await this.ragService.processQuery(sanitizedQuery + "\n\nCONTEXT: " + enhancedContext);
+      } else {
+        // For other queries, just use the standard context
+        return await this.ragService.processQuery(sanitizedQuery + "\n\nCONTEXT: " + context);
+      }
     } catch (error) {
       console.error('Error in RAG integration processQuery:', error);
       
@@ -204,7 +254,8 @@ export class RAGIntegration implements RAGIntegrationAdapter {
       
       // Create standardized error response
       return {
-        naturalLanguageAnswer: `I'm sorry, but I encountered an error processing your query. ${llmError.message}`,
+        naturalLanguageAnswer: `I'm sorry, but I encountered an error processing your query. Please try again with a simpler question.`,
+        structuredData: null,
         confidence: 0,
         actions: [{
           type: 'VIEW_ALERTS',

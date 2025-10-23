@@ -4,32 +4,49 @@
 
 /**
  * Validates that required environment variables are set
- * @returns Object with validation status and any missing variables
+ * @returns Object with validation status, any missing variables, and guidance message
  */
 export function validateEnvironment(): { 
   isValid: boolean; 
   missingVars: string[]; 
-  message: string 
+  message: string;
+  useFallback?: boolean;
 } {
   const requiredVars = [
     'OPENAI_API_KEY',
   ];
   
+  // Check for empty string values as well as undefined/null
   const missingVars = requiredVars.filter(varName => {
-    return !process.env[varName];
+    const value = process.env[varName];
+    return !value || value.trim() === '' || value.includes('your_') || value === 'sk-...';
   });
   
   const isValid = missingVars.length === 0;
   
+  // Build a helpful message based on validation results
   let message = isValid 
     ? 'Environment validation successful' 
-    : `Missing required environment variables: ${missingVars.join(', ')}`;
+    : `Missing or invalid environment variables: ${missingVars.join(', ')}`;
     
+  // Provide more helpful guidance in development mode
   if (!isValid && process.env.NODE_ENV === 'development') {
-    message += '. Make sure to set them in your .env.local file.';
+    message += `
+    
+    Please check your .env.local file and ensure you have:
+    1. Created the file if it doesn't exist
+    2. Set OPENAI_API_KEY to your actual OpenAI API key
+    3. Restarted your server after making changes
+    
+    You can verify your API key by running:
+    node verify-openai-api.js
+    `;
   }
   
-  return { isValid, missingVars, message };
+  // Determine if we should use fallback mode
+  const useFallback = !isValid && process.env.ENABLE_MOCK_LLM === 'true';
+  
+  return { isValid, missingVars, message, useFallback };
 }
 
 /**

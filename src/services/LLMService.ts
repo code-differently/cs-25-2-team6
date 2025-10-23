@@ -61,40 +61,67 @@ export interface MessageHistoryEntry {
  */
 export class LLMService {
   private static instance: LLMService;
-  private client: OpenAI;
+  private client!: OpenAI; // Using definite assignment assertion
   private messageHistory: MessageHistoryEntry[] = [];
   private initialized: boolean = false;
-  private config: LLMServiceConfig;
+  private config!: LLMServiceConfig; // Using definite assignment assertion
 
   /**
    * Private constructor to enforce singleton pattern
    */
   private constructor() {
-    // Validate environment before initializing
-    const { isValid, message } = validateEnvironment();
-    if (!isValid) {
-      throw new Error(`LLMService initialization failed: ${message}`);
-    }
-
-    // Load configuration
-    this.config = loadConfigFromEnvironment();
-
-    // Initialize OpenAI client
-    this.client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
-    if (this.config.debug) {
-      console.log('[LLM] Service initialized with config:', {
-        model: this.config.openai.model,
-        temperature: this.config.openai.temperature,
-        maxTokens: this.config.openai.maxTokens
+    try {
+      // Validate environment before initializing
+      const { isValid, message, useFallback } = validateEnvironment();
+      
+      // Load configuration even if environment is invalid
+      this.config = loadConfigFromEnvironment();
+      
+      if (!isValid) {
+        console.warn(`LLMService initialization warning: ${message}`);
+        
+        // If in mock mode or fallback is explicitly enabled, continue without API key
+        if (process.env.ENABLE_MOCK_LLM === 'true' || useFallback) {
+          console.log('[LLM] Running in mock mode - OpenAI API will not be called');
+          this.initialized = true;
+          this.initializeSystemPrompt();
+          return; // Exit constructor early, leaving client undefined
+        }
+      }
+  
+      // Get the API key from environment
+      const apiKey = process.env.OPENAI_API_KEY;
+      
+      if (!apiKey) {
+        console.error('Missing OpenAI API key. Set OPENAI_API_KEY in your environment.');
+        throw new Error('OpenAI API key is required');
+      }
+      
+      // Initialize OpenAI client
+      this.client = new OpenAI({
+        apiKey: apiKey,
       });
+  
+      if (this.config.debug) {
+        console.log('[LLM] Service initialized with config:', {
+          model: this.config.openai.model,
+          temperature: this.config.openai.temperature,
+          maxTokens: this.config.openai.maxTokens
+        });
+      }
+  
+      // Initialize system prompt
+      this.initializeSystemPrompt();
+      this.initialized = true;
+      
+      console.log('[LLM] Service successfully initialized');
+    } catch (error) {
+      console.error('Error initializing LLMService:', error);
+      // Set initialized to false to indicate failure
+      this.initialized = false;
+      // The API route will handle this gracefully
+      throw error;
     }
-
-    // Initialize system prompt
-    this.initializeSystemPrompt();
-    this.initialized = true;
   }
 
   /**
@@ -164,6 +191,12 @@ export class LLMService {
       if (this.config.debug) {
         console.log('[LLM] Processing query:', sanitizedQuery);
       }
+      
+      // Check if we're in mock mode
+      if (process.env.ENABLE_MOCK_LLM === 'true' || !this.client) {
+        console.log('[LLM] Using mock response mode - OpenAI API will not be called');
+        return this.generateMockResponse(sanitizedQuery);
+      }
 
       // If a specific query context is provided, update the system prompt
       if (request.queryContext) {
@@ -186,18 +219,40 @@ export class LLMService {
         content: msg.content
       }));
 
+      // Create API call options
+      const apiRequestOptions: any = {
+        model: this.config.openai.model,
+        messages,
+        temperature: this.config.openai.temperature,
+        max_tokens: this.config.openai.maxTokens,
+        top_p: this.config.openai.topP,
+        frequency_penalty: this.config.openai.frequencyPenalty,
+        presence_penalty: this.config.openai.presencePenalty,
+      };
+      
+      // Only add response_format for models that support it
+      // GPT-4 Turbo and newer models support JSON response format
+      const supportsJsonFormat = (
+        this.config.openai.model.includes('gpt-4-turbo') || 
+        this.config.openai.model.includes('gpt-4-0125') ||
+        this.config.openai.model.includes('gpt-4-1106') ||
+        this.config.openai.model.includes('gpt-3.5-turbo-1106')
+      );
+      
+      if (supportsJsonFormat) {
+        apiRequestOptions.response_format = { type: "json_object" };
+        if (this.config.debug) {
+          console.log(`[LLM] Using JSON response format with model: ${this.config.openai.model}`);
+        }
+      } else {
+        if (this.config.debug) {
+          console.log(`[LLM] Model ${this.config.openai.model} doesn't support JSON response format, using default format`);
+        }
+      }
+
       // Create a promise that will resolve with the API response
       const apiResponsePromise = retryAsync(
-        async () => this.client.chat.completions.create({
-          model: this.config.openai.model,
-          messages,
-          temperature: this.config.openai.temperature,
-          max_tokens: this.config.openai.maxTokens,
-          top_p: this.config.openai.topP,
-          frequency_penalty: this.config.openai.frequencyPenalty,
-          presence_penalty: this.config.openai.presencePenalty,
-          response_format: { type: "json_object" }
-        }),
+        async () => this.client.chat.completions.create(apiRequestOptions),
         {
           maxRetries: this.config.openai.maxRetries,
           baseDelay: this.config.openai.retryDelay,
@@ -336,11 +391,30 @@ export class LLMService {
     }
 
     prompt += `
-Please provide a helpful response in JSON format with these fields:
-- naturalLanguageAnswer: A human-readable response to the query
-- structuredData: Relevant data extracted or processed from the query
-- suggestedActions: Array of suggested actions the user can take
-- confidence: Number between 0-1 indicating your confidence in the response
+IMPORTANT: You must format your entire response as a valid JSON object with these fields:
+{
+  "naturalLanguageAnswer": "A detailed, conversational response that thoroughly explains all information in the structuredData field",
+  "structuredData": {}, // Comprehensive data with specific details about the query
+  "suggestedActions": [], // Specific, actionable next steps with clear guidance
+  "confidence": 0.0 // Number between 0-1 indicating your confidence in the response
+}
+
+RESPONSE GUIDELINES:
+1. Make your naturalLanguageAnswer comprehensive and detailed
+2. Always explain ALL data points included in structuredData thoroughly
+3. Use natural, conversational language as if speaking directly to an educator
+4. Include specific examples and names when available
+5. Format your response for easy reading with appropriate organization
+
+If you are unsure how to respond or encounter an error, use this fallback format:
+{
+  "naturalLanguageAnswer": "I'm not able to process this query at the moment. [Explanation]",
+  "structuredData": null,
+  "suggestedActions": ["Try rephrasing your question", "Be more specific"],
+  "confidence": 0.0
+}
+
+DO NOT include any text outside the JSON object. Your entire response must be parseable as JSON.
 `;
 
     return prompt;
@@ -392,6 +466,72 @@ Please provide a helpful response in JSON format with these fields:
       confidence: 0
     };
   }
+  
+  /**
+   * Generate a mock response for testing without API
+   * This is used when ENABLE_MOCK_LLM=true or when OpenAI API key is missing
+   */
+  private generateMockResponse(query: string): LLMResponse {
+    // Log that we're using a mock response
+    console.log('[LLM] Generating mock response for query:', query);
+    
+    // Simple keyword matching for different types of mock responses
+    let response = '';
+    let suggestedActions: string[] = [];
+    let structuredData: any = {};
+    let confidence = 0.9;
+    
+    const lowerQuery = query.toLowerCase();
+    
+    // Generate response based on query keywords
+    if (lowerQuery.includes('attendance') || lowerQuery.includes('present') || lowerQuery.includes('absent')) {
+      response = 'Based on the attendance records, the overall attendance rate is 85%. There were 5 absences last week.';
+      suggestedActions = ['View detailed attendance reports', 'Check student absences', 'Set up attendance alerts'];
+      structuredData = {
+        attendanceRate: "85%",
+        absences: 5,
+        period: "last week"
+      };
+    } else if (lowerQuery.includes('student') || lowerQuery.includes('performance')) {
+      response = 'Student performance data shows an average score of 78% across all subjects. Mathematics has the highest average at 82%.';
+      suggestedActions = ['View student details', 'Generate performance report', 'Compare to previous term'];
+      structuredData = {
+        averageScore: "78%",
+        highestSubject: "Mathematics",
+        highestScore: "82%"
+      };
+    } else if (lowerQuery.includes('report') || lowerQuery.includes('summary')) {
+      response = 'I\'ve prepared a summary report for you. The data indicates normal attendance patterns with no significant anomalies this month.';
+      suggestedActions = ['Download full report', 'Share with staff', 'Schedule regular reports'];
+      structuredData = {
+        reportType: "summary",
+        period: "current month",
+        status: "normal"
+      };
+    } else if (lowerQuery.includes('alert') || lowerQuery.includes('notification')) {
+      response = 'There are 3 active alerts in the system. One student has triggered the attendance threshold alert.';
+      suggestedActions = ['Review all alerts', 'Modify alert thresholds', 'Disable notifications'];
+      structuredData = {
+        alertCount: 3,
+        criticalAlerts: 1,
+        type: "attendance threshold"
+      };
+    } else {
+      response = 'I\'m here to help with attendance and student performance data. How can I assist you today?';
+      suggestedActions = ['Check attendance records', 'Generate reports', 'Set up alerts'];
+      confidence = 0.7;
+    }
+    
+    // Add a disclaimer about mock mode
+    response += '\n\n[Note: This is a mock response for testing. OpenAI API is not being used.]';
+    
+    return {
+      naturalLanguageAnswer: response,
+      structuredData,
+      suggestedActions,
+      confidence
+    };
+  }
 
   /**
    * Reset conversation history
@@ -409,4 +549,20 @@ Please provide a helpful response in JSON format with these fields:
 }
 
 // Export singleton instance accessor
-export const getLLMService = (): LLMService => LLMService.getInstance();
+/**
+ * Gets the LLM service instance with error handling
+ * @returns LLM service instance or throws an error if initialization fails
+ */
+export const getLLMService = (): LLMService => {
+  try {
+    return LLMService.getInstance();
+  } catch (error) {
+    console.error('Failed to get LLM service instance:', error);
+    throw new LLMError(
+      'LLM service initialization failed. Check API key and environment.',
+      LLMErrorCategory.SERVICE_INTEGRATION,
+      500,
+      false
+    );
+  }
+};

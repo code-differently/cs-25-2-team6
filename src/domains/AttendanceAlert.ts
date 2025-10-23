@@ -38,7 +38,17 @@ export class AttendanceAlert {
     public period: AlertPeriod,
     public notificationSent: boolean = false,
     public createdAt: Date = new Date(),
-    public updatedAt: Date = new Date()
+    public updatedAt: Date = new Date(),
+    public studentFirstName?: string,
+    public studentLastName?: string,
+    public details?: {
+      absenceDates?: string[],
+      tardyDates?: string[],
+      threshold?: string,
+      currentValue?: string,
+      averageMinutesLate?: number,
+      pattern?: string
+    }
   ) {}
 
   /**

@@ -71,17 +71,38 @@ export class FileAlertRepo {
 
       // Convert dates from strings back to Date objects
       return alerts.map((alert: any) => {
+        // Extract first and last name if studentName is present
+        let firstName, lastName;
+        if (alert.studentName) {
+          const nameParts = alert.studentName.split(' ');
+          firstName = nameParts[0];
+          lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+        }
+        
+        // Extract details if present
+        const details = alert.details ? {
+          absenceDates: alert.details.absenceDates || [],
+          tardyDates: alert.details.tardyDates || [],
+          threshold: alert.details.threshold,
+          currentValue: alert.details.currentValue,
+          averageMinutesLate: alert.details.averageMinutesLate,
+          pattern: alert.details.pattern
+        } : undefined;
+        
         return new AttendanceAlert(
           alert.id,
           alert.studentId,
-          alert.thresholdId,
+          alert.thresholdId || '',
           alert.type,
-          alert.count,
-          alert.status,
-          alert.period,
-          alert.notificationSent,
-          new Date(alert.createdAt),
-          new Date(alert.updatedAt)
+          alert.count || 0,
+          alert.status || AlertStatus.ACTIVE,
+          alert.period || 'ROLLING_30',
+          alert.notificationSent || false,
+          alert.timestamp ? new Date(alert.timestamp) : new Date(),
+          alert.updatedAt ? new Date(alert.updatedAt) : new Date(),
+          firstName,
+          lastName,
+          details
         );
       });
     } catch (error) {

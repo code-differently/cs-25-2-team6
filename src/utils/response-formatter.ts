@@ -60,14 +60,22 @@ export async function formatLLMResponse(
     
     // Handle string responses (parse as JSON if possible)
     if (typeof rawResponse === 'string') {
-      const { data, error } = safeJsonParse(rawResponse);
+      // Try to extract JSON from the response (some models might return text with JSON embedded)
+      const jsonMatch = rawResponse.match(/```json\s*([\s\S]*?)\s*```/) || 
+                      rawResponse.match(/\{[\s\S]*\}/);
+      
+      const jsonContent = jsonMatch ? jsonMatch[0].replace(/```json|```/g, '') : rawResponse;
+      
+      const { data, error } = safeJsonParse(jsonContent);
       if (error) {
         // If it's not valid JSON, treat the string as the natural language answer
+        console.log("[Response Formatter] Received non-JSON response, treating as plain text");
         processedResponse = {
           naturalLanguageAnswer: rawResponse,
           confidence: defaultConfidence
         };
       } else {
+        console.log("[Response Formatter] Successfully parsed JSON from response");
         processedResponse = data;
       }
     } else {

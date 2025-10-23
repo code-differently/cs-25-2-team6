@@ -106,6 +106,15 @@ export function handleOpenAIError(error: any): LLMError {
           false
         );
       }
+      if (message.includes('response_format') && message.includes('json_object') && message.includes('not supported with this model')) {
+        console.warn('Model does not support JSON response format. Consider using gpt-4-turbo or another compatible model.');
+        return new LLMError(
+          'This model does not support structured JSON responses. Consider using gpt-4-turbo or another compatible model.',
+          LLMErrorCategory.VALIDATION,
+          400,
+          false
+        );
+      }
       return new LLMError(
         'Invalid request to OpenAI API',
         LLMErrorCategory.VALIDATION,
@@ -217,9 +226,15 @@ export function getFallbackResponse(error: LLMError): string {
     case LLMErrorCategory.SERVICE_INTEGRATION:
       return "There was an issue connecting the attendance database with the analysis service. Please try again later.";
     
-    // Other errors
-    case LLMErrorCategory.AUTHORIZATION:
     case LLMErrorCategory.VALIDATION:
+      // Special handling for JSON format compatibility issues
+      if (error.message && error.message.includes('JSON response') && error.message.includes('model')) {
+        return "I apologize, but I'm having trouble generating a structured response with the current model configuration. Our team has been notified of this compatibility issue.";
+      }
+      return "I'm having trouble validating your request. Please check that your query follows the expected format.";
+      
+    // Other errors  
+    case LLMErrorCategory.AUTHORIZATION:
     case LLMErrorCategory.PARSING:
     case LLMErrorCategory.UNKNOWN:
     default:

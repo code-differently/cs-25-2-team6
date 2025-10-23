@@ -1,0 +1,52 @@
+/* RAGQueryBox Terminal Styling */
+.terminal-output {
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  padding: 0.5rem;
+}
+
+/* JSON syntax highlighting */
+.json-key {
+  color: #59a5d8;
+  font-weight: 600;
+}
+
+.json-string {
+  color: #78b13f;
+}
+
+.json-number {
+  color: #d18f52;
+}
+
+.json-boolean {
+  color: #ca60ca;
+}
+
+/* Table styling */
+.terminal-table {
+  margin: 0.5rem 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.terminal-table th {
+  font-weight: bold;
+  text-align: left;
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid #d1d1d1;
+  background-color: #f5f5f5;
+}
+
+.terminal-table td {
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.terminal-table tr:last-child td {
+  border-bottom: none;
+}
+
+.terminal-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}

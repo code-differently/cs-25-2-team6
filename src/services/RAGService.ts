@@ -61,19 +61,31 @@ export class RAGService {
    * Main entry point for processing natural language queries
    */
   async processQuery(query: string): Promise<RAGResponse> {
-    // 1. Classify query intent
-    const intent = this.queryProcessor.classifyQuery(query);
-    
-    // 2. Convert to API filters
-    const filters = await this.queryProcessor.queryToFilters(query, intent);
-    
-    // 3. Fetch data based on intent
-    const data = await this.fetchRelevantData(intent, filters);
-    
-    // 4. Generate natural language response
-    const response = await this.generateResponse(query, intent, data);
-    
-    return response;
+    try {
+      // 1. Classify query intent
+      const intent = this.queryProcessor.classifyQuery(query);
+      
+      // 2. Convert to API filters
+      const filters = await this.queryProcessor.queryToFilters(query, intent);
+      
+      // 3. Fetch data based on intent
+      const data = await this.fetchRelevantData(intent, filters);
+      
+      // 4. Generate natural language response
+      const response = await this.generateResponse(query, intent, data);
+      
+      return response;
+    } catch (error) {
+      console.error('Error in RAGService.processQuery:', error);
+      
+      // Return a graceful fallback response
+      return {
+        naturalLanguageAnswer: "I'm sorry, but I couldn't process your query at this time. Our system might be experiencing high demand. Please try again with a simpler question.",
+        structuredData: null,
+        actions: [],
+        confidence: 0
+      };
+    }
   }
   
   /**
