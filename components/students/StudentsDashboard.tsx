@@ -40,22 +40,34 @@ export default function StudentsDashboard() {
         backgroundColor: '#fef2f2',
         border: '1px solid #fecaca',
         borderRadius: '8px',
-        padding: '16px',
-        color: '#111827'
+        padding: '16px'
       }}>
-        <h3 style={{ margin: '0 0 8px 0', color: '#dc2626' }}>Error</h3>
-        <p style={{ margin: 0 }}>{error}</p>
+        <h3 style={{ 
+          color: '#991b1b', 
+          fontWeight: '600', 
+          marginBottom: '8px',
+          margin: 0
+        }}>Error</h3>
+        <p style={{ 
+          color: '#b91c1c', 
+          marginBottom: '12px',
+          margin: 0
+        }}>{error}</p>
         <button 
           onClick={refreshStudentList}
           style={{
-            marginTop: '12px',
             padding: '8px 16px',
             backgroundColor: '#dc2626',
             color: 'white',
             borderRadius: '6px',
             border: 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            outline: 'none'
           }}
+          onFocus={(e) => e.currentTarget.style.boxShadow = '0 0 0 2px #fecaca'}
+          onBlur={(e) => e.currentTarget.style.boxShadow = 'none'}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b91c1c'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc2626'}
         >
           🔄 Retry
         </button>
@@ -64,15 +76,13 @@ export default function StudentsDashboard() {
   }
 
   return (
-    <div style={{ padding: '0', minHeight: '70vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Dashboard Header */}
-      <div style={{ 
-        marginBottom: '24px',
-        padding: '20px',
+      <div style={{
         backgroundColor: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-        border: '1px solid #e5e7eb'
+        padding: '24px',
+        borderRadius: '8px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
       }}>
         <div style={{
           display: 'flex',
@@ -81,7 +91,7 @@ export default function StudentsDashboard() {
           marginBottom: '16px'
         }}>
           <h2 style={{
-            fontSize: '24px',
+            fontSize: '20px',
             fontWeight: 'bold',
             color: '#111827',
             margin: 0
@@ -95,13 +105,23 @@ export default function StudentsDashboard() {
               onClick={() => handleViewModeChange('list')}
               style={{
                 padding: '8px 16px',
-                backgroundColor: viewMode === 'list' ? '#3b82f6' : '#f3f4f6',
-                color: viewMode === 'list' ? 'white' : '#374151',
-                borderRadius: '8px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500'
+                backgroundColor: viewMode === 'list' ? '#2563eb' : '#f3f4f6',
+                color: viewMode === 'list' ? 'white' : '#374151'
+              }}
+              onMouseEnter={(e) => {
+                if (viewMode !== 'list') {
+                  e.currentTarget.style.backgroundColor = '#e5e7eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (viewMode !== 'list') {
+                  e.currentTarget.style.backgroundColor = '#f3f4f6';
+                }
               }}
             >
               📋 List View
@@ -110,13 +130,23 @@ export default function StudentsDashboard() {
               onClick={() => handleViewModeChange('table')}
               style={{
                 padding: '8px 16px',
-                backgroundColor: viewMode === 'table' ? '#3b82f6' : '#f3f4f6',
-                color: viewMode === 'table' ? 'white' : '#374151',
-                borderRadius: '8px',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500'
+                backgroundColor: viewMode === 'table' ? '#2563eb' : '#f3f4f6',
+                color: viewMode === 'table' ? 'white' : '#374151'
+              }}
+              onMouseEnter={(e) => {
+                if (viewMode !== 'table') {
+                  e.currentTarget.style.backgroundColor = '#e5e7eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (viewMode !== 'table') {
+                  e.currentTarget.style.backgroundColor = '#f3f4f6';
+                }
               }}
             >
               📊 Table View
@@ -136,60 +166,68 @@ export default function StudentsDashboard() {
       {/* Bulk Actions Bar */}
       {selectedStudentIds.length > 0 && (
         <div style={{
-          marginBottom: '16px',
-          padding: '12px 20px',
-          backgroundColor: '#dbeafe',
+          backgroundColor: '#eff6ff',
+          border: '1px solid #bfdbfe',
           borderRadius: '8px',
-          border: '1px solid #bfdbfe'
+          padding: '16px'
         }}>
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
           }}>
-            <span style={{ color: '#1e40af', fontSize: '14px', fontWeight: '500' }}>
+            <span style={{ 
+              color: '#1d4ed8', 
+              fontWeight: '500' 
+            }}>
               {selectedStudentIds.length} student(s) selected
             </span>
             <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 onClick={() => handleBulkActions(selectedStudentIds, { type: 'activate' })}
                 style={{
-                  padding: '6px 12px',
-                  backgroundColor: '#10b981',
+                  padding: '4px 12px',
+                  backgroundColor: '#059669',
                   color: 'white',
-                  borderRadius: '6px',
+                  borderRadius: '4px',
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '12px'
+                  fontSize: '14px'
                 }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#047857'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#059669'}
               >
                 ✅ Activate
               </button>
               <button
                 onClick={() => handleBulkActions(selectedStudentIds, { type: 'deactivate' })}
                 style={{
-                  padding: '6px 12px',
-                  backgroundColor: '#f59e0b',
+                  padding: '4px 12px',
+                  backgroundColor: '#d97706',
                   color: 'white',
-                  borderRadius: '6px',
+                  borderRadius: '4px',
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '12px'
+                  fontSize: '14px'
                 }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b45309'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#d97706'}
               >
                 ⏸️ Deactivate
               </button>
               <button
                 onClick={() => handleBulkActions(selectedStudentIds, { type: 'export' })}
                 style={{
-                  padding: '6px 12px',
-                  backgroundColor: '#6366f1',
+                  padding: '4px 12px',
+                  backgroundColor: '#4f46e5',
                   color: 'white',
-                  borderRadius: '6px',
+                  borderRadius: '4px',
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '12px'
+                  fontSize: '14px'
                 }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
               >
                 📤 Export
               </button>

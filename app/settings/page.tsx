@@ -3,7 +3,7 @@
 import React from 'react';
 import StudentsDashboard from '@/components/students/StudentsDashboard';
 
-export default function StudentsPage() {
+export default function SettingsPage() {
   return (
     <div style={{
       maxWidth: '1152px',
@@ -15,10 +15,10 @@ export default function StudentsPage() {
         fontWeight: 'bold',
         color: '#111827',
         marginBottom: '32px'
-      }}>Student Management</h1>
+      }}>Settings</h1>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {/* Page Header */}
+        {/* Student Management Section */}
         <div style={{
           backgroundColor: 'white',
           padding: '24px',
@@ -35,7 +35,7 @@ export default function StudentsPage() {
               alignItems: 'center',
               gap: '12px'
             }}>
-              👥 Student Records
+              👥 Student Management
             </h2>
             <p style={{
               color: '#6b7280'
@@ -133,7 +133,8 @@ export default function StudentsPage() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '16px'
+            gap: '16px',
+            marginBottom: '24px'
           }}>
             <div style={{
               backgroundColor: '#eff6ff',
