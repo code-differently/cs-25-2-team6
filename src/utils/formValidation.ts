@@ -36,16 +36,24 @@ export function validateField(
 ): ValidationError | null {
   switch (fieldName) {
     case 'firstName':
-      const firstNameValidation = validateStudentName(value, '');
-      if (firstNameValidation.errors.length > 0) {
-        return { field: 'firstName', message: firstNameValidation.errors[0] };
+      if (!value.trim()) {
+        return { field: 'firstName', message: 'First name is required' };
+      }
+      const firstNameValidation = validateStudentName(value, 'TempLast');
+      const firstNameErrors = firstNameValidation.errors.filter(err => err.includes('First'));
+      if (firstNameErrors.length > 0) {
+        return { field: 'firstName', message: firstNameErrors[0] };
       }
       break;
 
     case 'lastName':
-      const lastNameValidation = validateStudentName('', value);
-      if (lastNameValidation.errors.length > 0) {
-        return { field: 'lastName', message: lastNameValidation.errors[0] };
+      if (!value.trim()) {
+        return { field: 'lastName', message: 'Last name is required' };
+      }
+      const lastNameValidation = validateStudentName('TempFirst', value);
+      const lastNameErrors = lastNameValidation.errors.filter(err => err.includes('Last'));
+      if (lastNameErrors.length > 0) {
+        return { field: 'lastName', message: lastNameErrors[0] };
       }
       break;
 
