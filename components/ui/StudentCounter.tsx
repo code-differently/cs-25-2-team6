@@ -1,10 +1,15 @@
 'use client'
 
 import React from 'react'
+import { countStudentsInClass, ClassStudent } from '../utilities/classUtils'
 
 interface StudentCounterProps {
   /** Current number of enrolled students */
-  currentCount: number
+  currentCount?: number
+  /** Array of class-student relationships for auto-counting */
+  relationships?: ClassStudent[]
+  /** Class ID to count students for */
+  classId?: string
   /** Maximum capacity of the class */
   maxCapacity: number
   /** Visual variant for different display styles */
@@ -23,10 +28,14 @@ interface StudentCounterProps {
   clickable?: boolean
   /** Additional CSS classes */
   className?: string
+  /** Auto-count students using utility function */
+  autoCount?: boolean
 }
 
 export default function StudentCounter({
   currentCount,
+  relationships = [],
+  classId,
   maxCapacity,
   variant = 'default',
   size = 'md',
@@ -35,12 +44,24 @@ export default function StudentCounter({
   colorScheme = 'default',
   onClick,
   clickable = false,
-  className = ''
+  className = '',
+  autoCount = false
 }: StudentCounterProps) {
-  const percentage = maxCapacity > 0 ? (currentCount / maxCapacity) * 100 : 0
-  const isOverCapacity = currentCount > maxCapacity
+  /**
+   * Get student count using utility function when auto-count is enabled
+   */
+  const getStudentCount = (): number => {
+    if (autoCount && classId && relationships.length > 0) {
+      return countStudentsInClass(classId, relationships)
+    }
+    return currentCount || 0
+  }
+
+  const studentCount = getStudentCount()
+  const percentage = maxCapacity > 0 ? (studentCount / maxCapacity) * 100 : 0
+  const isOverCapacity = studentCount > maxCapacity
   const isNearCapacity = percentage >= 90 && !isOverCapacity
-  const isFull = currentCount === maxCapacity
+  const isFull = studentCount === maxCapacity
 
   // Determine color scheme based on capacity
   const getColorScheme = () => {
@@ -113,10 +134,10 @@ export default function StudentCounter({
         onKeyDown={handleKeyDown}
         role={clickable ? 'button' : undefined}
         tabIndex={clickable ? 0 : undefined}
-        aria-label={`${currentCount} of ${maxCapacity} students enrolled`}
+        aria-label={`${studentCount} of ${maxCapacity} students enrolled`}
       >
         <span className="font-semibold">
-          {currentCount}/{maxCapacity}
+          {studentCount}/{maxCapacity}
         </span>
       </span>
     )
@@ -131,12 +152,12 @@ export default function StudentCounter({
         onKeyDown={handleKeyDown}
         role={clickable ? 'button' : undefined}
         tabIndex={clickable ? 0 : undefined}
-        aria-label={`${currentCount} of ${maxCapacity} students enrolled, ${percentage.toFixed(1)}% capacity`}
+        aria-label={`${studentCount} of ${maxCapacity} students enrolled, ${percentage.toFixed(1)}% capacity`}
       >
         <div className="flex items-center justify-between w-full">
           <span className="font-medium">Students</span>
           <span className="font-semibold">
-            {currentCount}/{maxCapacity}
+            {studentCount}/{maxCapacity}
           </span>
         </div>
         
@@ -159,7 +180,7 @@ export default function StudentCounter({
         
         {isOverCapacity && (
           <div className="text-xs text-red-600 font-medium">
-            Over capacity by {currentCount - maxCapacity}
+            Over capacity by {studentCount - maxCapacity}
           </div>
         )}
       </div>
@@ -174,7 +195,7 @@ export default function StudentCounter({
       onKeyDown={handleKeyDown}
       role={clickable ? 'button' : undefined}
       tabIndex={clickable ? 0 : undefined}
-      aria-label={`${currentCount} of ${maxCapacity} students enrolled`}
+      aria-label={`${studentCount} of ${maxCapacity} students enrolled`}
     >
       <span className="flex items-center space-x-1">
         <svg
@@ -192,7 +213,7 @@ export default function StudentCounter({
           />
         </svg>
         <span className="font-semibold">
-          {currentCount}
+          {studentCount}
         </span>
       </span>
       

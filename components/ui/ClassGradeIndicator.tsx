@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { getClassGradeDisplay } from '../utilities/classUtils'
 
 interface ClassGradeIndicatorProps {
   /** Grade level (e.g., 'K', '1', '2', '12', 'Pre-K') */
@@ -23,6 +24,8 @@ interface ClassGradeIndicatorProps {
   className?: string
   /** Tooltip text */
   tooltip?: string
+  /** Auto-format grade using utility function */
+  autoFormat?: boolean
 }
 
 export default function ClassGradeIndicator({
@@ -35,10 +38,14 @@ export default function ClassGradeIndicator({
   clickable = false,
   onClick,
   className = '',
-  tooltip
+  tooltip,
+  autoFormat = true
 }: ClassGradeIndicatorProps) {
   const gradeString = String(grade)
   const numericGrade = typeof grade === 'number' ? grade : parseInt(gradeString)
+  
+  // Get formatted grade display using utility function
+  const formattedGrade = autoFormat ? getClassGradeDisplay(grade) : gradeString
   
   // Determine color based on grade level for rainbow scheme
   const getRainbowColor = () => {
@@ -184,7 +191,12 @@ export default function ClassGradeIndicator({
   const getDisplayText = () => {
     const prefix = customPrefix || (showPrefix ? 'Grade ' : '')
     
-    // Format special grades
+    // Use utility function for formatting if autoFormat is enabled
+    if (autoFormat) {
+      return `${prefix}${formattedGrade}`
+    }
+    
+    // Format special grades manually (legacy behavior)
     if (gradeString.toLowerCase() === 'k' || gradeString === '0') {
       return `${prefix}K`
     }
@@ -198,7 +210,7 @@ export default function ClassGradeIndicator({
     return `${prefix}${gradeString}`
   }
 
-  const ariaLabel = `Grade ${gradeString}${clickable ? ', clickable' : ''}`
+  const ariaLabel = `Grade ${autoFormat ? formattedGrade : gradeString}${clickable ? ', clickable' : ''}`
 
   return (
     <span
