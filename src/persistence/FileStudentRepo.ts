@@ -67,10 +67,45 @@ export class FileStudentRepo {
   }
 
   /**
-   * Create a new student if ID is unique
+   * Delete student profile, optionally cascade
+   */
+  deleteStudent(id: string, options?: { cascade?: boolean }): boolean {
+    let students = this.allStudents();
+    const initialLength = students.length;
+    students = students.filter(s => s.id !== id);
+    fs.writeFileSync(this.filePath, JSON.stringify(students, null, 2));
+    if (options?.cascade) {
+      // Cascade delete: remove related attendance and class records
+      this.cascadeDeleteAttendance(id);
+      this.cascadeDeleteClassMembership(id);
+    }
+    return students.length < initialLength;
+  }
+
+  /**
+   * Remove all attendance records for a student (stub)
+   */
+  private cascadeDeleteAttendance(studentId: string): void {
+    // TODO: Implement actual attendance repo logic
+    // Example: const attendanceRepo = new FileAttendanceRepo();
+    // attendanceRepo.deleteRecordsByStudentId(studentId);
+  }
+
+  /**
+   * Remove student from all classes (stub)
+   */
+  private cascadeDeleteClassMembership(studentId: string): void {
+    // TODO: Implement actual class repo logic
+    // Example: const classRepo = new FileClassRepo();
+    // classRepo.removeStudentFromAllClasses(studentId);
+  }
+
+  /**
+   * Create a new student if ID is unique (conflict resolution)
    */
   createStudent(student: Student): Student | undefined {
     if (!this.isStudentIdUnique(student.id)) {
+      // Conflict resolution: do not create, throw error
       throw new Error('Student ID must be unique');
     }
     const students = this.allStudents();
@@ -93,18 +128,6 @@ export class FileStudentRepo {
     }
     fs.writeFileSync(this.filePath, JSON.stringify(students, null, 2));
     return students[idx];
-  }
-
-  /**
-   * Delete student profile, optionally cascade
-   */
-  deleteStudent(id: string, options?: { cascade?: boolean }): boolean {
-    let students = this.allStudents();
-    const initialLength = students.length;
-    students = students.filter(s => s.id !== id);
-    fs.writeFileSync(this.filePath, JSON.stringify(students, null, 2));
-    // TODO: Cascade delete attendance/class dependencies if options?.cascade
-    return students.length < initialLength;
   }
 
   /**

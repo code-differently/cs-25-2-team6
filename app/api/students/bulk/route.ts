@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
       }
       results.push({ success: true, result });
     } catch (error) {
-      results.push({ success: false, error: error.message });
+      const errorMsg = (error instanceof Error && error.message) ? error.message : String(error);
+      results.push({ success: false, error: errorMsg });
     }
   }
   return NextResponse.json({ results });
