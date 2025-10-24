@@ -5,6 +5,7 @@ export interface Student {
   id: string;
   firstName: string;
   lastName: string;
+  grade?: string; // Optional grade property
 }
 
 export class FileStudentRepo {
