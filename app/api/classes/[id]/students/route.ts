@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-// Placeholder for ClassManagementService
+import { ClassManagementService } from '../../../../../src/services/ClassManagementService';
+
+const service = new ClassManagementService();
 
 export async function POST(req: NextRequest, context: any) {
-  // TODO: Add students to class
   const { id } = context.params;
-  return NextResponse.json({ message: `Students added to class ${id} (stub)` });
+  const { studentIds } = await req.json();
+  const result = await service.addStudentsToClass(id, studentIds || []);
+  if (!result.valid) {
+    return NextResponse.json({ errors: result.errors }, { status: 400 });
+  }
+  return NextResponse.json({ message: `Students added to class ${id}` });
 }
 
 export async function DELETE(req: NextRequest, context: any) {
-  // TODO: Remove students from class
   const { id } = context.params;
-  return NextResponse.json({ message: `Students removed from class ${id} (stub)` });
+  const { studentIds } = await req.json();
+  const result = await service.removeStudentsFromClass(id, studentIds || []);
+  if (!result.valid) {
+    return NextResponse.json({ errors: result.errors }, { status: 400 });
+  }
+  return NextResponse.json({ message: `Students removed from class ${id}` });
 }

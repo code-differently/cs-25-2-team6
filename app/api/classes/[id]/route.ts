@@ -1,26 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-// Placeholder for ClassManagementService
+import { ClassManagementService } from '../../../../src/services/ClassManagementService';
+
+const service = new ClassManagementService();
 
 export async function GET(req: NextRequest, context: any) {
-  // TODO: Fetch class by ID
   const { id } = context.params;
-  return NextResponse.json({ class: { id } });
+  const classObj = await service.getClassById(id);
+  if (!classObj) return NextResponse.json({ error: 'Class not found' }, { status: 404 });
+  return NextResponse.json({ class: classObj });
 }
 
 export async function PUT(req: NextRequest, context: any) {
-  // TODO: Update class
   const { id } = context.params;
-  return NextResponse.json({ message: `Class ${id} updated (stub)` });
+  const updates = await req.json();
+  const updated = await service.updateClass(id, updates);
+  if (!updated) return NextResponse.json({ error: 'Class not found' }, { status: 404 });
+  return NextResponse.json({ class: updated });
 }
 
 export async function PATCH(req: NextRequest, context: any) {
-  // TODO: Partial update
   const { id } = context.params;
-  return NextResponse.json({ message: `Class ${id} patched (stub)` });
+  const updates = await req.json();
+  const updated = await service.updateClass(id, updates);
+  if (!updated) return NextResponse.json({ error: 'Class not found' }, { status: 404 });
+  return NextResponse.json({ class: updated });
 }
 
 export async function DELETE(req: NextRequest, context: any) {
-  // TODO: Remove class
   const { id } = context.params;
-  return NextResponse.json({ message: `Class ${id} deleted (stub)` });
+  const { preserveStudents } = await req.json();
+  const deleted = await service.deleteClassSafely(id, preserveStudents ?? false);
+  if (!deleted) return NextResponse.json({ error: 'Class not found' }, { status: 404 });
+  return NextResponse.json({ message: `Class ${id} deleted` });
 }

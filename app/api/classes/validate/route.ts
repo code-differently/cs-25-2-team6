@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-// Placeholder for ClassManagementService
+import { ClassManagementService } from '../../../../src/services/ClassManagementService';
+
+const service = new ClassManagementService();
 
 export async function POST(req: NextRequest) {
-  // TODO: Validate class ID uniqueness
-  return NextResponse.json({ isUnique: true });
+  const { classId, studentIds } = await req.json();
+  const result = await service.validateClassStudentRelationships(classId, studentIds || []);
+  return NextResponse.json({ validation: result });
 }
