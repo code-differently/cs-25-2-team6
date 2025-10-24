@@ -65,4 +65,53 @@ export class FileStudentRepo {
   clearAll(): void {
     fs.writeFileSync(this.filePath, JSON.stringify([]));
   }
+
+  /**
+   * Create a new student if ID is unique
+   */
+  createStudent(student: Student): Student | undefined {
+    if (!this.isStudentIdUnique(student.id)) {
+      throw new Error('Student ID must be unique');
+    }
+    const students = this.allStudents();
+    students.push(student);
+    fs.writeFileSync(this.filePath, JSON.stringify(students, null, 2));
+    return student;
+  }
+
+  /**
+   * Update student profile (full or partial)
+   */
+  updateStudent(id: string, updates: Partial<Student>, partial: boolean = false): Student | undefined {
+    const students = this.allStudents();
+    const idx = students.findIndex(s => s.id === id);
+    if (idx === -1) return undefined;
+    if (partial) {
+      students[idx] = { ...students[idx], ...updates };
+    } else {
+      students[idx] = { ...updates, id } as Student;
+    }
+    fs.writeFileSync(this.filePath, JSON.stringify(students, null, 2));
+    return students[idx];
+  }
+
+  /**
+   * Delete student profile, optionally cascade
+   */
+  deleteStudent(id: string, options?: { cascade?: boolean }): boolean {
+    let students = this.allStudents();
+    const initialLength = students.length;
+    students = students.filter(s => s.id !== id);
+    fs.writeFileSync(this.filePath, JSON.stringify(students, null, 2));
+    // TODO: Cascade delete attendance/class dependencies if options?.cascade
+    return students.length < initialLength;
+  }
+
+  /**
+   * Check if student ID is unique (optionally exclude an ID)
+   */
+  isStudentIdUnique(studentId: string, excludeId?: string): boolean {
+    const students = this.allStudents();
+    return !students.some(s => s.id === studentId && s.id !== excludeId);
+  }
 }
