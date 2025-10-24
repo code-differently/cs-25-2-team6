@@ -14,3 +14,10 @@ export { default as AttendanceForm } from './AttendanceForm';
 export { default as AttendanceFormExample } from './AttendanceFormExample';
 export { default as RAGQueryBox } from './RAGQueryBox';
 export { default as QuerySuggestions } from './QuerySuggestions';
+
+// New UI Components
+export { default as StudentAvatar } from './ui/StudentAvatar';
+export { default as RequiredFieldLabel } from './ui/RequiredFieldLabel';
+export { default as ValidationMessage } from './ui/ValidationMessage';
+export { default as StudentBadge } from './ui/StudentBadge';
+export { default as ConfirmButton } from './ui/ConfirmButton';
