@@ -135,23 +135,23 @@ export interface RAGIntegrationAdapter {
 export class RAGIntegration implements RAGIntegrationAdapter {
   private ragService: RAGService;
   private llmService: LLMService;
-  private studentRepo: FileStudentRepo;
-  private attendanceRepo: FileAttendanceRepo;
-  private alertRepo: FileAlertRepo;
   
   constructor(
-    ragService?: RAGService,
-    studentRepo?: FileStudentRepo,
-    attendanceRepo?: FileAttendanceRepo,
-    alertRepo?: FileAlertRepo
+    ragService?: RAGService
   ) {
     this.ragService = ragService || new RAGService();
     this.llmService = getLLMService();
-    this.studentRepo = studentRepo || new FileStudentRepo();
-    this.attendanceRepo = attendanceRepo || new FileAttendanceRepo();
-    this.alertRepo = alertRepo || new FileAlertRepo();
   }
   
+  /**
+   * Classify the intent and filters of a user query
+   * @param userQuery User's query text
+   * @returns Promise resolving to intent and filters
+   */
+  private async classifyIntent(userQuery: string): Promise<{ intent: QueryIntentType; filters: QueryFilters }> {
+    return await this.analyzeQueryIntent(userQuery);
+  }
+
   /**
    * Process a natural language query using RAG
    * @param query User's query text
@@ -159,110 +159,60 @@ export class RAGIntegration implements RAGIntegrationAdapter {
    * @returns Promise resolving to RAGResponse
    */
   public async processQuery(
-    query: string, 
+    userQuery: string,
     options?: RAGQueryOptions
   ): Promise<RAGResponse> {
+    // 1. Classify intent
+    const { intent, filters } = await this.classifyIntent(userQuery);
+    // 2. Fetch data from Supabase
+    let supabaseRecords = [];
     try {
-      // Add a fallback response in case of timeouts or other errors
-      if (!query || query.trim() === '') {
-        return {
-          naturalLanguageAnswer: "I need a question to help you. Please ask me something about student attendance or alerts.",
-          structuredData: null,
-          actions: [],
-          confidence: 0.5
-        };
+      if (intent === QueryIntentType.STUDENT_QUERY || intent === QueryIntentType.ATTENDANCE_QUERY) {
+        const { data, error } = await supabase
+          .from('view_student_attendance_summary')
+          .select('*')
+          .limit(100);
+        if (error) throw error;
+        supabaseRecords = data ?? [];
       }
-
-      // Sanitize the query
-      const sanitizedQuery = sanitizeQuery(query);
-      
-      // Analyze query intent
-      const { intent, filters } = await this.analyzeQueryIntent(sanitizedQuery);
-      
-      // Get relevant attendance data based on filters
-      const attendanceData = await this.getFormattedAttendanceData(
-        filters.studentId,
-        filters.startDate,
-        filters.endDate,
-        {
-          maxRecords: options?.maxAttendanceRecords || 50,
-          summarize: true
-        }
-      );
-      
-      // Get student information if needed
-      const studentData = options?.includeStudentInfo ?
-        await this.getFormattedStudentData(filters.studentId) :
-        [];
-      
-      // Get alert data if this is an alert-related query
-      let alertData: AttendanceAlert[] = [];
-      if (intent === QueryIntentType.ALERT_QUERY) {
-        alertData = this.alertRepo.getAllAlerts();
-        console.log(`[RAGIntegration] Found ${alertData.length} alerts for query about alerts`);
-      }
-      
-      // Prepare context - convert AttendanceRecordContext back to domain records if needed
-      const domainRecords = this.attendanceRepo.allAttendance().filter(record => 
-        attendanceData.some(ctx => ctx.studentId === record.studentId && ctx.date === record.dateISO)
-      );
-      const context = prepareAttendanceContext(domainRecords, studentData, sanitizedQuery);
-      
-      // Log data sizes for debugging
-      console.log(`[RAGService] Sending request to LLM service:`, {
-        query: sanitizedQuery + "\n\nCONTEXT: " + context,
-        intent: intent,
-        dataSize: domainRecords.length + studentData.length + alertData.length
-      });
-      
-      // Process with RAG service
-      if (intent === QueryIntentType.ALERT_QUERY && alertData.length > 0) {
-        // Get full student data for all students with alerts
-        const studentIds = alertData.map(alert => alert.studentId);
-        const allStudents = this.studentRepo.allStudents();
-        const alertStudents = allStudents.filter((student: Student) => studentIds.includes(student.id));
-        
-        // Combine student data with alert data for richer context
-        const enrichedAlerts = alertData.map(alert => {
-          const student = alertStudents.find((s: Student) => s.id === alert.studentId);
-          if (student) {
-            return {
-              ...alert,
-              studentFirstName: student.firstName || alert.studentFirstName,
-              studentLastName: student.lastName || alert.studentLastName
-            };
-          }
-          return alert;
-        });
-        
-        // For alert queries, add the enriched alert data to the context
-        const alertContext = JSON.stringify(enrichedAlerts);
-        const enhancedContext = `${context}\n\nALERT DATA: ${alertContext}`;
-        return await this.ragService.processQuery(sanitizedQuery, enhancedContext, { alerts: enrichedAlerts, total: enrichedAlerts.length });
-      } else {
-        // For other queries, just use the standard context and data
-        return await this.ragService.processQuery(sanitizedQuery, context, { attendance: domainRecords, students: studentData });
-      }
-    } catch (error) {
-      console.error('Error in RAG integration processQuery:', error);
-      
-      // Create appropriate error based on type
-      const llmError = error instanceof LLMError ? error : new LLMError(
-        error instanceof Error ? error.message : 'Unknown error occurred',
-        LLMErrorCategory.SERVICE_INTEGRATION
-      );
-      
-      // Create standardized error response
+      // Add more intent mappings as needed
+    } catch (err: any) {
       return {
-        naturalLanguageAnswer: `I'm sorry, but I encountered an error processing your query. Please try again with a simpler question.`,
-        structuredData: null,
-        confidence: 0,
-        actions: [{
-          type: 'VIEW_ALERTS',
-          label: 'Try again with a simpler query'
-        }]
+        naturalLanguageAnswer: `⚠️ Error fetching live data.`,
+        structuredData: {},
+        actions: [],
+        confidence: 0.1
       };
     }
+    // 3. Fallback if no data
+    if (!supabaseRecords.length) {
+      return {
+        naturalLanguageAnswer: "No matching records were found.",
+        structuredData: { students: [] },
+        actions: [],
+        confidence: 0.4,
+      };
+    }
+    // 4. Prepare prompt for LLM
+    const systemPrompt = getSystemPromptForContext(intent);
+    const injectedPrompt = `\n${systemPrompt}\n\n### RETRIEVED DATA\n${JSON.stringify(supabaseRecords, null, 2)}\n\n### USER QUERY\n${userQuery}\n`;
+    // 5. Call LLM
+    const llmResponse = await runLLM(injectedPrompt);
+    // 6. Validate
+    const validated = validateResponse(llmResponse);
+    if (!validated.valid) {
+      return {
+        naturalLanguageAnswer: `⚠️ The response didn't meet validation standards.`,
+        structuredData: {},
+        actions: [],
+        confidence: 0.2,
+      };
+    }
+    // 7. Return final response
+    return {
+      ...llmResponse,
+      confidence: llmResponse.confidence || 0.85,
+    };
   }
   
   /**
@@ -314,7 +264,7 @@ export class RAGIntegration implements RAGIntegrationAdapter {
   ): Promise<AttendanceRecordContext[]> {
     try {
       // Get raw attendance data from repository
-      let attendanceRecords: AttendanceRecord[] = this.attendanceRepo.allAttendance();
+      let attendanceRecords: AttendanceRecord[] = await getAllAttendance();
       
       // Apply filters
       if (studentId) {
@@ -336,9 +286,16 @@ export class RAGIntegration implements RAGIntegrationAdapter {
       }
       
       // Get student info for formatting
-      const students = this.studentRepo.allStudents();
-      const studentMap: Record<string, Student> = {};
-      students.forEach(student => {
+      const students = await getAllStudents();
+      // Map Supabase students to StudentRecord format
+      const studentRecords: StudentRecord[] = students.map(student => ({
+        id: student.id,
+        firstName: student.first_name,
+        lastName: student.last_name,
+        email: student.email
+      }));
+      const studentMap: Record<string, StudentRecord> = {};
+      studentRecords.forEach(student => {
         studentMap[student.id] = student;
       });
       

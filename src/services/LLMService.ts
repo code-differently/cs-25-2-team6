@@ -538,8 +538,23 @@ DO NOT include any text outside the JSON object. Your entire response must be pa
 
     // Use alertData if present
     if (request.alertData && request.alertData.length > 0) {
-      response = `There are ${request.alertData.length} alerts in the system.\n` +
-        request.alertData.map((a: any) => `${a.studentFirstName || a.studentName || ''} ${a.studentLastName || ''}: ${a.type} (${a.description || ''})`).join('\n');
+      // Build a detailed, consistent answer from the actual alert data
+      response = `There are ${request.alertData.length} active attendance alerts in the system.\n`;
+      response += request.alertData.map((a: any) => {
+        const name = `${a.studentFirstName || a.studentName || ''} ${a.studentLastName || ''}`.trim();
+        const id = a.studentId ? `(${a.studentId})` : '';
+        const type = a.type || 'Alert';
+        const status = a.status || '';
+        const absenceDates = a.details?.absenceDates && a.details.absenceDates.length > 0
+          ? `Absent on: ${a.details.absenceDates.map((d: string) => new Date(d).toISOString().split('T')[0]).join(', ')}`
+          : '';
+        const tardyDates = a.details?.tardyDates && a.details.tardyDates.length > 0
+          ? `Late on: ${a.details.tardyDates.map((d: string) => new Date(d).toISOString().split('T')[0]).join(', ')}`
+          : '';
+        const threshold = a.details?.threshold ? `Threshold: ${a.details.threshold}` : '';
+        const pattern = a.details?.pattern ? `Pattern: ${a.details.pattern}` : '';
+        return `- ${name} ${id}: ${type} (${status})${absenceDates ? ", " + absenceDates : ''}${tardyDates ? ", " + tardyDates : ''}${threshold ? ", " + threshold : ''}${pattern ? ", " + pattern : ''}`;
+      }).join('\n');
       suggestedActions = ['Review all alerts', 'Modify alert thresholds', 'Disable notifications'];
       structuredData = { alerts: request.alertData, total: request.alertData.length };
     } else if (request.attendanceData && request.attendanceData.length > 0) {
