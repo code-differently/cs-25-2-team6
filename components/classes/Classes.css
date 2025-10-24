@@ -1,0 +1,528 @@
+/* Classes.css - Comprehensive styling for class management components */
+
+/* Base class management container */
+.classes-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Class cards and layouts */
+.class-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.class-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.class-card.featured {
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+}
+
+.class-card.inactive {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  opacity: 0.75;
+}
+
+.class-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.class-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.class-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+/* Class grid layouts */
+.classes-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.classes-grid.compact {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.classes-grid.detailed {
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+}
+
+/* Class list layouts */
+.classes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.class-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.class-list-item:hover {
+  background-color: #f9fafb;
+}
+
+.class-list-item.selected {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+/* Class information sections */
+.class-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.class-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.class-subtitle {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.class-description {
+  font-size: 0.875rem;
+  color: #374151;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.class-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.class-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Class actions */
+.class-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.class-actions.vertical {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.class-action-button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.class-action-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.class-action-button.primary {
+  background-color: #2563eb;
+  color: white;
+}
+
+.class-action-button.primary:hover {
+  background-color: #1d4ed8;
+}
+
+.class-action-button.secondary {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.class-action-button.secondary:hover {
+  background-color: #d1d5db;
+}
+
+.class-action-button.danger {
+  background-color: #dc2626;
+  color: white;
+}
+
+.class-action-button.danger:hover {
+  background-color: #b91c1c;
+}
+
+/* Class status indicators */
+.class-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.class-status-indicator.active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.class-status-indicator.inactive {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.class-status-indicator.pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.class-status-indicator.full {
+  background-color: #fed7aa;
+  color: #c2410c;
+}
+
+.class-status-indicator.cancelled {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Student enrollment displays */
+.enrollment-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.enrollment-progress {
+  width: 100%;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  height: 0.5rem;
+  overflow: hidden;
+}
+
+.enrollment-progress-bar {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease-in-out;
+}
+
+.enrollment-progress-bar.normal {
+  background-color: #10b981;
+}
+
+.enrollment-progress-bar.warning {
+  background-color: #f59e0b;
+}
+
+.enrollment-progress-bar.danger {
+  background-color: #ef4444;
+}
+
+/* Class search and filters */
+.class-search-container {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.class-search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.class-search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  border-color: transparent;
+}
+
+.class-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  width: 1rem;
+  height: 1rem;
+}
+
+.class-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.class-filter-button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.class-filter-button:hover {
+  background-color: #f9fafb;
+}
+
+.class-filter-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.class-filter-button.active {
+  background-color: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.class-filter-button.active:hover {
+  background-color: #1d4ed8;
+}
+
+/* Class modals and overlays */
+.class-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.class-modal {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  max-width: 42rem;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.class-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.class-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.class-modal-close {
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out;
+}
+
+.class-modal-close:hover {
+  color: #4b5563;
+}
+
+.class-modal-body {
+  padding: 1.5rem;
+}
+
+.class-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Class form styles */
+.class-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.class-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.class-form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.class-form-input,
+.class-form-textarea,
+.class-form-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.class-form-input:focus,
+.class-form-textarea:focus,
+.class-form-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  border-color: transparent;
+}
+
+.class-form-textarea {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+.class-form-error {
+  font-size: 0.875rem;
+  color: #dc2626;
+}
+
+.class-form-help {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .classes-container {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+  
+  .class-card {
+    padding: 1rem;
+  }
+  
+  .class-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .class-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .classes-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .class-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .class-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+}
+
+/* Loading states */
+.class-loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.class-loading-card {
+  background-color: #e5e7eb;
+  border-radius: 0.5rem;
+  height: 8rem;
+}
+
+.class-loading-text {
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  height: 1rem;
+}
+
+.class-loading-text.short {
+  width: 33.333333%;
+}
+
+.class-loading-text.medium {
+  width: 50%;
+}
+
+.class-loading-text.long {
+  width: 66.666667%;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
