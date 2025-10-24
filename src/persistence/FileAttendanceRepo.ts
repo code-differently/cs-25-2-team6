@@ -106,11 +106,10 @@ export class FileAttendanceRepo {
     return records.filter(record => record.studentId === studentId && record.earlyDismissal === true);
   }
 
-  findByStudentAndDateRange(studentId: string, startISO: string, endISO: string): AttendanceRecord[] {
-    const records = this.allAttendance();
-    return records
-      .filter(record => record.studentId === studentId && record.dateISO >= startISO && record.dateISO <= endISO)
-      .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  findByStudentAndDateRange(studentId: string, start: string, end: string): AttendanceRecord[] {
+    return this.allAttendance().filter(r =>
+      r.studentId === studentId && r.dateISO >= start && r.dateISO <= end
+    );
   }
 
   findAllByStudent(studentId: string): AttendanceRecord[] {
