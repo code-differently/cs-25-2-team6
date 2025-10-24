@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { 
   formatStudentName, 
   generateStudentInitials, 
@@ -187,10 +188,11 @@ const StudentAvatar: React.FC<StudentAvatarProps> = ({
     >
       {/* Avatar Image */}
       {avatarUrl && (
-        <img
+        <Image
           src={avatarUrl}
           alt={accessibilityLabel}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
           onError={handleImageError}
         />
       )}

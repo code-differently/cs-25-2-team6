@@ -205,6 +205,7 @@ RequiredFieldLabel.Asterisk = ({
     *
   </span>
 );
+RequiredFieldLabel.Asterisk.displayName = 'RequiredFieldLabel.Asterisk';
 
 /**
  * RequiredFieldLabel.Text - Standalone required text component
@@ -220,6 +221,7 @@ RequiredFieldLabel.Text = ({
     ({children})
   </span>
 );
+RequiredFieldLabel.Text.displayName = 'RequiredFieldLabel.Text';
 
 /**
  * RequiredFieldLabel.Optional - Optional field indicator
@@ -235,5 +237,6 @@ RequiredFieldLabel.Optional = ({
     ({children})
   </span>
 );
+RequiredFieldLabel.Optional.displayName = 'RequiredFieldLabel.Optional';
 
 export default RequiredFieldLabel;
