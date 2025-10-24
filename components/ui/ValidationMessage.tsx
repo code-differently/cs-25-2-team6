@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatStudentName } from '../utilities';
 
 /**
  * Props for the ValidationMessage component
@@ -32,6 +33,8 @@ export interface ValidationMessageProps {
   role?: string;
   /** Field name for context */
   fieldName?: string;
+  /** Auto-format field name in messages */
+  formatFieldName?: boolean;
 }
 
 /**
@@ -59,10 +62,27 @@ const ValidationMessage: React.FC<ValidationMessageProps> & {
   autoHideDelay,
   id,
   role,
-  fieldName
+  fieldName,
+  formatFieldName = false
 }) => {
   const [isVisible, setIsVisible] = React.useState(show);
   const [isAnimating, setIsAnimating] = React.useState(false);
+
+  /**
+   * Format field name for display
+   */
+  const getFormattedFieldName = (): string => {
+    if (!fieldName) return '';
+    if (!formatFieldName) return fieldName;
+    
+    // Convert camelCase/snake_case to readable format
+    return fieldName
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/_/g, ' ')
+      .toLowerCase()
+      .replace(/^\w/, c => c.toUpperCase())
+      .trim();
+  };
 
   // Handle auto-hide functionality
   React.useEffect(() => {

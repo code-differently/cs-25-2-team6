@@ -1,4 +1,5 @@
 import React from 'react';
+import { isRequiredField } from '../utilities';
 
 /**
  * Props for the RequiredFieldLabel component
@@ -8,6 +9,10 @@ export interface RequiredFieldLabelProps {
   children: React.ReactNode;
   /** Whether the field is required */
   required?: boolean;
+  /** Auto-detect if field is required based on field name */
+  autoDetectRequired?: boolean;
+  /** Field name for auto-detection */
+  fieldName?: string;
   /** Custom className for styling */
   className?: string;
   /** HTML for attribute for label association */
@@ -47,6 +52,8 @@ const RequiredFieldLabel: React.FC<RequiredFieldLabelProps> & {
 } = ({
   children,
   required = false,
+  autoDetectRequired = false,
+  fieldName,
   className = '',
   htmlFor,
   requiredIndicator,
@@ -60,6 +67,18 @@ const RequiredFieldLabel: React.FC<RequiredFieldLabelProps> & {
   hint,
   id
 }) => {
+  /**
+   * Determine if field is required
+   */
+  const isFieldRequired = (): boolean => {
+    if (required !== undefined) return required;
+    if (autoDetectRequired && fieldName) {
+      return isRequiredField(fieldName);
+    }
+    return false;
+  };
+
+  const fieldIsRequired = isFieldRequired();
   /**
    * Get size classes
    */
@@ -114,7 +133,7 @@ const RequiredFieldLabel: React.FC<RequiredFieldLabelProps> & {
   /**
    * Required text component
    */
-  const requiredTextComponent = showRequiredText && required && (
+  const requiredTextComponent = showRequiredText && fieldIsRequired && (
     <span className="text-red-500 text-xs ml-1 font-medium">
       ({requiredText})
     </span>
@@ -124,7 +143,7 @@ const RequiredFieldLabel: React.FC<RequiredFieldLabelProps> & {
    * Get the required indicator to display
    */
   const getRequiredIndicator = () => {
-    if (!required) return null;
+    if (!fieldIsRequired) return null;
     return requiredIndicator || defaultRequiredIndicator;
   };
 

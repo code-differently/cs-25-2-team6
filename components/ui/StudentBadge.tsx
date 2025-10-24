@@ -1,11 +1,12 @@
 import React from 'react';
+import { formatGradeDisplay, formatStudentId } from '../utilities';
 
 /**
  * Props for the StudentBadge component
  */
 export interface StudentBadgeProps {
   /** Badge content */
-  children: React.ReactNode;
+  children?: React.ReactNode;
   /** Badge variant/type */
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
   /** Badge size */
@@ -39,7 +40,13 @@ export interface StudentBadgeProps {
   /** Student status for semantic badges */
   status?: 'enrolled' | 'pending' | 'dropped' | 'graduated' | 'transferred' | 'inactive';
   /** Grade level for grade badges */
-  grade?: string;
+  grade?: string | number;
+  /** Auto-format grade display */
+  autoFormatGrade?: boolean;
+  /** Student ID for ID badges */
+  studentId?: string;
+  /** Auto-format student ID display */
+  autoFormatStudentId?: boolean;
   /** Attendance status for attendance badges */
   attendance?: 'present' | 'absent' | 'late' | 'excused';
   /** Custom tooltip */
@@ -75,9 +82,24 @@ const StudentBadge: React.FC<StudentBadgeProps> & {
   ariaLabel,
   status,
   grade,
+  autoFormatGrade = false,
+  studentId,
+  autoFormatStudentId = false,
   attendance,
   tooltip
 }) => {
+  /**
+   * Get formatted content
+   */
+  const getFormattedContent = (): React.ReactNode => {
+    if (autoFormatGrade && grade !== undefined) {
+      return formatGradeDisplay(grade);
+    }
+    if (autoFormatStudentId && studentId) {
+      return formatStudentId(studentId);
+    }
+    return children || '';
+  };
   /**
    * Get variant from semantic props
    */
@@ -249,7 +271,7 @@ const StudentBadge: React.FC<StudentBadgeProps> & {
 
       {/* Badge Content */}
       <span className="truncate">
-        {children}
+        {getFormattedContent()}
       </span>
 
       {/* Right Icon */}

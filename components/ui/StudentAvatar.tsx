@@ -1,4 +1,9 @@
 import React from 'react';
+import { 
+  formatStudentName, 
+  generateStudentInitials, 
+  getStudentAvatarColor 
+} from '../utilities';
 
 /**
  * Props for the StudentAvatar component
@@ -63,51 +68,29 @@ const StudentAvatar: React.FC<StudentAvatarProps> = ({
   studentId
 }) => {
   /**
-   * Generate initials from name
+   * Generate initials from name using utility function
    */
   const getInitials = (): string => {
     if (fullName) {
       const nameParts = fullName.trim().split(' ');
       if (nameParts.length >= 2) {
-        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+        return generateStudentInitials(nameParts[0], nameParts[nameParts.length - 1]);
       }
-      return nameParts[0]?.[0]?.toUpperCase() || '?';
+      return generateStudentInitials(nameParts[0] || '', '');
     }
     
-    if (firstName && lastName) {
-      return `${firstName[0]}${lastName[0]}`.toUpperCase();
-    }
-    
-    if (firstName) {
-      return firstName[0].toUpperCase();
-    }
-    
-    if (studentId) {
-      return studentId.slice(-2).toUpperCase();
-    }
-    
-    return '?';
+    return generateStudentInitials(firstName || '', lastName || '');
   };
 
   /**
-   * Generate background color based on name
+   * Generate background color using utility function
    */
   const getBackgroundColor = (): string => {
     if (backgroundColor) return backgroundColor;
     
-    const name = fullName || `${firstName} ${lastName}`.trim() || studentId || '';
-    const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-      '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
-      '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2'
-    ];
-    
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    
-    return colors[Math.abs(hash) % colors.length];
+    // Use studentId if available, otherwise fallback to name-based ID
+    const idForColor = studentId || `${firstName || ''}-${lastName || ''}` || 'default';
+    return getStudentAvatarColor(idForColor);
   };
 
   /**
@@ -178,7 +161,7 @@ const StudentAvatar: React.FC<StudentAvatarProps> = ({
   };
 
   const accessibilityLabel = ariaLabel || 
-    `Avatar for ${fullName || `${firstName} ${lastName}`.trim() || `Student ${studentId}` || 'Student'}`;
+    `Avatar for ${fullName || formatStudentName(firstName || '', lastName || '') || `Student ${studentId}` || 'Student'}`;
 
   if (loading) {
     return (

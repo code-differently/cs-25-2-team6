@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatStudentName } from '../utilities';
 
 /**
  * Props for the ConfirmButton component
@@ -46,6 +47,12 @@ export interface ConfirmButtonProps {
   form?: string;
   /** Custom loading spinner */
   loadingSpinner?: React.ReactNode;
+  /** Student context for dynamic messages */
+  studentFirstName?: string;
+  /** Student last name for dynamic messages */
+  studentLastName?: string;
+  /** Auto-format student names in confirmation */
+  autoFormatStudentName?: boolean;
 }
 
 /**
@@ -78,12 +85,27 @@ const ConfirmButton: React.FC<ConfirmButtonProps> & {
   fullWidth = false,
   ariaLabel,
   form,
-  loadingSpinner
+  loadingSpinner,
+  studentFirstName,
+  studentLastName,
+  autoFormatStudentName = false
 }) => {
   const [showConfirmation, setShowConfirmation] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [countdown, setCountdown] = React.useState<number | null>(null);
   const countdownRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  /**
+   * Get formatted confirmation message
+   */
+  const getFormattedConfirmationMessage = (): string => {
+    if (!autoFormatStudentName || (!studentFirstName && !studentLastName)) {
+      return confirmationMessage;
+    }
+    
+    const studentName = formatStudentName(studentFirstName || '', studentLastName || '');
+    return confirmationMessage.replace(/\{studentName\}/g, studentName);
+  };
 
   /**
    * Handle button click
@@ -256,7 +278,7 @@ const ConfirmButton: React.FC<ConfirmButtonProps> & {
     return (
       <div className="inline-flex flex-col gap-2">
         <div className="text-sm text-gray-600 font-medium">
-          {confirmationMessage}
+          {getFormattedConfirmationMessage()}
           {countdown && (
             <span className="ml-2 text-blue-600">({countdown}s)</span>
           )}
