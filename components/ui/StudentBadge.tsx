@@ -307,6 +307,7 @@ const StudentBadge: React.FC<StudentBadgeProps> & {
 StudentBadge.Status = (props: Omit<StudentBadgeProps, 'status'> & { status: NonNullable<StudentBadgeProps['status']> }) => (
   <StudentBadge {...props} showDot />
 );
+StudentBadge.Status.displayName = 'StudentBadge.Status';
 
 /**
  * StudentBadge.Grade - Grade-specific badge
@@ -314,6 +315,7 @@ StudentBadge.Status = (props: Omit<StudentBadgeProps, 'status'> & { status: NonN
 StudentBadge.Grade = (props: Omit<StudentBadgeProps, 'grade'> & { grade: NonNullable<StudentBadgeProps['grade']> }) => (
   <StudentBadge {...props} variant="primary" />
 );
+StudentBadge.Grade.displayName = 'StudentBadge.Grade';
 
 /**
  * StudentBadge.Attendance - Attendance-specific badge
@@ -321,5 +323,6 @@ StudentBadge.Grade = (props: Omit<StudentBadgeProps, 'grade'> & { grade: NonNull
 StudentBadge.Attendance = (props: Omit<StudentBadgeProps, 'attendance'> & { attendance: NonNullable<StudentBadgeProps['attendance']> }) => (
   <StudentBadge {...props} showDot size="small" />
 );
+StudentBadge.Attendance.displayName = 'StudentBadge.Attendance';
 
 export default StudentBadge;

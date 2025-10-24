@@ -332,6 +332,7 @@ ConfirmButton.Danger = (props: Omit<ConfirmButtonProps, 'variant' | 'requireConf
     confirmationMessage={props.confirmationMessage || 'This action cannot be undone. Are you sure?'}
   />
 );
+ConfirmButton.Danger.displayName = 'ConfirmButton.Danger';
 
 /**
  * ConfirmButton.Delete - Delete-specific button
@@ -346,5 +347,6 @@ ConfirmButton.Delete = (props: Omit<ConfirmButtonProps, 'variant' | 'requireConf
     Delete
   </ConfirmButton>
 );
+ConfirmButton.Delete.displayName = 'ConfirmButton.Delete';
 
 export default ConfirmButton;

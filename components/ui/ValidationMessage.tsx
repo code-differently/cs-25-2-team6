@@ -258,6 +258,7 @@ const ValidationMessage: React.FC<ValidationMessageProps> & {
 ValidationMessage.Error = (props: Omit<ValidationMessageProps, 'type'>) => (
   <ValidationMessage {...props} type="error" />
 );
+ValidationMessage.Error.displayName = 'ValidationMessage.Error';
 
 /**
  * ValidationMessage.Success - Shorthand for success messages
@@ -265,6 +266,7 @@ ValidationMessage.Error = (props: Omit<ValidationMessageProps, 'type'>) => (
 ValidationMessage.Success = (props: Omit<ValidationMessageProps, 'type'>) => (
   <ValidationMessage {...props} type="success" />
 );
+ValidationMessage.Success.displayName = 'ValidationMessage.Success';
 
 /**
  * ValidationMessage.Warning - Shorthand for warning messages
@@ -272,6 +274,7 @@ ValidationMessage.Success = (props: Omit<ValidationMessageProps, 'type'>) => (
 ValidationMessage.Warning = (props: Omit<ValidationMessageProps, 'type'>) => (
   <ValidationMessage {...props} type="warning" />
 );
+ValidationMessage.Warning.displayName = 'ValidationMessage.Warning';
 
 /**
  * ValidationMessage.Info - Shorthand for info messages
@@ -279,5 +282,6 @@ ValidationMessage.Warning = (props: Omit<ValidationMessageProps, 'type'>) => (
 ValidationMessage.Info = (props: Omit<ValidationMessageProps, 'type'>) => (
   <ValidationMessage {...props} type="info" />
 );
+ValidationMessage.Info.displayName = 'ValidationMessage.Info';
 
 export default ValidationMessage;
