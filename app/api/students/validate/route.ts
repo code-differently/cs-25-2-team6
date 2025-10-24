@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FileStudentRepo } from '../../../../src/persistence/FileStudentRepo';
+import { StudentManagementService } from '../../../../src/services/StudentManagementService';
 
-const repo = new FileStudentRepo();
+const service = new StudentManagementService();
 
 export async function POST(req: NextRequest) {
   const { studentId, excludeId } = await req.json();
-  const isUnique = repo.isStudentIdUnique(studentId, excludeId);
-  return NextResponse.json({ isUnique });
+  const result = service.validateStudentUniqueness(studentId, excludeId);
+  return NextResponse.json({ isUnique: result.valid, errors: result.errors });
 }
