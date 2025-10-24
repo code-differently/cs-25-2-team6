@@ -1,0 +1,5 @@
+export { default as CreateClassModal } from './CreateClassModal'
+export { default as EditClassModal } from './EditClassModal'
+export { default as DeleteClassModal } from './DeleteClassModal'
+export { default as StudentSelectionModal } from './StudentSelectionModal'
+export { default as ManageStudentsModal } from './ManageStudentsModal'
