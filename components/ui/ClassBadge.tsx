@@ -1,10 +1,13 @@
 'use client'
 
 import React from 'react'
+import { formatClassName, getClassGradeDisplay } from '../utilities/classUtils'
 
 interface ClassBadgeProps {
   /** The class name/title to display */
-  className: string
+  className?: string
+  /** Grade level */
+  grade?: string | number
   /** Visual variant of the badge */
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'
   /** Size variant of the badge */
@@ -21,10 +24,19 @@ interface ClassBadgeProps {
   showDot?: boolean
   /** Color of the dot indicator */
   dotColor?: 'green' | 'yellow' | 'red' | 'blue' | 'gray'
+  /** Class status for semantic badges */
+  status?: 'active' | 'inactive' | 'archived' | 'draft' | 'full'
+  /** Auto-format class name with grade */
+  autoFormatClassName?: boolean
+  /** Auto-format grade display */
+  autoFormatGrade?: boolean
+  /** Custom content override */
+  children?: React.ReactNode
 }
 
 export default function ClassBadge({
   className,
+  grade,
   variant = 'default',
   size = 'md',
   clickable = false,
@@ -32,8 +44,54 @@ export default function ClassBadge({
   additionalClasses = '',
   icon,
   showDot = false,
-  dotColor = 'gray'
+  dotColor = 'gray',
+  status,
+  autoFormatClassName = false,
+  autoFormatGrade = false,
+  children
 }: ClassBadgeProps) {
+  /**
+   * Get formatted content using utility functions
+   */
+  const getFormattedContent = (): React.ReactNode => {
+    if (children) return children
+    
+    if (autoFormatClassName && className && grade) {
+      return formatClassName(className, String(grade))
+    }
+    if (autoFormatClassName && className) {
+      return className
+    }
+    if (autoFormatGrade && grade !== undefined) {
+      return getClassGradeDisplay(grade)
+    }
+    return className || 'Class'
+  }
+
+  /**
+   * Get variant from semantic props
+   */
+  const getSemanticVariant = (): string => {
+    if (status) {
+      const statusVariantMap = {
+        active: 'success',
+        inactive: 'secondary',
+        archived: 'warning',
+        draft: 'default',
+        full: 'danger'
+      }
+      return statusVariantMap[status]
+    }
+
+    if (grade) {
+      return 'primary'
+    }
+
+    return variant
+  }
+  
+  const currentVariant = getSemanticVariant()
+  
   const baseClasses = 'inline-flex items-center gap-2 font-medium rounded-full transition-all duration-200'
   
   const variantClasses = {
@@ -63,7 +121,7 @@ export default function ClassBadge({
   
   const combinedClasses = `
     ${baseClasses}
-    ${variantClasses[variant]}
+    ${variantClasses[currentVariant as keyof typeof variantClasses]}
     ${sizeClasses[size]}
     ${clickableClasses}
     ${additionalClasses}
@@ -82,6 +140,8 @@ export default function ClassBadge({
     }
   }
 
+  const formattedContent = getFormattedContent()
+
   return (
     <span
       className={combinedClasses}
@@ -89,7 +149,7 @@ export default function ClassBadge({
       onKeyDown={handleKeyDown}
       role={clickable ? 'button' : undefined}
       tabIndex={clickable ? 0 : undefined}
-      aria-label={clickable ? `Class badge for ${className}, clickable` : `Class badge for ${className}`}
+      aria-label={clickable ? `Class badge for ${formattedContent}, clickable` : `Class badge for ${formattedContent}`}
     >
       {/* Status dot indicator */}
       {showDot && (
@@ -103,9 +163,9 @@ export default function ClassBadge({
         </span>
       )}
       
-      {/* Class name */}
+      {/* Class name with formatted content */}
       <span className="truncate">
-        {className}
+        {formattedContent}
       </span>
     </span>
   )

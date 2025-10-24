@@ -1,10 +1,11 @@
 'use client'
 
 import React from 'react'
+import { formatClassSummary, generateClassDisplayText, isClassEmpty, type ClassProfile, type ClassStudent } from '../utilities/classUtils'
 
 interface ClassStatusIconProps {
   /** Status of the class */
-  status: 'active' | 'inactive' | 'pending' | 'full' | 'cancelled' | 'archived' | 'draft'
+  status: 'active' | 'inactive' | 'pending' | 'full' | 'cancelled' | 'archived' | 'draft' | 'empty' | 'warning' | 'error'
   /** Size of the icon */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   /** Whether to show status text alongside icon */
@@ -19,18 +20,89 @@ interface ClassStatusIconProps {
   tooltip?: string
   /** Whether to use pulse animation for certain statuses */
   animated?: boolean
+  /** Auto-detect status from class data */
+  autoDetectStatus?: boolean
+  /** Class data for auto-detection */
+  classData?: ClassProfile
+  /** Class relationships for empty check */
+  classRelationships?: ClassStudent[]
+  /** Custom status text */
+  customText?: string
 }
 
 export default function ClassStatusIcon({
-  status,
+  status: propStatus,
   size = 'md',
   showText = false,
   clickable = false,
   onClick,
   className = '',
   tooltip,
-  animated = true
+  animated = true,
+  autoDetectStatus = false,
+  classData,
+  classRelationships,
+  customText
 }: ClassStatusIconProps) {
+  
+  // Auto-detect status from class data
+  const getAutoDetectedStatus = (): ClassStatusIconProps['status'] => {
+    if (!classData) return propStatus
+    
+    try {
+      // Check if class is empty
+      if (classData.id && classRelationships) {
+        if (isClassEmpty(classData.id, classRelationships)) {
+          return 'empty'
+        }
+      }
+      
+      // Check if class has capacity limits
+      if (classData.capacity && classRelationships) {
+        const enrolledCount = classRelationships.filter(rel => 
+          rel.classId === classData.id && rel.status === 'enrolled'
+        ).length
+        
+        if (enrolledCount >= classData.capacity) {
+          return 'full'
+        }
+        if (enrolledCount / classData.capacity > 0.9) {
+          return 'warning'
+        }
+      }
+      
+      // Check class status
+      if (classData.status) {
+        switch (classData.status.toLowerCase()) {
+          case 'active':
+          case 'ongoing':
+            return 'active'
+          case 'inactive':
+          case 'suspended':
+            return 'inactive'
+          case 'pending':
+          case 'scheduled':
+            return 'pending'
+          case 'archived':
+          case 'completed':
+            return 'archived'
+          case 'cancelled':
+            return 'cancelled'
+          case 'draft':
+            return 'draft'
+          default:
+            return 'active'
+        }
+      }
+      
+      return 'active'
+    } catch (error) {
+      console.warn('Error auto-detecting class status:', error)
+      return propStatus
+    }
+  }
+  
+  const status = autoDetectStatus ? getAutoDetectedStatus() : propStatus
   
   const sizeClasses = {
     xs: 'w-3 h-3',
@@ -135,6 +207,42 @@ export default function ClassStatusIcon({
           ),
           shouldPulse: false
         }
+      case 'empty':
+        return {
+          color: 'text-gray-400',
+          bgColor: 'bg-gray-50',
+          text: customText || 'Empty',
+          icon: (
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          ),
+          shouldPulse: false
+        }
+      case 'warning':
+        return {
+          color: 'text-yellow-600',
+          bgColor: 'bg-yellow-100',
+          text: customText || 'Near Full',
+          icon: (
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          ),
+          shouldPulse: true
+        }
+      case 'error':
+        return {
+          color: 'text-red-600',
+          bgColor: 'bg-red-100',
+          text: customText || 'Error',
+          icon: (
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ),
+          shouldPulse: true
+        }
       default:
         return {
           color: 'text-gray-500',
@@ -178,8 +286,40 @@ export default function ClassStatusIcon({
     }
   }
 
-  const ariaLabel = `Class status: ${config.text}${clickable ? ', clickable' : ''}`
-  const titleText = tooltip || `Status: ${config.text}`
+  const getDisplayText = (): string => {
+    if (customText) return customText
+    
+    if (autoDetectStatus && classData) {
+      try {
+        return generateClassDisplayText(classData)
+      } catch (error) {
+        console.warn('Error generating class display text:', error)
+      }
+    }
+    
+    return config.text
+  }
+
+  const getTooltipText = (): string => {
+    if (tooltip) return tooltip
+    
+    if (autoDetectStatus && classData) {
+      try {
+        const studentCount = classRelationships ? 
+          classRelationships.filter(rel => rel.classId === classData.id && rel.status === 'enrolled').length : 
+          0
+        return formatClassSummary(classData, studentCount)
+      } catch (error) {
+        console.warn('Error formatting class summary:', error)
+      }
+    }
+    
+    return `Status: ${config.text}`
+  }
+
+  const displayText = getDisplayText()
+  const ariaLabel = `Class status: ${displayText}${clickable ? ', clickable' : ''}`
+  const titleText = getTooltipText()
 
   return (
     <div
@@ -199,7 +339,7 @@ export default function ClassStatusIcon({
       {/* Status Text */}
       {showText && (
         <span className={`font-medium ${config.color} ${textSizeClasses[size]}`}>
-          {config.text}
+          {displayText}
         </span>
       )}
     </div>
@@ -215,7 +355,10 @@ export const getStatusColor = (status: ClassStatusIconProps['status']) => {
     full: 'orange',
     cancelled: 'red',
     archived: 'gray',
-    draft: 'blue'
+    draft: 'blue',
+    empty: 'gray',
+    warning: 'yellow',
+    error: 'red'
   }
   return colorMap[status] || 'gray'
 }

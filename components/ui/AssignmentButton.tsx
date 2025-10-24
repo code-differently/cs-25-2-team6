@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { isClassEmpty, type ClassStudent } from '../utilities/classUtils'
 
 interface AssignmentButtonProps {
   /** Type of assignment action */
@@ -31,6 +32,16 @@ interface AssignmentButtonProps {
   requireConfirmation?: boolean
   /** Confirmation message */
   confirmationMessage?: string
+  /** Auto-disable if class is empty */
+  autoDisableEmpty?: boolean
+  /** Class data for empty check */
+  classData?: {
+    students?: any[]
+    id?: string
+    name?: string
+  }
+  /** Class-student relationships for empty check */
+  classRelationships?: ClassStudent[]
 }
 
 export default function AssignmentButton({
@@ -47,9 +58,36 @@ export default function AssignmentButton({
   tooltip,
   count,
   requireConfirmation = false,
-  confirmationMessage
+  confirmationMessage,
+  autoDisableEmpty = false,
+  classData,
+  classRelationships
 }: AssignmentButtonProps) {
   const [isProcessing, setIsProcessing] = useState(false)
+
+  // Check if button should be disabled due to empty class
+  const shouldDisableForEmptyClass = (): boolean => {
+    if (!autoDisableEmpty || !classData) return false
+    
+    try {
+      // Use utility function if we have both classId and relationships
+      if (classData.id && classRelationships) {
+        return isClassEmpty(classData.id, classRelationships)
+      }
+      
+      // If classData has students array, check it directly
+      if (classData.students) {
+        return classData.students.length === 0
+      }
+      
+      // If classData has id but no students array or relationships, 
+      // we can't determine emptiness, so don't disable
+      return false
+    } catch (error) {
+      console.warn('Error checking if class is empty:', error)
+      return false
+    }
+  }
 
   // Default texts based on action
   const getDefaultText = () => {
@@ -143,6 +181,8 @@ export default function AssignmentButton({
     }
   }
 
+  const isEmptyClass = shouldDisableForEmptyClass()
+  const isButtonDisabled = disabled || isEmptyClass
   const disabledClasses = 'opacity-50 cursor-not-allowed'
   const loadingClasses = 'cursor-wait'
 
@@ -152,13 +192,13 @@ export default function AssignmentButton({
     ${baseClasses}
     ${sizeClasses[size]}
     ${buttonVariantClasses}
-    ${disabled ? disabledClasses : ''}
+    ${isButtonDisabled ? disabledClasses : ''}
     ${loading || isProcessing ? loadingClasses : ''}
     ${className}
   `.trim().replace(/\s+/g, ' ')
 
   const handleClick = async () => {
-    if (disabled || loading || isProcessing || !onClick) return
+    if (isButtonDisabled || loading || isProcessing || !onClick) return
 
     // Show confirmation dialog if required
     if (requireConfirmation) {
@@ -189,9 +229,9 @@ export default function AssignmentButton({
       type="button"
       className={combinedClasses}
       onClick={handleClick}
-      disabled={disabled || isLoading}
+      disabled={isButtonDisabled || isLoading}
       title={tooltip || displayText}
-      aria-label={`${displayText}${disabled ? ' (disabled)' : ''}${isLoading ? ' (loading)' : ''}`}
+      aria-label={`${displayText}${isButtonDisabled ? ' (disabled)' : ''}${isEmptyClass ? ' - no students in class' : ''}${isLoading ? ' (loading)' : ''}`}
     >
       {/* Loading spinner or icon */}
       {isLoading ? (
