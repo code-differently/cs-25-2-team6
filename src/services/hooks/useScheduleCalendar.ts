@@ -109,56 +109,64 @@ export const useScheduleCalendar = (initialDate: Date = new Date()) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
-      // Get the year and month from the current date
-      const year = state.currentDate.getFullYear();
-      const month = state.currentDate.getMonth() + 1; // JS months are 0-indexed, API expects 1-indexed
+      // Simulate API call - replace with actual API calls
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Fetch scheduled days from the API
-      const response = await fetch(`/api/schedule?year=${year}&month=${month}`);
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch scheduled days');
-      }
-      
-      // Convert API response to our internal structure
-      const fetchedDaysOff: DayOff[] = result.data.map((day: any) => ({
-        id: day.id,
-        date: day.date,
-        teacherId: 'system',
-        teacherName: 'System',
-        reason: day.reason,
-        status: 'approved',
-        type: day.reason.toLowerCase()
-      }));
+      // Mock data - replace with actual data fetching
+      const mockDaysOff: DayOff[] = [
+        {
+          id: '1',
+          date: '2024-01-15',
+          teacherId: 'teacher1',
+          teacherName: 'John Smith',
+          reason: 'Sick leave',
+          status: 'approved',
+          type: 'sick'
+        },
+        {
+          id: '2',
+          date: '2024-01-20',
+          teacherId: 'teacher2',
+          teacherName: 'Jane Doe',
+          reason: 'Vacation',
+          status: 'pending',
+          type: 'vacation'
+        }
+      ];
 
-      // Create events based on scheduled days
-      const fetchedEvents: ScheduleEvent[] = result.data.map((day: any) => ({
-        id: day.id,
-        title: day.reason,
-        date: day.date,
-        startTime: '00:00',
-        endTime: '23:59',
-        type: day.reason.toLowerCase() === 'holiday' ? 'holiday' : 'event',
-        description: day.description || `Scheduled day off: ${day.reason}`,
-        location: 'All locations'
-      }));
+      const mockEvents: ScheduleEvent[] = [
+        {
+          id: '1',
+          title: 'Staff Meeting',
+          date: '2024-01-18',
+          startTime: '09:00',
+          endTime: '10:30',
+          type: 'meeting',
+          description: 'Monthly staff meeting',
+          location: 'Conference Room A'
+        },
+        {
+          id: '2',
+          title: 'Parent-Teacher Conference',
+          date: '2024-01-25',
+          startTime: '14:00',
+          endTime: '17:00',
+          type: 'event',
+          description: 'Quarterly parent-teacher conferences',
+          location: 'Main Hall'
+        }
+      ];
 
       setState(prev => ({
         ...prev,
-        daysOff: fetchedDaysOff,
-        events: fetchedEvents,
+        daysOff: mockDaysOff,
+        events: mockEvents,
         isLoading: false
       }));
-    } catch (error: any) {
+    } catch (error) {
       setState(prev => ({
         ...prev,
-        error: error.message || 'Failed to load schedule data',
+        error: 'Failed to load schedule data',
         isLoading: false
       }));
     }

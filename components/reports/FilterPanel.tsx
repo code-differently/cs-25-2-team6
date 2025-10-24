@@ -78,7 +78,7 @@ function FilterPanel() {
         <FilterDropdown
           label="Student Names"
           options={studentOptions}
-          selectedValues={filters.filters.studentNames}
+          selectedValues={filters.filters.studentNames || []}
           onChange={handleStudentChange}
         />
         
