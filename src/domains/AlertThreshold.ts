@@ -89,3 +89,43 @@ export interface ValidationResult {
   valid: boolean;
   errors: string[];
 }
+
+/**
+ * Threshold effectiveness tracking
+ */
+export interface ThresholdEffectiveness {
+  thresholdId: string;
+  alertsTriggered: number;
+  falsePositives: number;
+  interventionsSuccessful: number;
+  averageResolutionDays: number;
+  lastEvaluated: Date;
+}
+
+/**
+ * Threshold comparison for optimization
+ */
+export interface ThresholdComparison {
+  originalThreshold: AlertThreshold;
+  proposedChanges: Partial<{
+    count: number;
+    period: AlertPeriod;
+    notifyParents: boolean;
+  }>;
+  expectedImpact: {
+    alertsReduced: number;
+    alertsIncreased: number;
+    effectivenessScore: number;
+  };
+}
+
+/**
+ * Threshold conflict detection
+ */
+export interface ThresholdConflict {
+  thresholdId: string;
+  conflictType: 'duplicate' | 'overlapping' | 'contradictory';
+  conflictingThresholdId: string;
+  severity: 'warning' | 'error';
+  resolution: string;
+}

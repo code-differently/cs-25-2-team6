@@ -141,3 +141,9 @@ vite.config.ts.timestamp-*
 # Ignore all data files in persistence
 data/
 src/persistence/*.json
+
+# Local environment variables - never commit these
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

@@ -2,15 +2,20 @@
   background: white;
   border-radius: 8px;
   padding: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 24px;
+  transition: box-shadow 0.3s ease;
+}
+
+.filter-panel:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
 
 .filter-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid #e5e7eb;
 }
