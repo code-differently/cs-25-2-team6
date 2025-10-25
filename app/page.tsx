@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import AttendanceForm from '@/components/AttendanceForm'
 import ScheduleDashboard from '@/components/schedule/ScheduleDashboard'
@@ -13,6 +13,9 @@ export default function Home() {
   const [showAlertsModal, setShowAlertsModal] = useState(false)
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [view, setView] = useState<'calendar' | 'list'>('calendar')
+  const [classOptions, setClassOptions] = useState<string[]>([])
+  const [selectedClass, setSelectedClass] = useState('')
+  const [classStudents, setClassStudents] = useState<any[]>([])
 
   const handleDateClick = (day: number) => {
     if (day > 0) {
@@ -27,6 +30,24 @@ export default function Home() {
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date)
   }
+
+  // Fetch class options on mount
+  useEffect(() => {
+    fetch('/api/data/classes')
+      .then(res => res.json())
+      .then(data => setClassOptions(data));
+  }, []);
+
+  // Fetch students for selected class
+  useEffect(() => {
+    if (selectedClass) {
+      fetch(`/api/data/students?class=${encodeURIComponent(selectedClass)}`)
+        .then(res => res.json())
+        .then(data => setClassStudents(data));
+    } else {
+      setClassStudents([]);
+    }
+  }, [selectedClass]);
 
   return (
     <DashboardLayout>
@@ -161,11 +182,15 @@ export default function Home() {
         
         {/* Attendance Form Modal */}
         <AttendanceForm 
-          isOpen={showAttendanceModal}
-          onClose={() => setShowAttendanceModal(false)}
-        />
+  isOpen={showAttendanceModal}
+  onClose={() => setShowAttendanceModal(false)}
+  classOptions={classOptions}
+  selectedClass={selectedClass}
+  setSelectedClass={setSelectedClass}
+  classStudents={classStudents}
+  selectedDate={selectedDate}
+/>
 
-        {/* Alerts Modal */}
         {showAlertsModal && (
           <div 
             style={{
@@ -193,7 +218,7 @@ export default function Home() {
                 overflow: 'hidden',
                 boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               {/* Modal Header */}
               <div style={{
@@ -225,7 +250,6 @@ export default function Home() {
                   ❌
                 </button>
               </div>
-              
               {/* Modal Content */}
               <div style={{
                 padding: '24px',
