@@ -19,9 +19,8 @@ export function validateStudentAssignment(
   const conflicts: RelationshipValidationResult['conflicts'] = [];
   const warnings: RelationshipValidationResult['warnings'] = [];
 
-  // Validate class ID
-  const classValidation = validateClassId(classId, existingClassIds);
-  if (!classValidation.isValid) {
+  // Validate class ID exists
+  if (!existingClassIds.includes(classId)) {
     conflicts.push({
       studentId: '',
       classId,
@@ -43,9 +42,8 @@ export function validateStudentAssignment(
 
   // Validate each student
   for (const studentId of studentIds) {
-    // Validate student ID format and existence
-    const studentValidation = validateStudentId(studentId, existingStudentIds);
-    if (!studentValidation.isValid) {
+    // Validate student ID exists
+    if (!existingStudentIds.includes(studentId)) {
       conflicts.push({
         studentId,
         classId,
