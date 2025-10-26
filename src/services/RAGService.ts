@@ -3,16 +3,10 @@
  * This service orchestrates query processing, data retrieval, and response generation.
  */
 import { QueryProcessor, QueryIntent, APIFilters } from './QueryProcessor';
-import { calculateSimilarity, extractKeywords } from '../utils/embeddings';
-import { FileAlertRepo } from '../persistence/FileAlertRepo';
-import { FileStudentRepo } from '../persistence/FileStudentRepo';
-import { FileAttendanceRepo } from '../persistence/FileAttendanceRepo';
-import { Student } from '../persistence/FileStudentRepo';
-import { AttendanceAlert, AlertStatus } from '../domains/AttendanceAlert';
 import { LLMService, LLMRequest, getLLMService } from './LLMService';
 import { sanitizeQuery } from './QuerySanitizer';
-import { 
-  MAX_CONTEXT_ITEMS, 
+import {
+  MAX_CONTEXT_ITEMS,
   truncateDataForContext,
   validateResponse,
   createErrorResponse,
@@ -24,10 +18,10 @@ import {
   adaptLLMToRAGResponse,
   RAG_RESPONSE_SCHEMA
 } from '../utils/response-adapter';
-import { 
-  LLMError, 
-  LLMErrorCategory, 
-  getFallbackResponse 
+import {
+  LLMError,
+  LLMErrorCategory,
+  getFallbackResponse
 } from '../utils/llm-error-handler';
 
 // Response types
@@ -46,15 +40,9 @@ export interface SuggestedAction {
 
 export class RAGService {
   private queryProcessor: QueryProcessor;
-  private alertRepo: FileAlertRepo;
-  private studentRepo: FileStudentRepo;
-  private attendanceRepo: FileAttendanceRepo;
   
   constructor() {
     this.queryProcessor = new QueryProcessor();
-    this.alertRepo = new FileAlertRepo();
-    this.studentRepo = new FileStudentRepo();
-    this.attendanceRepo = new FileAttendanceRepo();
   }
   
   /**
@@ -107,169 +95,58 @@ export class RAGService {
     }
   }
   
-  /**
-   * Fetch data about alerts requiring intervention
-   */
+  // --- API-based data fetching ---
   private async fetchAlertData(filters: APIFilters): Promise<any> {
-    // Get active alerts
-    let alerts = this.alertRepo.getFilteredAlerts({
-      status: [AlertStatus.ACTIVE]
-    });
-    
-    // Apply additional filters if provided
-    if (filters.studentId) {
-      alerts = alerts.filter(alert => alert.studentId === filters.studentId);
-    }
-    
-    if (filters.alertType) {
-      alerts = alerts.filter(alert => alert.type === filters.alertType);
-    }
-    
-    // Enrich with student data
-    const students = this.studentRepo.allStudents();
-    const enrichedAlerts = alerts.map(alert => {
-      const student = students.find(s => s.id === alert.studentId);
-      return {
-        ...alert,
-        student: student ? student : { firstName: 'Unknown', lastName: 'Student' }
-      };
-    });
-    
-    return { alerts: enrichedAlerts, total: enrichedAlerts.length };
+    const params = new URLSearchParams();
+    if (filters.studentId) params.append('studentId', filters.studentId);
+    if (filters.alertType) params.append('type', filters.alertType);
+    if (filters.status) params.append('status', filters.status);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/alerts?${params.toString()}`);
+    const alerts = await res.json();
+    return { alerts, total: alerts.length };
   }
-  
-  /**
-   * Fetch data explaining why a specific alert was triggered
-   */
-  private async fetchAlertExplanationData(filters: APIFilters): Promise<any> {
-    // Get the alert data
-    const alertData = await this.fetchAlertData(filters);
-    
-    // For each alert, get the threshold that triggered it and the attendance pattern
-    const enrichedAlertData = {
-      ...alertData,
-      alerts: await Promise.all(alertData.alerts.map(async (alert: any) => {
-        // Get the threshold that triggered this alert
-        const threshold = this.alertRepo.getThresholdById(alert.thresholdId);
-        
-        // Get recent attendance for this student to provide context
-        const attendanceRecords = this.attendanceRepo.allAttendance().filter(
-          record => record.studentId === alert.studentId
-        );
-        
-        // Calculate some stats about the attendance pattern
-        const recentAttendance = attendanceRecords.slice(-30); // Last 30 records
-        const absences = recentAttendance.filter((a: any) => a.status === 'ABSENT').length;
-        const lates = recentAttendance.filter((a: any) => a.status === 'LATE').length;
-        
-        return {
-          ...alert,
-          threshold,
-          attendancePattern: {
-            recentAbsences: absences,
-            recentLates: lates,
-            totalRecords: recentAttendance.length
-          }
-        };
-      }))
-    };
-    
-    return enrichedAlertData;
-  }
-  
-  /**
-   * Fetch attendance data
-   */
+
   private async fetchAttendanceData(filters: APIFilters): Promise<any> {
-    // Get attendance records with basic filtering
-    let attendanceRecords = this.attendanceRepo.allAttendance();
-    
-    // Apply date range filters if provided
-    if (filters.dateRange) {
-      attendanceRecords = attendanceRecords.filter((record: any) => {
-        const recordDate = new Date(record.dateISO);
-        const startDate = new Date(filters.dateRange!.start);
-        const endDate = new Date(filters.dateRange!.end);
-        return recordDate >= startDate && recordDate <= endDate;
-      });
-    }
-    
-    // Apply status filters if provided
-    if (filters.status) {
-      const statusArray = Array.isArray(filters.status) ? filters.status : [filters.status];
-      attendanceRecords = attendanceRecords.filter((record: any) => 
-        statusArray.includes(record.status)
-      );
-    }
-    
-    // Apply student filter if provided
-    if (filters.studentId) {
-      attendanceRecords = attendanceRecords.filter((record: any) => 
-        record.studentId === filters.studentId
-      );
-    }
-    
-    // Group by student for easier processing
-    const students = this.studentRepo.allStudents();
-    const byStudent: Record<string, any> = {};
-    
-    attendanceRecords.forEach((record: any) => {
-      if (!byStudent[record.studentId]) {
-        const student = students.find(s => s.id === record.studentId);
-        byStudent[record.studentId] = {
-          student: student || { firstName: 'Unknown', lastName: 'Student', id: record.studentId },
-          records: []
-        };
-      }
-      byStudent[record.studentId].records.push(record);
-    });
-    
-    return {
-      byStudent,
-      records: attendanceRecords,
-      total: attendanceRecords.length
-    };
+    const params = new URLSearchParams();
+    if (filters.studentId) params.append('studentId', filters.studentId);
+    // Add more filters as needed
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/attendance?${params.toString()}`);
+    const attendance = await res.json();
+    return { attendance, total: attendance.length };
   }
-  
-  /**
-   * Fetch student data
-   */
+
   private async fetchStudentData(filters: APIFilters): Promise<any> {
-    // Get all students
-    let students = this.studentRepo.allStudents();
-    
-    // Apply filters if provided
-    if (filters.studentName) {
-      const nameParts = filters.studentName.toLowerCase().split(' ');
-      students = students.filter(student => 
-        nameParts.some(part => 
-          student.firstName.toLowerCase().includes(part) || 
-          student.lastName.toLowerCase().includes(part)
-        )
-      );
-    }
-    
-    if (filters.studentId) {
-      students = students.filter(student => student.id === filters.studentId);
-    }
-    
+    const params = new URLSearchParams();
+    if (filters.className) params.append('class', filters.className);
+    if (filters.studentId) params.append('studentId', filters.studentId);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/students?${params.toString()}`);
+    const students = await res.json();
     return { students, total: students.length };
   }
-  
-  /**
-   * Fetch general data (fallback)
-   */
+
   private async fetchGeneralData(filters: APIFilters): Promise<any> {
-    // For general queries, provide a summary of the system state
-    const students = this.studentRepo.allStudents();
-    const alerts = this.alertRepo.getAllAlerts();
-    const activeAlerts = alerts.filter(alert => alert.status === AlertStatus.ACTIVE);
-    
+    // Fetch all classes and count students
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/classes`);
+    const classes = await res.json();
+    let studentCount = 0;
+    for (const className of classes) {
+      const sRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/students?class=${encodeURIComponent(className)}`);
+      const students = await sRes.json();
+      studentCount += students.length;
+    }
+    const alertsRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/alerts`);
+    const alerts = await alertsRes.json();
+    const activeAlertCount = alerts.filter((a: any) => a.status === 'active').length;
     return {
-      studentCount: students.length,
+      studentCount,
       alertCount: alerts.length,
-      activeAlertCount: activeAlerts.length
+      activeAlertCount
     };
+  }
+
+  private async fetchAlertExplanationData(filters: APIFilters): Promise<any> {
+    // For now, just fetch alert data (can be extended for more detail)
+    return this.fetchAlertData(filters);
   }
   
   /**
@@ -283,18 +160,15 @@ export class RAGService {
     contextOverride?: string
   ): Promise<RAGResponse> {
     try {
-      // Get LLM service instance
       const llmService = getLLMService();
-      // Build context based on intent or use override
       let fullContext = contextOverride !== undefined ? contextOverride : `Query intent: ${intent}`;
-      // Create LLM request
+      // Prepare LLMRequest with structured data
       const llmRequest: LLMRequest = {
         query,
         context: fullContext,
-        // Map intent to appropriate query context for system prompt selection
         queryContext: this.mapIntentToQueryContext(intent),
-        attendanceData: this.extractAttendanceDataForLLM(data, intent),
-        alertData: this.extractAlertDataForLLM(data, intent),
+        attendanceData: data.attendance || data.attendanceRecords || data.records || [],
+        alertData: data.alerts || [],
         ...(intent === 'STUDENT_QUERY' && data.students ? { students: data.students } : {})
       };
       console.log('[RAGService] Sending request to LLM service:', {
