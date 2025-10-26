@@ -509,9 +509,10 @@ export class RAGService {
    */
   private summarizeLLMResponse(llmResponse: any, originalData: any): string {
     // If alert data, use alert summary
-    if (llmResponse.structuredData?.alerts || originalData?.alerts) {
-      const alerts = llmResponse.structuredData?.alerts || originalData?.alerts || [];
-      if (!alerts.length) return 'No alerts were found matching your query.';
+    const alerts = (llmResponse.structuredData?.alerts && Array.isArray(llmResponse.structuredData.alerts))
+      ? llmResponse.structuredData.alerts
+      : (originalData?.alerts && Array.isArray(originalData.alerts) ? originalData.alerts : []);
+    if (alerts.length) {
       const byClass: Record<string, any[]> = {};
       alerts.forEach((alert: any) => {
         const classId = alert.classId || 'Unknown Class';
@@ -525,7 +526,7 @@ export class RAGService {
         const classAlerts = byClass[classId];
         classAlerts.sort((a, b) => (b.alertMessage?.match(/(\d+)/)?.[0] || 0) - (a.alertMessage?.match(/(\d+)/)?.[0] || 0));
         const top = classAlerts.slice(0, 3);
-        const names = top.map(a => a.studentName).join(', ');
+        const names = top.map(a => a.studentName || (a.student ? `${a.student.firstName} ${a.student.lastName}` : 'Unknown')).join(', ');
         summary += ` In ${classId}, ${names}${top.length === 3 ? ', and others' : ''} have triggered alerts due to multiple absences`;
         if (top[0]?.alertMessage) {
           const match = top[0].alertMessage.match(/Absent (\d+) times/);
@@ -535,6 +536,8 @@ export class RAGService {
       });
       summary += ' Please review the full alert list for details.';
       return summary;
+    } else if (llmResponse.structuredData?.alerts || originalData?.alerts) {
+      return 'No alerts were found matching your query.';
     }
     // If student data, summarize students
     const students = llmResponse.structuredData?.students || llmResponse.students || originalData?.students || [];
@@ -580,6 +583,12 @@ export class RAGService {
     if (originalData?.students && Array.isArray(originalData.students) && originalData.students.length > 0) {
       if (!structuredData.students || !Array.isArray(structuredData.students) || structuredData.students.length === 0) {
         structuredData = { ...structuredData, students: originalData.students };
+      }
+    }
+    // Inject alerts into structuredData if missing or empty but present in originalData
+    if (originalData?.alerts && Array.isArray(originalData.alerts) && originalData.alerts.length > 0) {
+      if (!structuredData.alerts || !Array.isArray(structuredData.alerts) || structuredData.alerts.length === 0) {
+        structuredData = { ...structuredData, alerts: originalData.alerts };
       }
     }
     // Always summarize for user-friendly output
