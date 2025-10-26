@@ -109,7 +109,13 @@ export class RAGService {
     const params = new URLSearchParams();
     if (filters.studentId) params.append('studentId', filters.studentId);
     if (filters.alertType) params.append('type', filters.alertType);
-    if (filters.status) params.append('status', filters.status);
+    if (filters.status) {
+      if (Array.isArray(filters.status)) {
+        filters.status.forEach(status => params.append('status', status));
+      } else {
+        params.append('status', filters.status);
+      }
+    }
     const res = await fetch(getApiUrl(`/api/data/alerts?${params.toString()}`));
     const alerts = await res.json();
     return { alerts, total: alerts.length };
@@ -499,25 +505,87 @@ export class RAGService {
   }
   
   /**
-   * Convert LLM response format to RAG response format
+   * Post-process LLM response to generate a concise, user-friendly summary for any response
    */
+  private summarizeLLMResponse(llmResponse: any, originalData: any): string {
+    // If alert data, use alert summary
+    if (llmResponse.structuredData?.alerts || originalData?.alerts) {
+      const alerts = llmResponse.structuredData?.alerts || originalData?.alerts || [];
+      if (!alerts.length) return 'No alerts were found matching your query.';
+      const byClass: Record<string, any[]> = {};
+      alerts.forEach((alert: any) => {
+        const classId = alert.classId || 'Unknown Class';
+        if (!byClass[classId]) byClass[classId] = [];
+        byClass[classId].push(alert);
+      });
+      const classNames = Object.keys(byClass);
+      const total = alerts.length;
+      let summary = `There are ${total} students with active attendance alerts across ${classNames.length > 1 ? 'Classes ' + classNames.join(', ') : 'Class ' + classNames[0]}.`;
+      classNames.forEach((classId) => {
+        const classAlerts = byClass[classId];
+        classAlerts.sort((a, b) => (b.alertMessage?.match(/(\d+)/)?.[0] || 0) - (a.alertMessage?.match(/(\d+)/)?.[0] || 0));
+        const top = classAlerts.slice(0, 3);
+        const names = top.map(a => a.studentName).join(', ');
+        summary += ` In ${classId}, ${names}${top.length === 3 ? ', and others' : ''} have triggered alerts due to multiple absences`;
+        if (top[0]?.alertMessage) {
+          const match = top[0].alertMessage.match(/Absent (\d+) times/);
+          if (match) summary += ` (top: ${top[0].studentName} with ${match[1]} absences)`;
+        }
+        summary += '.';
+      });
+      summary += ' Please review the full alert list for details.';
+      return summary;
+    }
+    // If student data, summarize students
+    const students = llmResponse.structuredData?.students || llmResponse.students || originalData?.students || [];
+    if (students.length) {
+      const total = students.length;
+      const names = students.slice(0, 3).map((s: any) => `${s.firstName} ${s.lastName}`).join(', ');
+      let summary = `The system currently tracks ${total} student${total !== 1 ? 's' : ''}`;
+      if (total > 3) {
+        summary += `, including ${names}, and others.`;
+      } else {
+        summary += `: ${names}.`;
+      }
+      summary += ' Each student record includes ID, absences, tardiness, and attendance rate.';
+      return summary;
+    } else if (llmResponse.structuredData?.students || llmResponse.students || originalData?.students) {
+      return 'No students were found matching your query.';
+    }
+    // If attendance data, summarize attendance
+    if (llmResponse.structuredData?.attendance || originalData?.attendance) {
+      const attendance = llmResponse.structuredData?.attendance || originalData?.attendance || [];
+      if (!attendance.length) return 'No attendance records were found matching your query.';
+      const total = attendance.length;
+      let summary = `There are ${total} attendance records available.`;
+      return summary;
+    }
+    // Fallback: return LLM's answer
+    return llmResponse.naturalLanguageAnswer;
+  }
+
   private convertLLMResponseToRAGResponse(llmResponse: any, originalData: any): RAGResponse {
-    // Convert suggested actions to the format expected by RAG consumers
     const actions = Array.isArray(llmResponse.suggestedActions)
       ? llmResponse.suggestedActions.map((action: string) => {
-          // Extract action type from text (e.g., "View student" -> "VIEW_STUDENT")
           const actionType = this.inferActionTypeFromText(action);
           return {
             type: actionType,
             label: action,
-            params: {} // Default empty params - in real impl we'd extract from action text
+            params: {}
           };
         })
       : [];
-    
+    // Inject students into structuredData if missing or empty but present in originalData
+    let structuredData = llmResponse.structuredData || {};
+    if (originalData?.students && Array.isArray(originalData.students) && originalData.students.length > 0) {
+      if (!structuredData.students || !Array.isArray(structuredData.students) || structuredData.students.length === 0) {
+        structuredData = { ...structuredData, students: originalData.students };
+      }
+    }
+    // Always summarize for user-friendly output
     return {
-      naturalLanguageAnswer: llmResponse.naturalLanguageAnswer,
-      structuredData: llmResponse.structuredData || originalData,
+      naturalLanguageAnswer: this.summarizeLLMResponse({ ...llmResponse, structuredData }, originalData),
+      structuredData,
       actions,
       confidence: llmResponse.confidence
     };

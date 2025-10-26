@@ -23,6 +23,7 @@ export interface APIFilters {
   alertStatus?: string;
   alertType?: string;
   interventionNeeded?: boolean;
+  className?: string;
   [key: string]: any;
 }
 
@@ -120,6 +121,13 @@ export class QueryProcessor {
     const studentName = this.extractStudentName(query);
     if (studentName) {
       filters.studentName = studentName;
+    }
+    
+    // Extract class name (e.g., 'class A', 'class B', etc.)
+    const classMatch = query.match(/class\s+([A-Z])/i);
+    if (classMatch) {
+      // Always use the format 'Class X' to match data.json keys
+      filters.className = `Class ${classMatch[1].toUpperCase()}`;
     }
     
     return filters;
