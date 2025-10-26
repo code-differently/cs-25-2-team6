@@ -23,6 +23,7 @@ import {
   LLMErrorCategory,
   getFallbackResponse
 } from '../utils/llm-error-handler';
+import type { Student } from '../types/students';
 
 // Response types
 export interface RAGResponse {
@@ -36,6 +37,14 @@ export interface SuggestedAction {
   type: 'VIEW_STUDENT' | 'SEND_NOTIFICATION' | 'SCHEDULE_MEETING' | 'VIEW_ALERTS';
   label: string;
   params?: Record<string, any>;
+}
+
+// Utility to get absolute API URL for server-side fetches
+function getApiUrl(path: string) {
+  // Use NEXT_PUBLIC_BASE_URL if set, otherwise default to localhost:3000
+  const base = process.env.NEXT_PUBLIC_BASE_URL ||
+    (typeof window === 'undefined' ? 'http://localhost:3000' : '');
+  return `${base}${path}`;
 }
 
 export class RAGService {
@@ -101,7 +110,7 @@ export class RAGService {
     if (filters.studentId) params.append('studentId', filters.studentId);
     if (filters.alertType) params.append('type', filters.alertType);
     if (filters.status) params.append('status', filters.status);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/alerts?${params.toString()}`);
+    const res = await fetch(getApiUrl(`/api/data/alerts?${params.toString()}`));
     const alerts = await res.json();
     return { alerts, total: alerts.length };
   }
@@ -110,7 +119,7 @@ export class RAGService {
     const params = new URLSearchParams();
     if (filters.studentId) params.append('studentId', filters.studentId);
     // Add more filters as needed
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/attendance?${params.toString()}`);
+    const res = await fetch(getApiUrl(`/api/data/attendance?${params.toString()}`));
     const attendance = await res.json();
     return { attendance, total: attendance.length };
   }
@@ -119,22 +128,22 @@ export class RAGService {
     const params = new URLSearchParams();
     if (filters.className) params.append('class', filters.className);
     if (filters.studentId) params.append('studentId', filters.studentId);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/students?${params.toString()}`);
+    const res = await fetch(getApiUrl(`/api/data/students?${params.toString()}`));
     const students = await res.json();
     return { students, total: students.length };
   }
 
   private async fetchGeneralData(filters: APIFilters): Promise<any> {
     // Fetch all classes and count students
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/classes`);
+    const res = await fetch(getApiUrl('/api/data/classes'));
     const classes = await res.json();
     let studentCount = 0;
     for (const className of classes) {
-      const sRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/students?class=${encodeURIComponent(className)}`);
+      const sRes = await fetch(getApiUrl(`/api/data/students?class=${encodeURIComponent(className)}`));
       const students = await sRes.json();
       studentCount += students.length;
     }
-    const alertsRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/data/alerts`);
+    const alertsRes = await fetch(getApiUrl('/api/data/alerts'));
     const alerts = await alertsRes.json();
     const activeAlertCount = alerts.filter((a: any) => a.status === 'active').length;
     return {
