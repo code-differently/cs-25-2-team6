@@ -1,0 +1,5768 @@
+{
+  "Class A": [
+    {
+      "firstName": "Noah",
+      "lastName": "Brown",
+      "studentId": "3659",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Unexcused Absence",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Emma",
+      "lastName": "Davis",
+      "studentId": "6358",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Olivia",
+      "lastName": "Brown",
+      "studentId": "7069",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Emma",
+      "lastName": "Smith",
+      "studentId": "9042",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Sophia",
+      "lastName": "Miller",
+      "studentId": "7220",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Lucas",
+      "lastName": "Brown",
+      "studentId": "5389",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Isabella",
+      "lastName": "Martinez",
+      "studentId": "3275",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Elijah",
+      "lastName": "Jones",
+      "studentId": "3480",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Olivia",
+      "lastName": "Jones",
+      "studentId": "9184",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Emma",
+      "lastName": "Garcia",
+      "studentId": "8455",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Ava",
+      "lastName": "Williams",
+      "studentId": "7705",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Liam",
+      "lastName": "Johnson",
+      "studentId": "6920",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Liam",
+      "lastName": "Garcia",
+      "studentId": "3121",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "John",
+      "lastName": "Jones",
+      "studentId": "2382",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Lucas",
+      "lastName": "Davis",
+      "studentId": "9980",
+      "classId": "Class A",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    }
+  ],
+  "Class B": [
+    {
+      "firstName": "Elijah",
+      "lastName": "Williams",
+      "studentId": "6831",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Emma",
+      "lastName": "Miller",
+      "studentId": "2220",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Liam",
+      "lastName": "Jones",
+      "studentId": "2543",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Emma",
+      "lastName": "Davis",
+      "studentId": "2137",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Ava",
+      "lastName": "Miller",
+      "studentId": "4267",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Liam",
+      "lastName": "Miller",
+      "studentId": "1807",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Isabella",
+      "lastName": "Miller",
+      "studentId": "9068",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Emma",
+      "lastName": "Hernandez",
+      "studentId": "3611",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Isabella",
+      "lastName": "Garcia",
+      "studentId": "4933",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Noah",
+      "lastName": "Martinez",
+      "studentId": "1728",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Emma",
+      "lastName": "Johnson",
+      "studentId": "6857",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "John",
+      "lastName": "Miller",
+      "studentId": "4746",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Liam",
+      "lastName": "Williams",
+      "studentId": "3015",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Noah",
+      "lastName": "Martinez",
+      "studentId": "7517",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Ava",
+      "lastName": "Martinez",
+      "studentId": "1430",
+      "classId": "Class B",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "Present",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    }
+  ],
+  "Class C": [
+    {
+      "firstName": "Noah",
+      "lastName": "Garcia",
+      "studentId": "1590",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Elijah",
+      "lastName": "Smith",
+      "studentId": "4874",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Sophia",
+      "lastName": "Davis",
+      "studentId": "6457",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Isabella",
+      "lastName": "Davis",
+      "studentId": "3556",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Liam",
+      "lastName": "Brown",
+      "studentId": "8005",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Liam",
+      "lastName": "Hernandez",
+      "studentId": "9497",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Elijah",
+      "lastName": "Miller",
+      "studentId": "1348",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        }
+      ]
+    },
+    {
+      "firstName": "Lucas",
+      "lastName": "Smith",
+      "studentId": "3544",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Olivia",
+      "lastName": "Miller",
+      "studentId": "2170",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Noah",
+      "lastName": "Brown",
+      "studentId": "8510",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "John",
+      "lastName": "Hernandez",
+      "studentId": "6890",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "John",
+      "lastName": "Smith",
+      "studentId": "7734",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Ava",
+      "lastName": "Martinez",
+      "studentId": "1737",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "John",
+      "lastName": "Garcia",
+      "studentId": "1188",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    },
+    {
+      "firstName": "Sophia",
+      "lastName": "Garcia",
+      "studentId": "8118",
+      "classId": "Class C",
+      "attendance": [
+        {
+          "dateISO": "2025-10-25",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-24",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-23",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-22",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-21",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-20",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-19",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-18",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-17",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-16",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-15",
+          "status": "ABSENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": true
+        },
+        {
+          "dateISO": "2025-10-14",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-13",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": true,
+          "onTime": false,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-12",
+          "status": "PRESENT",
+          "late": false,
+          "earlyDismissal": false,
+          "onTime": true,
+          "excused": false
+        },
+        {
+          "dateISO": "2025-10-11",
+          "status": "PRESENT",
+          "late": true,
+          "earlyDismissal": false,
+          "onTime": false,
+          "excused": false
+        }
+      ]
+    }
+  ]
+}

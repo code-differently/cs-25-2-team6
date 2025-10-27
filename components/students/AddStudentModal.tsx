@@ -34,10 +34,12 @@ export const AddStudentModal: React.FC<AddStudentModalProps> = ({
       return;
     }
 
-    const success = await handleStudentFormSubmit(formData, 'create');
-    if (success) {
-      onClose();
-    }
+    await handleStudentFormSubmit({
+      mode: "create",
+      formData,
+      onStudentSaved: onStudentAdded,
+    });
+    onClose();
   };
 
   const handleClose = () => {
