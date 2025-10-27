@@ -75,8 +75,6 @@ In many small or underfunded schools, the process of tracking attendance is done
 - **Role-based access control** - Different permission levels for teachers, administrators, and support staff
 - **Cloud database integration** - Scalable production deployment with enhanced data security
 
----
-
 ## Tech Stack
 
 | Category | Technologies |
@@ -127,8 +125,6 @@ npm run test:integration
 # View coverage report
 npm run test:coverage
 ```
-
----
 
 ## Credits
 
