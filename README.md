@@ -1,140 +1,144 @@
-# cs-25-2-team6
-Main repo for Code Society 25.2 Cohort Team 6
+# Presence: Centralized Attendance Management System
+**Team 6 - Code Society 25.2 Cohort**
 
-Selected Problem: 
-School attendance management system 
+[![Demo](https://img.shields.io/badge/Live_Demo-Available-green)](https://cs-25-2-team6.vercel.app/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Timeline
-Submit three user stories (Monday, 9/15, 5PM ET)
-Receive approval for your user stories (Tuesday, 9/16, 1PM ET)
-Finish code commits (Friday, 9/19, 1PM ET)
-Give presentation (Monday, 9/22, 1PM ET)
+---
 
-Project Requirements w/ Group Notes:
-All work must be submitted in your team's assigned GitHub repository.
-The assignment can be completed in TypeScript or in Java.
-TypeScript
-## Must include at least 5 types of objects with meaningful relationships to each other.
-Building
-- Main Building
-- Admin Building 
-Attendance Record
-- Is On Time
-- Is Late
-- Is Absent
-    - Unexcused
-    - Excused
-Student 
-- First name
-- Last name
-- Studentid
+## Team Members
 
+| **Martha Ofuani** | **Jared Edge** | **Linda Quinoa** | **Benjamin Scott** | **Thomas Boyle** |
+|-------|-------|-------|-------|-------|
+| ![Martha Ofuani](images/m-headshot.jpg) | ![Jared Edge](images/j-headshot.jpg) | ![Linda Quinoa](images/l-headshot.jpg) | ![Benjamin Scott](images/b-headshot.jpg) | ![Thomas Boyle](images/t-headshot.jpg) |
+| **Scrum Master & Front-End Developer** | **Lead Full-Stack Developer** | **Backend Developer** | **Front-End Developer** | **Front-End Developer** |
 
-Staff
-- Teaching Staff
-- Building Staff
-- Administrative Staff
-Scheduled days off
-- Student schedule
-- Staff schedule
+Each team member contributed individual pull requests with working code and comprehensive test coverage, following agile development practices and maintaining high code quality standards.
 
-One of your objects must be a custom data structure that provides for adding, removing, and updating items in a collection.
-Student
-Implement at least two custom exceptions.
-Exception 1: Has Scheduled Day Off
-Exception 2: Student Not Found
-Write unit tests achieving 90% code coverage ( Jest for Typescript). 
-Must include an integration test for each user story that demonstrates how your code implements the desired feature.
-Your solution must illustrate each of the SOLID principles.
-Each team member must contribute at least one submitted pull request containing working code and tests.
-Include a README for your repo describing the problem you're solving, the solution, and how you would improve your solution.
-Design a CLI that allows users to interact with your application. Check out the code in lesson_10 for an example in TypeScript, or this file for an example in Java.
+---
 
-Problems to Address:
-What problem were you attempting to solve?
-In many small or underfunded schools, the process of tracking attendance is done on paper and manually entered into a spreadsheet, which increases the risk of inaccurate data. We want to create a more effective method of tracking who is coming and going in a school environment to make sure that the whereabouts of each student is properly tracked and to ensure appropriate staff coverage.
-How does your design address the solution?
-It provides the oversight needed to have accurate tracking of who is present in a school at a given time, from students to staff members. 
-It provides a unified system that can be used by all teachers and staff, so the process of tracking attendance is standardized, reducing the likelihood of manual entry errors.
-It makes the process of generating reports and reviewing attendance data more efficient because it provides the functionality to sort and filter through electronic records quickly.
-How did you address each of the SOLID principles?
-How would you improve on your solution?
+## App Description
 
+Presence is a centralized attendance system that can be used by teachers and staff, so the process of tracking attendance is standardized, reducing the likelihood of manual entry errors. It makes the process of generating reports and reviewing attendance data more efficient because it provides the functionality to sort and filter through electronic records quickly. The system streamlines attendance recording, generates automated reports, and provides real-time alerts to ensure student safety and administrative efficiency.
 
+---
 
+## Problem Statement
 
+In many small or underfunded schools, the process of tracking attendance is done on paper and later manually entered into a spreadsheet, which increases the risk of inaccurate data. The manual process also makes it difficult to aggregate data and identify students who are frequently absent or late that may require direct intervention.
 
+---
 
-## User Stories:
-As a teacher, I want a way to track attendance so that I can maintain a digitally recorded log.
-- Teachers should be able to input a student's first name, last name, attendance status and date.
-- Teachers can select dates using a calendar-based date selector.
-- Teachers can mark a checkbox to indicate whether a student was late or on time.
-If a student does not have a box checked for a given day, they should be marked as absent. 
+## Demo
 
-As a user, I want to manage attendance records from the CLI, so that I can review participation data without relying on a graphical interface.
-- Users should be able to filter attendance reports by student last name, attendance status, or date. 
-- Users can open a late list for any given date or individual.
-- Users can open an early dismissal list for any given date or individual.
+**Live Demo:** [https://cs-25-2-team6.vercel.app/](https://cs-25-2-team6.vercel.app/)
 
-As a teacher, I want a way to save the attendance records, so that I can view historical data.
-- Teachers can store students’ attendance in a digital log that they can view at any time.
-- Teachers have the option to view attendance logs in a daily, weekly, or monthly view.
-- Teachers get an alert to notify parents when a student reaches a previously designated number of absences or latenesses in a 30-day span or cumulatively.
-- Teachers can request a YTD at a glance of any student’s attendance.
+---
 
-As a teacher, I want to input scheduled days off, so that students can be given an excused absence in the system.
-- Planned days off are automatically marked as excused absences for all students.
-- Weekends and planned days off are excluded from totals in student attendance reports.
-- Planned days off will account for weekends, national holidays, professional development & report card conferences. (should be a.)
+## Feature Overview
 
-Presentation:
-UML and actions diagrams to show how each class interacts with each other
+- **Individual and Batch Attendance Record Submission** - Streamlined attendance tracking for single students or entire classes
+- **Scheduling Planned Days Off** - Automated excused absences for holidays and scheduled non-school days
+- **Attendance Report Creation** - Comprehensive reporting with filtering and sorting capabilities
+- **Student & Class Profile Management** - Complete student and class organization system
+- **Alert System & Data Validation** - Automated notifications and real-time validation
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+---
 
-## Getting Started
+## Screenshot Gallery
 
-First, run the development server:
+| Dashboard | Reports |
+|-----------|---------|
+| ![Dashboard](images/dashboard.png) | ![Reports](images/reports.png) |
+| **Student Management** | **Class Management** |
+| ![Students](images/students.png) | ![Classes](images/classes.png) |
 
+---
+
+## Known Issues
+
+- "Add Scheduled Days Off" button missing.
+- "Filter" buttons on the Alerts Dashboard does not have full functionality.
+- Interventions tab doesn't update when a new alert is selected.
+- Formatting issues with "Add Student" form.
+
+---
+
+## Roadmap Features
+
+- **Enhanced reporting and analytics to measure student outcomes** - Advanced analytics dashboard with improved filtering, KPI tracking, and trend analysis
+- **Enhance reporting and analytics to measure teacher outcomes** - Teacher performance insights and classroom analytics with correlation analysis
+- **Integration with grading system for correlation analysis** - Connect attendance data with academic performance for comprehensive insights
+- **Text/Email notifications** - Real-time communication system for automated parent alerts and teacher notifications
+- **Student & Parent Portal** - Self-service platform with excuse note submission, historical attendance view, and direct teacher feedback
+- **Mobile-responsive design** - Tablet and phone access for on-the-go attendance management
+- **Role-based access control** - Different permission levels for teachers, administrators, and support staff
+- **Cloud database integration** - Scalable production deployment with enhanced data security
+
+---
+
+## Tech Stack
+
+| Category | Technologies |
+|----------|-------------|
+| **Frontend** | Next.js 14, React, TypeScript, Tailwind CSS |
+| **Backend** | Node.js, TypeScript, Next.js API Routes |
+| **Database** | File-based JSON storage (development) |
+| **Testing** | Jest, 80%+ coverage, Integration tests |
+| **Deployment** | Vercel (planned) |
+| **Development** | Git/GitHub, VS Code, ESLint |
+
+---
+
+## Installation Instructions
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn package manager
+- Git for version control
+
+### Setup Instructions
+
+1. **Clone the Repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/code-differently/cs-25-2-team6.git
+cd cs-25-2-team6
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install Dependencies**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Run Development Server**
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+5. **Run Tests**
+```bash
+# Unit tests with coverage
+npm test
 
-## Learn More
+# Integration tests
+npm run test:integration
 
-To learn more about Next.js, take a look at the following resources:
+# View coverage report
+npm run test:coverage
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Credits
 
-## Deploy on Vercel
+- **Code Differently** - Educational guidance and capstone framework
+- **GitHub Copilot** - AI-powered code completion and development assistance
+- **ChatGPT/OpenAI** - AI assistance for documentation, problem-solving, and code review
+- **Claude** - AI assistance for documentation and wireframes
+- **Next.js Team** - React framework for production applications
+- **Vercel** - Deployment platform for seamless hosting
+- **Jest Community** - Comprehensive testing framework
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-
-
-
-
-
-
-
-
-
-
+---
