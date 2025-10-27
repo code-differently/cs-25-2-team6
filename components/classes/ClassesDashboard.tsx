@@ -40,6 +40,21 @@ export default function ClassesDashboard() {
     setSelectedClass(null);
   };
 
+  // Update search in filters on every keystroke
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters(prev => ({ ...prev, search: e.target.value }));
+  };
+
+  // Subject filter handler
+  const handleSubjectFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilters(prev => ({ ...prev, subject: e.target.value || undefined }));
+  };
+
+  // Status filter handler
+  const handleStatusFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilters(prev => ({ ...prev, status: e.target.value || undefined }));
+  };
+
   if (error) {
     return (
       <div style={{
@@ -152,7 +167,8 @@ export default function ClassesDashboard() {
             <input
               type="text"
               placeholder="Search classes by name, subject, or teacher..."
-              onChange={(e) => handleClassSearch(e.target.value)}
+              value={filters.search || ''}
+              onChange={handleSearchChange}
               style={{
                 width: '100%',
                 padding: '12px 12px 12px 40px',
@@ -170,7 +186,7 @@ export default function ClassesDashboard() {
           </div>
 
           <select
-            onChange={(e) => handleClassFilter('subject', e.target.value)}
+            onChange={handleSubjectFilter}
             style={{
               padding: '12px',
               border: '2px solid #e2e8f0',
@@ -180,6 +196,7 @@ export default function ClassesDashboard() {
               color: '#111827',
               minWidth: '150px'
             }}
+            value={filters.subject || ''}
           >
             <option value="">All Subjects</option>
             <option value="Mathematics">Mathematics</option>
@@ -190,7 +207,7 @@ export default function ClassesDashboard() {
           </select>
 
           <select
-            onChange={(e) => handleClassFilter('status', e.target.value)}
+            onChange={handleStatusFilter}
             style={{
               padding: '12px',
               border: '2px solid #e2e8f0',
@@ -200,6 +217,7 @@ export default function ClassesDashboard() {
               color: '#111827',
               minWidth: '120px'
             }}
+            value={filters.status || ''}
           >
             <option value="">All Status</option>
             <option value="active">Active</option>

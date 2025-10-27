@@ -26,20 +26,24 @@ export function useClassStudents(classId: string) {
 
   const fetchClassStudents = useCallback(async () => {
     if (!classId) return;
-    
     setLoading(true);
     setError(null);
-
     try {
-      // Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Mock data - replace with actual API call
-      const mockClassStudents: ClassStudent[] = [];
-      const mockAvailableStudents: Student[] = [];
-
-      setClassStudents(mockClassStudents);
-      setAvailableStudents(mockAvailableStudents);
+      // Fetch students for the class from the API
+      const response = await fetch(`/api/data/students?class=${encodeURIComponent(classId)}`);
+      const students = await response.json();
+      // Normalize to ClassStudent[]
+      const classStudents: ClassStudent[] = (students || []).map((student: any) => ({
+        ...student,
+        enrollmentDate: student.enrollmentDate ? new Date(student.enrollmentDate) : new Date(),
+        isActive: student.isActive !== undefined ? student.isActive : true,
+        attendanceRate: student.attendanceRate || 0
+      }));
+      setClassStudents(classStudents);
+      // Optionally, fetch available students (not in this class)
+      // const availableResponse = await fetch('/api/data/students');
+      // const allStudents = await availableResponse.json();
+      // setAvailableStudents(allStudents.filter((s: any) => s.class !== classId));
     } catch (err) {
       setError('Failed to fetch class students');
     } finally {
@@ -83,8 +87,24 @@ export function useClassStudents(classId: string) {
         );
 
         const removedStudents: Student[] = studentsToRemove.map(student => {
-          const { enrollmentDate, dropDate, finalGrade, participationScore, isActive, ...baseStudent } = student;
-          return baseStudent;
+          return {
+            id: student.id,
+            firstName: student.firstName,
+            lastName: student.lastName,
+            email: student.email,
+            grade: student.grade,
+            class: student.class,
+            status: student.status,
+            dateOfBirth: student.dateOfBirth,
+            enrollmentDate: student.enrollmentDate || new Date(),
+            guardianName: (student as any).guardianName || '',
+            guardianPhone: (student as any).guardianPhone || '',
+            guardianEmail: (student as any).guardianEmail || '',
+            emergencyContact: (student as any).emergencyContact || '',
+            address: (student as any).address || '',
+            lastActivity: student.lastActivity,
+            attendanceRate: student.attendanceRate || 0
+          };
         });
 
         setAvailableStudents(prev => [...prev, ...removedStudents]);

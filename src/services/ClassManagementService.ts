@@ -73,7 +73,17 @@ export class ClassManagementService {
   }
 
   async getAllClasses(): Promise<ClassProfile[]> {
-    return this.classRepo.getAllClasses();
+    // Fetch all classes and normalize to ensure 'id', 'name', 'subject', 'teacher', 'grade', and 'status' fields exist
+    const classes = this.classRepo.getAllClasses();
+    return classes.map(cls => ({
+      ...cls,
+      id: cls.id,
+      name: cls.name || cls.id, // fallback to id if name missing
+      subject: cls.subject || '',
+      teacher: cls.teacher || '',
+      grade: cls.grade || '',
+      status: cls.status || '',
+    }));
   }
 
   async updateClass(classId: string, updates: Partial<ClassProfile>): Promise<ClassProfile | undefined> {

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { useStudentModals, Student, StudentFormData } from '../../hooks/useStudentModals';
@@ -58,6 +60,7 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
 
   useEffect(() => {
     setMounted(true);
+    return () => setMounted(false);
   }, []);
 
   useEffect(() => {
@@ -209,7 +212,8 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
     );
   }, [formData, validationErrors, handleInputChange, mode]);
 
-  if (!isOpen || !mounted) return null;
+  if (!mounted) return null;
+  if (!isOpen) return null;
 
   const modalContent = (
     <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -300,7 +304,9 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
     </div>
   );
 
-  return mounted ? ReactDOM.createPortal(modalContent, document.body) : null;
+  const portalTarget = typeof document !== 'undefined' ? document.body : null;
+
+  return portalTarget ? ReactDOM.createPortal(modalContent, portalTarget) : modalContent;
 };
 
 export default StudentFormModal;
