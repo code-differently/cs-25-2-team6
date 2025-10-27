@@ -88,6 +88,7 @@ export default function AlertsDashboard() {
         <div>
           <AlertsList
             alerts={alerts}
+            setAlerts={setAlerts}
             loading={loading}
             onSort={handleAlertSort}
             onFilter={handleAlertFilter}
