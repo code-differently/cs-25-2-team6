@@ -3,6 +3,7 @@
 import React from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import ClassesDashboard from '@/components/classes/ClassesDashboard';
+import Link from 'next/link';
 
 export default function ClassesPage() {
   return (
@@ -45,7 +46,7 @@ export default function ClassesPage() {
             </div>
 
             {/* Quick Actions */}
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <button
                 style={{
                   padding: '10px 16px',
@@ -66,152 +67,24 @@ export default function ClassesPage() {
               >
                 ➕ Add Class
               </button>
-              
-              <button
-                style={{
-                  padding: '10px 16px',
-                  backgroundColor: '#3b82f6',
-                  color: 'white',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                onClick={() => {
-                  // Handle import classes
-                }}
-              >
-                📤 Import
-              </button>
-              
-              <button
-                style={{
-                  padding: '10px 16px',
-                  backgroundColor: '#6366f1',
-                  color: 'white',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                onClick={() => {
-                  // Handle export classes
-                }}
-              >
-                📥 Export
-              </button>
+              <Link href="/settings" style={{
+                display: 'inline-block',
+                marginTop: '0',
+                padding: '8px 16px',
+                backgroundColor: '#059669',
+                color: 'white',
+                borderRadius: '6px',
+                textDecoration: 'none',
+                fontWeight: 500,
+                fontSize: '14px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+              }}>
+                👥 Go to Student Management
+              </Link>
             </div>
           </div>
 
-          {/* Quick Stats */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-            gap: '16px',
-            marginTop: '24px',
-            paddingTop: '24px',
-            borderTop: '1px solid #e5e7eb'
-          }}>
-            <div style={{
-              padding: '16px',
-              backgroundColor: '#f0f9ff',
-              borderRadius: '8px',
-              border: '1px solid #bfdbfe'
-            }}>
-              <div style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                color: '#1e40af',
-                marginBottom: '4px'
-              }}>
-                24
-              </div>
-              <div style={{
-                fontSize: '14px',
-                color: '#1e40af',
-                fontWeight: '500'
-              }}>
-                Total Classes
-              </div>
-            </div>
-
-            <div style={{
-              padding: '16px',
-              backgroundColor: '#f0fdf4',
-              borderRadius: '8px',
-              border: '1px solid #bbf7d0'
-            }}>
-              <div style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                color: '#166534',
-                marginBottom: '4px'
-              }}>
-                18
-              </div>
-              <div style={{
-                fontSize: '14px',
-                color: '#166534',
-                fontWeight: '500'
-              }}>
-                Active Classes
-              </div>
-            </div>
-
-            <div style={{
-              padding: '16px',
-              backgroundColor: '#fffbeb',
-              borderRadius: '8px',
-              border: '1px solid #fde68a'
-            }}>
-              <div style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                color: '#92400e',
-                marginBottom: '4px'
-              }}>
-                567
-              </div>
-              <div style={{
-                fontSize: '14px',
-                color: '#92400e',
-                fontWeight: '500'
-              }}>
-                Total Enrollments
-              </div>
-            </div>
-
-            <div style={{
-              padding: '16px',
-              backgroundColor: '#fdf2f8',
-              borderRadius: '8px',
-              border: '1px solid #fbcfe8'
-            }}>
-              <div style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                color: '#be185d',
-                marginBottom: '4px'
-              }}>
-              89.5%
-              </div>
-              <div style={{
-                fontSize: '14px',
-                color: '#be185d',
-                fontWeight: '500'
-              }}>
-                Avg Attendance
-              </div>
-            </div>
-          </div>
+          
         </div>
 
         {/* Main Classes Dashboard */}

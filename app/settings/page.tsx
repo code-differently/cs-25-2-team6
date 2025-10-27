@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import StudentsDashboard from '@/components/students/StudentsDashboard';
 import StudentFormModal from '@/components/students/StudentFormModal';
+import Link from 'next/link';
 
 export default function SettingsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -67,6 +68,22 @@ export default function SettingsPage() {
                 }}>
                   Manage student information, track academic progress, and maintain comprehensive records for all enrolled students.
                 </p>
+                <Link href="/classes" style={{
+                  display: 'inline-block',
+                  marginTop: '16px',
+                  marginRight: '8px',
+                  padding: '8px 16px',
+                  backgroundColor: '#6366f1',
+                  color: 'white',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  fontWeight: 500,
+                  fontSize: '14px',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+                }}>
+                  🏫 Go to Class Management
+                </Link>
+               
               </div>
 
               {/* Quick Actions */}
@@ -101,55 +118,7 @@ export default function SettingsPage() {
                   ➕ Add Student
                 </button>
                 
-                <button
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#2563eb',
-                    color: 'white',
-                    borderRadius: '6px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    fontSize: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
-                  onFocus={(e) => e.currentTarget.style.outline = '2px solid #3b82f6'}
-                  onBlur={(e) => e.currentTarget.style.outline = 'none'}
-                  onClick={() => {
-                    // Handle import students
-                  }}
-                >
-                  📤 Import
-                </button>
                 
-                <button
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#4f46e5',
-                    color: 'white',
-                    borderRadius: '6px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    fontSize: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
-                  onFocus={(e) => e.currentTarget.style.outline = '2px solid #6366f1'}
-                  onBlur={(e) => e.currentTarget.style.outline = 'none'}
-                  onClick={() => {
-                    // Handle export students
-                  }}
-                >
-                  📥 Export
-                </button>
               </div>
 
               
