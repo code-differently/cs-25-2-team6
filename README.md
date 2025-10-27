@@ -41,14 +41,14 @@ In many small or underfunded schools, the process of tracking attendance is done
 - **Scheduling Planned Days Off** - Automated excused absences for holidays and scheduled non-school days
 - **Attendance Report Creation** - Comprehensive reporting with filtering and sorting capabilities
 - **Student & Class Profile Management** - Complete student and class organization system
-- **Alert System & Data Validation** - Automated notifications and real-time validation
+- **Alert System** - Automated notifications and real-time validation
 
 ---
 
 ## Screenshot Gallery
 
 | Dashboard | Reports |
-|-----------|---------|
+|:---------:|:-------:|
 | ![Dashboard](images/dashboard.png) | ![Reports](images/reports.png) |
 | **Student Management** | **Class Management** |
 | ![Students](images/students.png) | ![Classes](images/classes.png) |
