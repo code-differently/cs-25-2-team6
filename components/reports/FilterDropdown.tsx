@@ -2,9 +2,14 @@
 import { useState, useRef, useEffect } from 'react';
 import './FilterDropdown.css';
 
+interface OptionType {
+  value: string;
+  label: string;
+}
+
 interface FilterDropdownProps {
   label: string;
-  options: string[];
+  options: OptionType[];
   selectedValues: string[];
   onChange: (selectedValues: string[]) => void;
 }
@@ -26,7 +31,7 @@ function FilterDropdown({ label, options, selectedValues, onChange }: FilterDrop
   }, []);
 
   const handleSelectAll = () => {
-    onChange(options);
+    onChange(options.map(opt => opt.value));
   };
 
   const handleDeselectAll = () => {
@@ -43,7 +48,10 @@ function FilterDropdown({ label, options, selectedValues, onChange }: FilterDrop
 
   const getDisplayText = () => {
     if (selectedValues.length === 0) return `Select ${label}`;
-    if (selectedValues.length === 1) return selectedValues[0];
+    if (selectedValues.length === 1) {
+      const found = options.find(opt => opt.value === selectedValues[0]);
+      return found ? found.label : selectedValues[0];
+    }
     return `${selectedValues.length} selected`;
   };
 
@@ -70,13 +78,13 @@ function FilterDropdown({ label, options, selectedValues, onChange }: FilterDrop
           
           <div className="dropdown-options">
             {options.map((option) => (
-              <label key={option} className="dropdown-option">
+              <label key={option.value} className="dropdown-option">
                 <input
                   type="checkbox"
-                  checked={selectedValues.includes(option)}
-                  onChange={() => handleToggle(option)}
+                  checked={selectedValues.includes(option.value)}
+                  onChange={() => handleToggle(option.value)}
                 />
-                <span>{option}</span>
+                <span>{option.label}</span>
               </label>
             ))}
           </div>

@@ -125,17 +125,42 @@ export class RAGService {
     const params = new URLSearchParams();
     if (filters.studentId) params.append('studentId', filters.studentId);
     // Add more filters as needed
-    const res = await fetch(getApiUrl(`/api/data/attendance?${params.toString()}`));
+    // If no filters, fetch all attendance records
+    const url = params.toString()
+      ? getApiUrl(`/api/data/attendance?${params.toString()}`)
+      : getApiUrl('/api/data/attendance');
+    const res = await fetch(url);
     const attendance = await res.json();
     return { attendance, total: attendance.length };
   }
 
   private async fetchStudentData(filters: APIFilters): Promise<any> {
-    const params = new URLSearchParams();
-    if (filters.className) params.append('class', filters.className);
-    if (filters.studentId) params.append('studentId', filters.studentId);
-    const res = await fetch(getApiUrl(`/api/data/students?${params.toString()}`));
-    const students = await res.json();
+    // Support multi-class queries
+    let students: any[] = [];
+    if (Array.isArray(filters.classNames) && filters.classNames.length > 0) {
+      // Fetch students for each class and merge
+      const results = await Promise.all(
+        filters.classNames.map((className: string) =>
+          fetch(getApiUrl(`/api/data/students?class=${encodeURIComponent(className)}`)).then(res => res.json())
+        )
+      );
+      // Flatten and dedupe by studentId
+      const allStudents = results.flat();
+      const seen = new Set();
+      students = allStudents.filter((s: any) => {
+        const key = s.studentId || s.id || `${s.firstName}_${s.lastName}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    } else {
+      // Single class or no class filter
+      const params = new URLSearchParams();
+      if (filters.className) params.append('class', filters.className);
+      if (filters.studentId) params.append('studentId', filters.studentId);
+      const res = await fetch(getApiUrl(`/api/data/students?${params.toString()}`));
+      students = await res.json();
+    }
     return { students, total: students.length };
   }
 

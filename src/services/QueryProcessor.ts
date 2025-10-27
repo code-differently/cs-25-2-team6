@@ -24,6 +24,7 @@ export interface APIFilters {
   alertType?: string;
   interventionNeeded?: boolean;
   className?: string;
+  classNames?: string[];
   [key: string]: any;
 }
 
@@ -123,11 +124,23 @@ export class QueryProcessor {
       filters.studentName = studentName;
     }
     
-    // Extract class name (e.g., 'class A', 'class B', etc.)
-    const classMatch = query.match(/class\s+([A-Z])/i);
-    if (classMatch) {
-      // Always use the format 'Class X' to match data.json keys
-      filters.className = `Class ${classMatch[1].toUpperCase()}`;
+    // Extract class names (e.g., 'class A', 'class B', etc.)
+    const classMatches = query.match(/class\s+([A-Z])/gi);
+    if (classMatches) {
+      // Support multiple classes in a single query
+      const classNames = classMatches
+        .map((match: string) => {
+          const letter = match.match(/class\s+([A-Z])/i)?.[1];
+          return letter ? `Class ${letter.toUpperCase()}` : undefined;
+        })
+        .filter((c): c is string => Boolean(c));
+      if (classNames.length > 0) {
+        filters.classNames = classNames;
+        // For backward compatibility, set className to the first if only one
+        if (classNames.length === 1) {
+          filters.className = classNames[0];
+        }
+      }
     }
     
     return filters;
