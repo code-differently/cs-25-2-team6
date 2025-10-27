@@ -25,6 +25,12 @@ const gradeOptions = [
   { value: '12', label: '12th Grade' }
 ];
 
+const classOptions = [
+  { value: 'Class A', label: 'Class A' },
+  { value: 'Class B', label: 'Class B' },
+  { value: 'Class C', label: 'Class C' }
+];
+
 export const StudentFormModal: React.FC<StudentFormModalProps> = ({
   isOpen,
   onClose,
@@ -37,7 +43,6 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
     setFormData,
     validationErrors,
     hasUnsavedChanges,
-    modalState,
     handleStudentFormSubmit,
     handleFormValidation,
     handleModalClose
@@ -65,7 +70,8 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
         emergencyContact: student.emergencyContact || '',
         emergencyPhone: student.emergencyPhone || '',
         medicalNotes: student.medicalNotes || '',
-        status: student.status || 'active'
+        status: student.status || 'active',
+        className: (student as any).className || ''
       });
     } else if (isOpen && mode === 'create') {
       setFormData({
@@ -82,12 +88,14 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
         emergencyContact: '',
         emergencyPhone: '',
         medicalNotes: '',
-        status: 'active'
+        status: 'active',
+        className: ''
       });
     }
-  }, [isOpen, mode, student, setFormData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, mode, student]);
 
-  const handleInputChange = useCallback((field: keyof StudentFormData, value: string) => {
+  const handleInputChange = useCallback((field: keyof StudentFormData | 'className', value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -106,18 +114,18 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
     }
     setIsLoading(true);
     try {
-      const response = await fetch('/api/data/students', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+      await handleStudentFormSubmit({
+        mode,
+        student,
+        formData,
+        onStudentSaved: (savedStudent: Student) => {
+          if (onStudentSaved) onStudentSaved(savedStudent);
+          handleClose();
+        }
       });
-      if (!response.ok) {
-        throw new Error('Failed to add student');
-      }
-      await handleStudentFormSubmit(formData, mode);
-      handleClose();
     } catch (error) {
-      console.error('Form submission failed:', error);
+      // Optionally show error message
+      // console.error('Form submission failed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -225,6 +233,21 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
               {renderField('lastName', 'Last Name', 'text', true)}
               {renderField('studentId', 'Student ID', 'text', true)}
               {renderField('grade', 'Grade', 'select', true, gradeOptions)}
+              <div>
+                <label className="label">Class Name<span className="text-red-500 ml-1">*</span></label>
+                <select
+                  value={formData.className || ''}
+                  onChange={e => handleInputChange('className', e.target.value)}
+                  className={`dropdown${validationErrors.className ? ' border-red-500' : ''}`}
+                  required
+                >
+                  <option value="">Select Class</option>
+                  {classOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+                {validationErrors.className && <p className="error-message">{validationErrors.className}</p>}
+              </div>
               {renderField('dateOfBirth', 'Date of Birth', 'date')}
               {renderField('email', 'Email', 'email', true)}
             </div>

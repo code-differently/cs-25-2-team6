@@ -11,11 +11,18 @@ export default function SettingsPage() {
 
   // Handler for when a student is added
   const handleStudentAdded = async (student: any) => {
+    if (!student.className) {
+      alert('Class name is required to add a student.');
+      return;
+    }
     // POST to API endpoint to update data.json
     await fetch('/api/data/students', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(student),
+      body: JSON.stringify({
+        className: student.className,
+        student: { ...student, className: undefined }
+      }),
     });
     setStudentAdded(true); // Could be used to refresh StudentsDashboard if needed
   };
