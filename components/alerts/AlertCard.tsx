@@ -124,7 +124,9 @@ const getSeverityColor = (severity: AttendanceAlert['severity']) => {
               color: '#6b7280',
               fontWeight: '500'
             }}>
-              {alert.triggerDate.toLocaleDateString()}
+              {alert.triggerDate && !isNaN(new Date(alert.triggerDate).getTime())
+                ? new Date(alert.triggerDate).toLocaleDateString()
+                : 'N/A'}
             </span>
           </div>
 
@@ -228,7 +230,7 @@ const getSeverityColor = (severity: AttendanceAlert['severity']) => {
               </span>
             </span>
             
-            {alert.interventions.length > 0 && (
+            {Array.isArray(alert.interventions) && alert.interventions.length > 0 && (
               <span style={{
                 fontSize: '12px',
                 color: '#6b7280',
