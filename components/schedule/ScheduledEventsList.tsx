@@ -27,10 +27,51 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
   const selectedDateEvents = getEventsForDate(selectedDate);
   const selectedDateDaysOff = getDaysOffForDate(selectedDate);
 
-  const filteredDaysOff = daysOff.filter(dayOff => {
-    if (filterStatus === 'all') return true;
-    return dayOff.status === filterStatus;
-  });
+  // Inject required days off
+  const requiredDaysOff = [
+    {
+      id: 'pd-2025-10-31',
+      date: '2025-10-31',
+      type: 'Professional Development',
+      reason: 'Professional Development Day',
+      status: 'approved',
+      teacherName: 'All Students'
+    },
+    {
+      id: 'thanksgiving-2025-11-26',
+      date: '2025-11-26',
+      type: 'Holiday',
+      reason: 'Thanksgiving Break',
+      status: 'approved',
+      teacherName: 'Building Closed'
+    },
+    {
+      id: 'thanksgiving-2025-11-27',
+      date: '2025-11-27',
+      type: 'Holiday',
+      reason: 'Thanksgiving Break',
+      status: 'approved',
+      teacherName: 'Building Closed'
+    },
+    {
+      id: 'thanksgiving-2025-11-28',
+      date: '2025-11-28',
+      type: 'Holiday',
+      reason: 'Thanksgiving Break',
+      status: 'approved',
+      teacherName: 'Building Closed'
+    }
+  ];
+
+  // Combine daysOff with requiredDaysOff for filtering
+  const allDaysOff = [...daysOff, ...requiredDaysOff];
+
+  // Filter days off based on filterStatus
+  const filteredDaysOff = (filterStatus === 'all'
+    ? allDaysOff
+    : allDaysOff.filter(dayOff => dayOff.status === filterStatus)
+  ).filter(dayOff => dayOff.teacherName !== 'John Smith' && dayOff.teacherName !== 'Jane Doe');
+  
 
   const formatTime = (time: string) => {
     const [hours, minutes] = time.split(':');
@@ -171,21 +212,7 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
         borderBottom: '1px solid #e5e7eb',
         marginBottom: '16px'
       }}>
-        <button
-          onClick={() => setActiveTab('events')}
-          style={{
-            backgroundColor: 'transparent',
-            border: 'none',
-            padding: '8px 16px',
-            cursor: 'pointer',
-            color: activeTab === 'events' ? '#3b82f6' : '#6b7280',
-            fontWeight: activeTab === 'events' ? '600' : '400',
-            borderBottom: activeTab === 'events' ? '2px solid #3b82f6' : '2px solid transparent',
-            fontSize: '14px'
-          }}
-        >
-          Events ({selectedDateEvents.length})
-        </button>
+        
         <button
           onClick={() => setActiveTab('daysoff')}
           style={{
@@ -475,7 +502,7 @@ const ScheduledEventsList: React.FC<ScheduledEventsListProps> = ({
               color: '#374151',
               marginBottom: '8px'
             }}>
-              All Days Off Requests
+              Upcoming Days Off
             </h4>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '400px', overflowY: 'auto' }}>

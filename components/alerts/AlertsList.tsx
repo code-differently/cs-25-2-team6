@@ -168,21 +168,7 @@ export default function AlertsList({
                 display: 'flex',
                 gap: '8px'
               }}>
-                <button
-                  onClick={() => handleBulkAction('acknowledge')}
-                  style={{
-                    padding: '6px 12px',
-                    backgroundColor: '#3b82f6',
-                    color: 'white',
-                    fontSize: '14px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: '500'
-                  }}
-                >
-                  Acknowledge
-                </button>
+                
                 <button
                   onClick={() => handleBulkAction('resolve')}
                   style={{
