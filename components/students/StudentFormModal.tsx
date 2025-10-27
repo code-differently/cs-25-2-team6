@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import { useStudentModals, Student, StudentFormData } from '../../hooks/useStudentModals';
 
 interface StudentFormModalProps {
@@ -53,6 +54,11 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen && mode === 'edit' && student) {
@@ -125,7 +131,6 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
       });
     } catch (error) {
       // Optionally show error message
-      // console.error('Form submission failed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -204,9 +209,9 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
     );
   }, [formData, validationErrors, handleInputChange, mode]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="modal bg-white rounded-lg shadow-lg p-6 relative" style={{ maxWidth: 1000, width: '90%' }}>
         <div className="modal-header flex items-center justify-between mb-4">
@@ -285,7 +290,7 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
                 {isLoading ? (
                   <span>Saving...</span>
                 ) : (
-                  mode === 'create' ? 'Add Student' : 'Save Changes'
+                  mode === 'create' ? 'Add Student' : 'Save Student'
                 )}
               </button>
             </div>
@@ -294,6 +299,8 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
       </div>
     </div>
   );
+
+  return mounted ? ReactDOM.createPortal(modalContent, document.body) : null;
 };
 
 export default StudentFormModal;
