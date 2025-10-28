@@ -70,7 +70,7 @@ export class RAGService {
       const data = dataOverride !== undefined ? dataOverride : await this.fetchRelevantData(intent, filters);
       
       // 4. Generate natural language response, passing context if provided
-      const response = await this.generateResponse(query, intent, data, context);
+      const response = await this.generateResponse(query, intent, data, context, filters);
       
       return response;
     } catch (error) {
@@ -197,8 +197,21 @@ export class RAGService {
     query: string, 
     intent: QueryIntent, 
     data: any,
-    contextOverride?: string
+    contextOverride?: string,
+    filters?: APIFilters
   ): Promise<RAGResponse> {
+    if (intent === 'STUDENT_QUERY' && data?.students && Array.isArray(data.students) && data.students.length > 0) {
+      const targetClass = this.resolveTargetClass(filters, query, data.students);
+      if (targetClass) {
+        const classSpecificStudents = data.students.filter((student: any) => {
+          const studentClass = (student.className || student.classId || student.class)?.toString().toLowerCase();
+          return studentClass ? studentClass === targetClass.toLowerCase() : true;
+        });
+        const studentsForSummary = classSpecificStudents.length > 0 ? classSpecificStudents : data.students;
+        return this.buildClassStudentSummary(targetClass, studentsForSummary);
+      }
+    }
+
     try {
       const llmService = getLLMService();
       let fullContext = contextOverride !== undefined ? contextOverride : `Query intent: ${intent}`;
@@ -483,6 +496,153 @@ export class RAGService {
     };
   }
   
+  private resolveTargetClass(filters: APIFilters | undefined, query: string, students: any[]): string | null {
+    if (filters?.classNames && filters.classNames.length === 1) {
+      return filters.classNames[0];
+    }
+    if (filters?.className) {
+      return filters.className;
+    }
+    if (filters?.classNames && filters.classNames.length > 1) {
+      return null;
+    }
+    const classesFromQuery = this.extractClassNamesFromQuery(query);
+    if (classesFromQuery.length === 1) {
+      return classesFromQuery[0];
+    }
+    const classTokens = students
+      .map((student: any) => (student.className || student.classId || student.class)?.toString())
+      .filter((value: any): value is string => Boolean(value));
+    const uniqueClasses = Array.from(new Set(classTokens));
+    if (uniqueClasses.length === 1) {
+      return uniqueClasses[0];
+    }
+    return null;
+  }
+
+  private extractClassNamesFromQuery(query: string): string[] {
+    const matches = query.match(/class\s+([a-z0-9]+)/gi);
+    if (!matches) return [];
+    return matches
+      .map(match => {
+        const letter = match.match(/class\s+([a-z0-9]+)/i);
+        if (!letter || !letter[1]) return null;
+        const token = letter[1].toUpperCase();
+        return token.length === 1 ? `Class ${token}` : `Class ${token}`;
+      })
+      .filter((value): value is string => Boolean(value));
+  }
+
+  private buildClassStudentSummary(className: string, students: any[]): RAGResponse {
+    const normalizedStudents = students.map(student => this.normalizeStudentRecordForSummary(student, className));
+    const uniqueStudents = normalizedStudents.filter((student, index, arr) => {
+      const key = `${student.studentId}-${student.firstName}-${student.lastName}`;
+      return arr.findIndex(other => `${other.studentId}-${other.firstName}-${other.lastName}` === key) === index;
+    });
+    const totalStudents = uniqueStudents.length;
+    const studentsToReport = totalStudents <= 5 ? uniqueStudents : uniqueStudents.slice(0, 5);
+    const remaining = totalStudents - studentsToReport.length;
+
+    const headerLine = `Class ${className} currently has ${totalStudents} student${totalStudents !== 1 ? 's' : ''} in the roster.`;
+    const introLine = remaining > 0
+      ? `Highlighting ${studentsToReport.length} representative student${studentsToReport.length !== 1 ? 's' : ''}; ${remaining} additional student${remaining !== 1 ? 's' : ''} follow the same attendance pattern.`
+      : 'Attendance details for each student are listed below.';
+
+    const studentLines = studentsToReport.map(student => {
+      const absenceText = student.absences.length > 0
+        ? `Absences on ${this.formatAbsenceDates(student.absences as string[])}.`
+        : 'No absences recorded.';
+      const attendanceRateText = typeof student.attendanceRate === 'number'
+        ? `Attendance rate ${this.formatAttendanceRate(student.attendanceRate)}.`
+        : null;
+      const fragments = [absenceText];
+      if (attendanceRateText) fragments.push(attendanceRateText);
+      return `- ${student.firstName} ${student.lastName} (${student.studentId}): ${fragments.join(' ')}`;
+    });
+
+    const narrativeParts = [headerLine, introLine, ...studentLines];
+    if (remaining > 0) {
+      narrativeParts.push(`The remaining ${remaining} student${remaining !== 1 ? 's' : ''} currently do not have notable attendance concerns.`);
+    }
+
+    return {
+      naturalLanguageAnswer: narrativeParts.join('\n'),
+      structuredData: {
+        className,
+        totalStudents,
+        students: studentsToReport.map(student => ({
+          firstName: student.firstName,
+          lastName: student.lastName,
+          studentId: student.studentId,
+          className: student.className,
+          grade: student.grade,
+          absences: student.absences,
+          absenceCount: student.absences.length,
+          attendanceRate: student.attendanceRate,
+        }))
+      },
+      actions: [
+        {
+          type: 'VIEW_STUDENT',
+          label: `Review ${className} roster`,
+          params: { className }
+        }
+      ],
+      confidence: 0.88
+    };
+  }
+
+  private normalizeStudentRecordForSummary(student: any, fallbackClass: string) {
+    const attendanceRecords = Array.isArray(student.attendance) ? student.attendance : [];
+    const absenceDates = attendanceRecords
+      .filter((record: any) => {
+        if (!record || typeof record.status !== 'string') return false;
+        const status = record.status.toUpperCase();
+        return status.includes('ABSENT');
+      })
+      .map((record: any) => record.dateISO || record.dateIso || record.date)
+      .filter((date: any): date is string => Boolean(date));
+
+    const absences = Array.from(new Set(absenceDates)).sort();
+
+    const rawRate = student.attendanceRate;
+    let attendanceRate: number | null = null;
+    if (typeof rawRate === 'number') {
+      attendanceRate = rawRate;
+    } else if (typeof rawRate === 'string') {
+      const parsed = parseFloat(rawRate);
+      attendanceRate = Number.isFinite(parsed) ? parsed : null;
+    }
+
+    const studentId = student.studentId || student.id || student.uuid || '';
+
+    return {
+      firstName: student.firstName || '',
+      lastName: student.lastName || '',
+      studentId: studentId.toString(),
+      className: student.className || student.classId || fallbackClass,
+      grade: student.grade ?? null,
+      absences,
+      attendanceRate
+    };
+  }
+
+  private formatAbsenceDates(absenceDates: string[]): string {
+    if (absenceDates.length === 1) {
+      return absenceDates[0];
+    }
+    if (absenceDates.length === 2) {
+      return `${absenceDates[0]} and ${absenceDates[1]}`;
+    }
+    return `${absenceDates.slice(0, -1).join(', ')}, and ${absenceDates[absenceDates.length - 1]}`;
+  }
+
+  private formatAttendanceRate(rate: number): string {
+    if (!Number.isFinite(rate)) return '';
+    const percentage = rate > 1 ? rate : rate * 100;
+    return `${percentage.toFixed(1)}%`;
+  }
+
   /**
    * Extract attendance data from retrieved data for LLM processing
    * Formats data to be more suitable for LLM consumption
