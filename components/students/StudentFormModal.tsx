@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useState, useEffect, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import { useStudentModals, Student, StudentFormData } from '../../hooks/useStudentModals';
 
 interface StudentFormModalProps {
@@ -8,6 +11,28 @@ interface StudentFormModalProps {
   student?: Student | null;
   onStudentSaved?: (student: Student) => void;
 }
+
+const gradeOptions = [
+  { value: 'K', label: 'Kindergarten' },
+  { value: '1', label: '1st Grade' },
+  { value: '2', label: '2nd Grade' },
+  { value: '3', label: '3rd Grade' },
+  { value: '4', label: '4th Grade' },
+  { value: '5', label: '5th Grade' },
+  { value: '6', label: '6th Grade' },
+  { value: '7', label: '7th Grade' },
+  { value: '8', label: '8th Grade' },
+  { value: '9', label: '9th Grade' },
+  { value: '10', label: '10th Grade' },
+  { value: '11', label: '11th Grade' },
+  { value: '12', label: '12th Grade' }
+];
+
+const classOptions = [
+  { value: 'Class A', label: 'Class A' },
+  { value: 'Class B', label: 'Class B' },
+  { value: 'Class C', label: 'Class C' }
+];
 
 export const StudentFormModal: React.FC<StudentFormModalProps> = ({
   isOpen,
@@ -21,7 +46,6 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
     setFormData,
     validationErrors,
     hasUnsavedChanges,
-    modalState,
     handleStudentFormSubmit,
     handleFormValidation,
     handleModalClose
@@ -32,6 +56,12 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   useEffect(() => {
     if (isOpen && mode === 'edit' && student) {
@@ -49,7 +79,8 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
         emergencyContact: student.emergencyContact || '',
         emergencyPhone: student.emergencyPhone || '',
         medicalNotes: student.medicalNotes || '',
-        status: student.status || 'active'
+        status: student.status || 'active',
+        className: (student as any).className || ''
       });
     } else if (isOpen && mode === 'create') {
       setFormData({
@@ -66,17 +97,18 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
         emergencyContact: '',
         emergencyPhone: '',
         medicalNotes: '',
-        status: 'active'
+        status: 'active',
+        className: ''
       });
     }
-  }, [isOpen, mode, student, setFormData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, mode, student]);
 
-  const handleInputChange = useCallback((field: keyof StudentFormData, value: string) => {
+  const handleInputChange = useCallback((field: keyof StudentFormData | 'className', value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
-
     if (submitAttempted) {
       handleFormValidation({ ...formData, [field]: value });
     }
@@ -85,18 +117,23 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitAttempted(true);
-    
     const errors = handleFormValidation(formData);
     if (Object.keys(errors).length > 0) {
       return;
     }
-
     setIsLoading(true);
     try {
-      await handleStudentFormSubmit(formData, mode);
-      handleClose();
+      await handleStudentFormSubmit({
+        mode,
+        student,
+        formData,
+        onStudentSaved: (savedStudent: Student) => {
+          if (onStudentSaved) onStudentSaved(savedStudent);
+          handleClose();
+        }
+      });
     } catch (error) {
-      console.error('Form submission failed:', error);
+      // Optionally show error message
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +144,6 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
       const canClose = handleModalClose(hasUnsavedChanges);
       if (!canClose) return;
     }
-    
     setSubmitAttempted(false);
     setIsLoading(false);
     onClose();
@@ -122,181 +158,155 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
   ) => {
     const error = validationErrors[field as keyof typeof validationErrors];
     const value = formData[field] || '';
-
-    return (
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-        
-        {type === 'select' && options ? (
+    if (type === 'select' && options) {
+      return (
+        <div>
+          <label className="label">{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
           <select
             value={value}
-            onChange={(e) => handleInputChange(field, e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-              error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
-            }`}
+            onChange={e => handleInputChange(field, e.target.value)}
+            className={`dropdown${error ? ' border-red-500' : ''}`}
             disabled={field === 'studentId' && mode === 'edit'}
             required={required}
           >
             <option value="">Select {label}</option>
             {options.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
+              <option key={option.value} value={option.value}>{option.label}</option>
             ))}
           </select>
-        ) : type === 'textarea' ? (
+          {error && <p className="error-message">{error}</p>}
+        </div>
+      );
+    }
+    if (type === 'textarea') {
+      return (
+        <div>
+          <label className="label">{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
           <textarea
             value={value}
-            onChange={(e) => handleInputChange(field, e.target.value)}
-            rows={3}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-vertical ${
-              error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
-            }`}
-            placeholder={`Enter ${label.toLowerCase()}`}
-            required={required}
-          />
-        ) : (
-          <input
-            type={type}
-            value={value}
-            onChange={(e) => handleInputChange(field, e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-              error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
-            }`}
+            onChange={e => handleInputChange(field, e.target.value)}
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors${error ? ' border-red-500 focus:ring-red-500' : ' border-gray-300'}`}
             placeholder={`Enter ${label.toLowerCase()}`}
             disabled={field === 'studentId' && mode === 'edit'}
             required={required}
+            rows={3}
           />
-        )}
-        
-        {error && (
-          <p className="mt-1 text-sm text-red-600 flex items-center">
-            <span className="mr-1">⚠️</span>
-            {error}
-          </p>
-        )}
+          {error && <p className="error-message">{error}</p>}
+        </div>
+      );
+    }
+    return (
+      <div>
+        <label className="label">{label}{required && <span className="text-red-500 ml-1">*</span>}</label>
+        <input
+          type={type}
+          value={value}
+          onChange={e => handleInputChange(field, e.target.value)}
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors${error ? ' border-red-500 focus:ring-red-500' : ' border-gray-300'}`}
+          placeholder={`Enter ${label.toLowerCase()}`}
+          disabled={field === 'studentId' && mode === 'edit'}
+          required={required}
+        />
+        {error && <p className="error-message">{error}</p>}
       </div>
     );
   }, [formData, validationErrors, handleInputChange, mode]);
 
+  if (!mounted) return null;
   if (!isOpen) return null;
 
-  const gradeOptions = [
-    { value: 'K', label: 'Kindergarten' },
-    { value: '1', label: '1st Grade' },
-    { value: '2', label: '2nd Grade' },
-    { value: '3', label: '3rd Grade' },
-    { value: '4', label: '4th Grade' },
-    { value: '5', label: '5th Grade' },
-    { value: '6', label: '6th Grade' },
-    { value: '7', label: '7th Grade' },
-    { value: '8', label: '8th Grade' },
-    { value: '9', label: '9th Grade' },
-    { value: '10', label: '10th Grade' },
-    { value: '11', label: '11th Grade' },
-    { value: '12', label: '12th Grade' }
-  ];
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-hidden">
-        <div className="flex flex-col h-full max-h-screen">
-          <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {mode === 'create' ? 'Add New Student' : 'Edit Student'}
-                {mode === 'edit' && student && (
-                  <span className="text-sm font-normal text-gray-500 ml-2">
-                    ({student.firstName} {student.lastName})
-                  </span>
-                )}
-              </h2>
+  const modalContent = (
+    <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="modal bg-white rounded-lg shadow-lg p-6 relative" style={{ maxWidth: 1000, width: '90%' }}>
+        <div className="modal-header flex items-center justify-between mb-4">
+          <div className="header-left flex items-center">
+            <span className="icon text-2xl mr-2">👤</span>
+            <h2 className="text-xl font-bold">
+              {mode === 'create' ? 'Add New Student' : 'Edit Student'}
+              {mode === 'edit' && student && (
+                <span style={{ fontWeight: 400, fontSize: 18, marginLeft: 8 }}>
+                  ({student.firstName} {student.lastName})
+                </span>
+              )}
+            </h2>
+          </div>
+          <button className="close-btn absolute top-2 right-2 text-2xl" onClick={handleClose} disabled={isLoading} aria-label="Close">&times;</button>
+        </div>
+        <div className="modal-body">
+          <form onSubmit={handleSubmit}>
+            <div className="students-header">
+              <h3>Basic Information</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {renderField('firstName', 'First Name', 'text', true)}
+              {renderField('lastName', 'Last Name', 'text', true)}
+              {renderField('studentId', 'Student ID', 'text', true)}
+              {renderField('grade', 'Grade', 'select', true, gradeOptions)}
+              <div>
+                <label className="label">Class Name<span className="text-red-500 ml-1">*</span></label>
+                <select
+                  value={formData.className || ''}
+                  onChange={e => handleInputChange('className', e.target.value)}
+                  className={`dropdown${validationErrors.className ? ' border-red-500' : ''}`}
+                  required
+                >
+                  <option value="">Select Class</option>
+                  {classOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+                {validationErrors.className && <p className="error-message">{validationErrors.className}</p>}
+              </div>
+              {renderField('dateOfBirth', 'Date of Birth', 'date')}
+              {renderField('email', 'Email', 'email', true)}
+            </div>
+            <div className="students-header" style={{ marginTop: 30 }}>
+              <h3>Contact Information</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {renderField('phone', 'Student Phone', 'tel')}
+              {renderField('parentEmail', 'Parent/Guardian Email', 'email')}
+              {renderField('parentPhone', 'Parent/Guardian Phone', 'tel')}
+              {renderField('emergencyContact', 'Emergency Contact', 'text')}
+              {renderField('emergencyPhone', 'Emergency Phone', 'tel')}
+            </div>
+            <div className="students-header" style={{ marginTop: 30 }}>
+              <h3>Additional Information</h3>
+            </div>
+            <div className="space-y-4">
+              {renderField('address', 'Address', 'textarea')}
+              {renderField('medicalNotes', 'Medical Information', 'textarea')}
+            </div>
+            <div className="modal-footer flex justify-end gap-2 mt-6">
               <button
+                type="button"
+                className="cancel-btn px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
                 onClick={handleClose}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
                 disabled={isLoading}
               >
-                ×
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="submit-btn px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <span>Saving...</span>
+                ) : (
+                  mode === 'create' ? 'Add Student' : 'Save Student'
+                )}
               </button>
             </div>
-            {hasUnsavedChanges && (
-              <p className="text-sm text-yellow-600 mt-1">
-                You have unsaved changes
-              </p>
-            )}
-          </div>
-
-          <div className="flex-1 overflow-y-auto">
-            <form onSubmit={handleSubmit} className="p-6">
-              <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField('firstName', 'First Name', 'text', true)}
-                  {renderField('lastName', 'Last Name', 'text', true)}
-                  {renderField('studentId', 'Student ID', 'text', true)}
-                  {renderField('grade', 'Grade', 'select', true, gradeOptions)}
-                  {renderField('dateOfBirth', 'Date of Birth', 'date')}
-                  {renderField('email', 'Email', 'email', true)}
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {renderField('phone', 'Student Phone', 'tel')}
-                  {renderField('parentEmail', 'Parent/Guardian Email', 'email')}
-                  {renderField('parentPhone', 'Parent/Guardian Phone', 'tel')}
-                  {renderField('emergencyContact', 'Emergency Contact', 'text')}
-                  {renderField('emergencyPhone', 'Emergency Phone', 'tel')}
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Information</h3>
-                <div className="space-y-4">
-                  {renderField('address', 'Address', 'textarea')}
-                  {renderField('medicalNotes', 'Medical Information', 'textarea')}
-                </div>
-              </div>
-            </form>
-          </div>
-
-          <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3 flex-shrink-0">
-            <button
-              type="button"
-              onClick={handleClose}
-              disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
-            
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Saving...
-                </div>
-              ) : (
-                mode === 'create' ? 'Add Student' : 'Save Changes'
-              )}
-            </button>
-          </div>
+          </form>
         </div>
       </div>
     </div>
   );
+
+  const portalTarget = typeof document !== 'undefined' ? document.body : null;
+
+  return portalTarget ? ReactDOM.createPortal(modalContent, portalTarget) : modalContent;
 };
 
 export default StudentFormModal;

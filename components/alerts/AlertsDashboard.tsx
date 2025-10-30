@@ -1,25 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AlertsList from './AlertsList';
 import AlertSummaryStats from './AlertSummaryStats';
 import StudentInterventionPanel from './StudentInterventionPanel';
-import { useAlerts, AlertFilters } from '../../src/services/hooks/useAlerts';
 
 export default function AlertsDashboard() {
-  const [filters, setFilters] = useState<AlertFilters>({});
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [showInterventionPanel, setShowInterventionPanel] = useState(false);
 
-  const {
-    alerts,
-    loading,
-    error,
-    handleAlertSort,
-    handleAlertFilter,
-    handleBulkAlertActions,
-    refreshAlertData
-  } = useAlerts(filters);
+  const fetchAlerts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/data/alerts');
+      if (!res.ok) throw new Error('Failed to fetch alerts');
+      const data = await res.json();
+      setAlerts(data);
+    } catch (err: any) {
+      setError(err.message || 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAlerts();
+  }, [fetchAlerts]);
+
+  const refreshAlertData = fetchAlerts;
+
+  // Dummy handlers for sort/filter/bulk actions (implement as needed)
+  const handleAlertSort = () => {};
+  const handleAlertFilter = () => {};
+  const handleBulkAlertActions = () => {};
 
   const handleStudentSelect = (studentId: string) => {
     setSelectedStudentId(studentId);
@@ -71,6 +88,7 @@ export default function AlertsDashboard() {
         <div>
           <AlertsList
             alerts={alerts}
+            setAlerts={setAlerts}
             loading={loading}
             onSort={handleAlertSort}
             onFilter={handleAlertFilter}

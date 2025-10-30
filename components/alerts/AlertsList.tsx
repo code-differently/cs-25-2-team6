@@ -6,6 +6,7 @@ import { AttendanceAlert, SortCriteria, AlertAction } from '../../src/services/h
 
 interface AlertsListProps {
   alerts: AttendanceAlert[];
+  setAlerts: (alerts: AttendanceAlert[]) => void;
   loading: boolean;
   onSort: (criteria: SortCriteria) => void;
   onFilter: (filterType: string, value: any) => void;
@@ -15,6 +16,7 @@ interface AlertsListProps {
 
 export default function AlertsList({
   alerts,
+  setAlerts,
   loading,
   onSort,
   onFilter,
@@ -51,10 +53,14 @@ export default function AlertsList({
     }
   };
 
+  // Remove alerts from the list after acknowledge/resolve
   const handleBulkAction = (actionType: AlertAction['type']) => {
     if (selectedAlerts.size > 0) {
       onBulkAction(Array.from(selectedAlerts), { type: actionType });
+      // Remove the selected alerts from the local list
+      const remainingAlerts = alerts.filter(alert => !selectedAlerts.has(alert.id));
       setSelectedAlerts(new Set());
+      setAlerts(remainingAlerts);
     }
   };
 
@@ -162,21 +168,7 @@ export default function AlertsList({
                 display: 'flex',
                 gap: '8px'
               }}>
-                <button
-                  onClick={() => handleBulkAction('acknowledge')}
-                  style={{
-                    padding: '6px 12px',
-                    backgroundColor: '#3b82f6',
-                    color: 'white',
-                    fontSize: '14px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontWeight: '500'
-                  }}
-                >
-                  Acknowledge
-                </button>
+                
                 <button
                   onClick={() => handleBulkAction('resolve')}
                   style={{

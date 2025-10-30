@@ -307,6 +307,30 @@ respond with:\n
   ],
   "confidence": 0.96
 }
+
+---
+
+### CUSTOMIZED FOR CLASS FILTERING
+
+// If the user query includes a class name (e.g., "List all students in Class B"),
+// you MUST filter students by classId/className in both SQL and RAG flows.
+// For RAG, only include students whose classId or className matches the requested class.
+// For SQL, add a WHERE clause: WHERE class_id = 'Class B' or WHERE class_name = 'Class B'.
+// If no students are found for the class, return a compliant empty response as shown in the validator rules.
+// Always use the classId/className field from the data for filtering.
+// When summarizing, mention the class name in the narrative if a class filter is applied.
+
+---
+
+### CUSTOMIZED FOR LAST NAME FILTERING
+
+// If the user query requests students whose last names start with a specific letter (e.g., "last names start with S"),
+// you MUST filter students by lastName (or last_name) in both SQL and RAG flows.
+// For RAG, only include students whose lastName (case-insensitive) starts with the requested letter.
+// For SQL, add a WHERE clause: WHERE last_name ILIKE 'S%'.
+// If no students are found for the filter, return a compliant empty response as shown in the validator rules.
+// Always use the lastName/last_name field from the data for filtering.
+// When summarizing, mention the filter in the narrative (e.g., "students whose last names start with S").
 `;
 
 export const ALERT_SYSTEM_PROMPT = ATTENDANCE_SYSTEM_PROMPT;

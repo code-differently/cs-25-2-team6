@@ -172,68 +172,7 @@ export default function AlertSummaryStats({ alerts, loading }: AlertSummaryStats
           </div>
         ))}
       </div>      {/* Severity Breakdown */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '24px',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-        border: '1px solid #e5e7eb'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-          <span style={{ fontSize: '20px', marginRight: '8px' }}>📊</span>
-          <h3 style={{ 
-            fontSize: '18px', 
-            fontWeight: '600', 
-            color: '#111827',
-            margin: 0
-          }}>
-            Alert Severity Breakdown
-          </h3>
-        </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-          gap: '16px'
-        }}>
-          {[
-            { label: 'Critical', count: stats.critical, color: '#ef4444', bgColor: '#fee2e2' },
-            { label: 'High', count: stats.high, color: '#f59e0b', bgColor: '#fef3c7' },
-            { label: 'Medium', count: stats.medium, color: '#eab308', bgColor: '#fef9c3' },
-            { label: 'Low', count: stats.low, color: '#3b82f6', bgColor: '#dbeafe' }
-          ].map((item, index) => (
-            <div key={index} style={{
-              textAlign: 'center',
-              padding: '16px',
-              borderRadius: '8px',
-              backgroundColor: item.bgColor,
-              border: `1px solid ${item.color}30`
-            }}>
-              <div style={{
-                height: '8px',
-                backgroundColor: item.color,
-                borderRadius: '4px',
-                marginBottom: '8px'
-              }}></div>
-              <p style={{ 
-                fontSize: '14px', 
-                fontWeight: '500',
-                color: '#111827',
-                margin: '0 0 4px 0'
-              }}>
-                {item.label}
-              </p>
-              <p style={{ 
-                fontSize: '24px', 
-                fontWeight: 'bold', 
-                color: item.color,
-                margin: 0
-              }}>
-                {item.count}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+     
     </div>
   );
 }

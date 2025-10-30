@@ -6,7 +6,7 @@ import { StudentFilters } from '../../src/services/hooks/useStudents';
 interface StudentSearchProps {
   filters: StudentFilters;
   onFilterChange: (filters: StudentFilters) => void;
-  onSearch: (query: string) => void;
+  onSearch: (search: string) => void;
   studentCount: number;
 }
 
@@ -20,11 +20,7 @@ export default function StudentSearch({
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      onSearch(searchQuery);
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
+    onSearch(searchQuery || '');
   }, [searchQuery, onSearch]);
 
   const handleFilterChange = (key: keyof StudentFilters, value: string) => {

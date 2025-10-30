@@ -1,4 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
+'use client';
+
+import { useState, useCallback } from 'react';
 
 export interface Student {
   id: string;
@@ -34,6 +36,7 @@ export interface StudentFormData {
   emergencyPhone?: string;
   medicalNotes?: string;
   status: 'active' | 'inactive' | 'pending' | 'graduated';
+  className?: string; // <-- Added className here
 }
 
 export interface FormValidationErrors {
@@ -45,6 +48,7 @@ export interface FormValidationErrors {
   dateOfBirth?: string;
   phone?: string;
   parentEmail?: string;
+  className?: string;
 }
 
 export interface DependencyResult {
@@ -131,7 +135,6 @@ export const useStudentModals = (options: UseStudentModalsOptions = {}) => {
     if (!data.email?.trim()) {
       errors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      errors.email = 'Please enter a valid email address';
     }
 
     if (!data.studentId?.trim()) {
@@ -167,71 +170,48 @@ export const useStudentModals = (options: UseStudentModalsOptions = {}) => {
     return errors;
   }, []);
 
-  // Form submission handler
+  // Form submission handler (real API integration)
   const handleStudentFormSubmit = useCallback(async (
-    data: StudentFormData, 
-    mode: 'create' | 'edit'
-  ): Promise<boolean> => {
-    try {
-      setModalState(prev => ({ ...prev, isLoading: true, error: null }));
-
-      // Final validation
-      const errors = handleFormValidation(data);
-      if (Object.keys(errors).length > 0) {
-        setModalState(prev => ({ ...prev, isLoading: false }));
-        return false;
-      }
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      if (mode === 'create') {
-        const newStudent: Student = {
-          ...data,
-          id: Date.now().toString(),
-          enrollmentDate: new Date().toISOString().split('T')[0],
-        };
-        options.onStudentAdded?.(newStudent);
-        
-        // Reset form and close modal
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          studentId: '',
-          grade: '',
-          dateOfBirth: '',
-          phone: '',
-          parentEmail: '',
-          parentPhone: '',
-          address: '',
-          emergencyContact: '',
-          emergencyPhone: '',
-          medicalNotes: '',
-          status: 'active',
-        });
-        setOriginalFormData(formData);
-        setModalState(prev => ({ ...prev, isAddModalOpen: false, isLoading: false }));
-      } else if (mode === 'edit' && currentStudent) {
-        const updatedStudent: Student = {
-          ...currentStudent,
-          ...data,
-        };
-        options.onStudentUpdated?.(updatedStudent);
-        setOriginalFormData(data);
-        setModalState(prev => ({ ...prev, isEditModalOpen: false, isLoading: false }));
-      }
-
-      return true;
-    } catch (error) {
-      setModalState(prev => ({ 
-        ...prev, 
-        isLoading: false, 
-        error: 'Failed to save student. Please try again.' 
-      }));
-      return false;
+    { mode, student, formData, onStudentSaved }: {
+      mode: 'create' | 'edit',
+      student?: Student | null,
+      formData: StudentFormData,
+      onStudentSaved?: (student: Student) => void
     }
-  }, [formData, currentStudent, options, handleFormValidation]);
+  ): Promise<void> => {
+    try {
+      let endpoint = '/api/students';
+      let method = 'POST';
+      let body: any = formData;
+      if (mode === 'edit' && student && student.studentId) {
+        endpoint = `/api/students/${student.studentId}`;
+        method = 'PUT';
+        body = formData;
+      } else if (mode === 'create') {
+        // For POST, send { className, student }
+        const { className, ...studentFields } = formData;
+        body = { className, student: studentFields };
+        endpoint = '/api/data/students'; // <-- Fix endpoint for POST
+      }
+      const response = await fetch(endpoint, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to ${mode === 'create' ? 'add' : 'update'} student: ${errorText}`);
+      }
+      const savedStudent = await response.json();
+      if (onStudentSaved) {
+        onStudentSaved(savedStudent);
+      }
+    } catch (error) {
+      // Optionally show error message
+      // console.error('Form submission failed:', error);
+      throw error;
+    }
+  }, []);
 
   // Delete confirmation handler
   const handleDeleteConfirmation = useCallback(async (student: Student): Promise<void> => {
@@ -243,27 +223,27 @@ export const useStudentModals = (options: UseStudentModalsOptions = {}) => {
       if (options.checkDependencies) {
         const dependencies = await options.checkDependencies(student);
         setDependencyResult(dependencies);
-        
+
         if (!dependencies.canDelete) {
-          setModalState(prev => ({ 
-            ...prev, 
+          setModalState(prev => ({
+            ...prev,
             showDependencyWarning: true,
-            isLoading: false 
+            isLoading: false
           }));
           return;
         }
       }
 
-      setModalState(prev => ({ 
-        ...prev, 
+      setModalState(prev => ({
+        ...prev,
         isDeleteModalOpen: true,
-        isLoading: false 
+        isLoading: false
       }));
     } catch (error) {
-      setModalState(prev => ({ 
-        ...prev, 
+      setModalState(prev => ({
+        ...prev,
         error: 'Failed to check student dependencies',
-        isLoading: false 
+        isLoading: false
       }));
     }
   }, [options]);
@@ -297,7 +277,7 @@ export const useStudentModals = (options: UseStudentModalsOptions = {}) => {
       showDependencyWarning: false,
       error: null,
     }));
-    
+
     return true;
   }, [originalFormData]);
 

@@ -15,15 +15,28 @@ export default function StudentsDashboard() {
     students,
     loading,
     error,
-    handleStudentSearch,
     handleStudentSort,
     handleStudentFilter,
     handleBulkActions,
     refreshStudentList
   } = useStudents(filters);
 
+  // Update filters only when needed
+  const handleStudentSearch = (searchQuery: string) => {
+    setFilters(prev => {
+      if (prev.search === searchQuery) return prev;
+      return { ...prev, search: searchQuery };
+    });
+  };
+
   const handleFilterChange = (newFilters: StudentFilters) => {
-    setFilters(newFilters);
+    setFilters(prev => {
+      // Only update if filters actually changed
+      const changed = Object.keys(newFilters).some(
+        key => newFilters[key as keyof StudentFilters] !== prev[key as keyof StudentFilters]
+      );
+      return changed ? newFilters : prev;
+    });
   };
 
   const handleViewModeChange = (mode: 'list' | 'table') => {
@@ -91,7 +104,7 @@ export default function StudentsDashboard() {
           marginBottom: '16px'
         }}>
           <h2 style={{
-            fontSize: '20px',
+            fontSize: '24px',
             fontWeight: 'bold',
             color: '#111827',
             margin: 0

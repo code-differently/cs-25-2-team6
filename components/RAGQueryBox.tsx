@@ -7,7 +7,7 @@ export interface RAGQueryResult {
   query: string;
   answer: string; // Updated from interpretation
   data?: any;
-  formattedData?: string; // Formatted version of data for terminal display
+  formattedData?: string; 
   suggestedActions?: Array<{
     type: string;
     label: string;
@@ -119,7 +119,7 @@ export default function RAGQueryBox({
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
           <div className="w-3 h-3 rounded-full bg-green-500"></div>
         </div>
-        <div className="text-xs text-gray-800 font-semibold">attendance-query-terminal</div>
+        <div className="text-xl text-blue-1800 font-semibold">Agent P</div>
         <div className="w-4"></div>
       </div>
       
@@ -137,7 +137,7 @@ export default function RAGQueryBox({
           />
           {loading && (
             <div className="animate-pulse ml-2">
-              <span className="text-gray-800">Processing...</span>
+              <span className="text-black-800">Fetching...</span>
             </div>
           )}
         </div>
@@ -155,7 +155,7 @@ export default function RAGQueryBox({
           {/* Show the original query echoed back */}
           <div className="text-blue-600">
             <span className="mr-1 opacity-60">{`>`}</span>
-            <span className="opacity-80">Query: {results.query}</span>
+            <span className="opacity-80">User: {results.query}</span>
           </div>
           
           {/* Show the answer */}
@@ -213,7 +213,7 @@ export default function RAGQueryBox({
               onClick={clearResults}
               className="text-blue-600 hover:text-blue-800 underline"
             >
-              [Clear and start new query]
+              [Clear and start new chat]
             </button>
           </div>
         </div>

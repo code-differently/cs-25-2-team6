@@ -18,6 +18,16 @@ export {
   calculateAlertPriorityLevel
 } from './alertUtils';
 
+// Class management utility functions
+export {
+  formatClassName,
+  countStudentsInClass,
+  getClassGradeDisplay,
+  formatClassSummary,
+  isClassEmpty,
+  generateClassDisplayText
+} from './classUtils';
+
 // Type exports for convenience
 export type { ReportFilters } from '../../src/domains/ReportFilters';
 export { AttendanceStatus } from '../../src/domains/AttendanceStatus';
@@ -29,3 +39,9 @@ export type {
   PriorityLevel,
   AttendanceAlert
 } from './alertUtils';
+
+// Class type exports
+export type {
+  ClassProfile,
+  ClassStudent
+} from './classUtils';

@@ -54,9 +54,12 @@ export class FileStudentRepo {
     return students.filter(student => student.lastName === lastName);
   }
 
-  findStudentById(id: string): Student | undefined {
-    const students = this.allStudents();
-    return students.find(student => student.id === id);
+  findStudentById(studentId: string): Student | undefined {
+    return this.allStudents().find(s => s.id === studentId);
+  }
+
+  getAllStudents(): Student[] {
+    return this.allStudents();
   }
 
   addStudent(student: Student): void {

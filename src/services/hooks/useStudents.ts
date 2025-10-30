@@ -48,25 +48,44 @@ export function useStudents(filters: StudentFilters = {}) {
     direction: 'asc'
   });
 
-  const fetchStudents = useCallback(async (currentFilters: StudentFilters = {}) => {
+  async function fetchStudents(currentFilters: StudentFilters = {}) {
     setLoading(true);
     setError(null);
 
     try {
-      // Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Fetch students from API
+      const res = await fetch('/api/data/students');
+      if (!res.ok) throw new Error('Failed to fetch students');
+      const apiStudents = await res.json();
+      // Convert date strings to Date objects if needed
+      const studentsWithDates = apiStudents.map((student: any) => ({
+        ...student,
+        id: student.studentId || student.id, // normalize id
+        class: student.classId || student.class, // normalize class
+        enrollmentDate: new Date(student.enrollmentDate),
+        dateOfBirth: new Date(student.dateOfBirth),
+        lastActivity: student.lastActivity ? new Date(student.lastActivity) : undefined
+      }));
+      let filteredStudents: Student[] = studentsWithDates;
       
       // Apply filters to fetched data
-      let filteredStudents: Student[] = [];
-      
       // Apply search filter
       if (currentFilters.search) {
-        filteredStudents = filteredStudents.filter(student =>
-          student.firstName.toLowerCase().includes(currentFilters.search!.toLowerCase()) ||
-          student.lastName.toLowerCase().includes(currentFilters.search!.toLowerCase()) ||
-          student.email.toLowerCase().includes(currentFilters.search!.toLowerCase()) ||
-          student.id.toLowerCase().includes(currentFilters.search!.toLowerCase())
-        );
+        const term = currentFilters.search.toLowerCase();
+        filteredStudents = filteredStudents.filter(student => {
+          const firstName = student.firstName?.toLowerCase() || '';
+          const lastName = student.lastName?.toLowerCase() || '';
+          const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
+          const email = student.email?.toLowerCase() || '';
+          const id = student.id?.toLowerCase() || '';
+          return (
+            firstName.includes(term) ||
+            lastName.includes(term) ||
+            fullName.includes(term) ||
+            email.includes(term) ||
+            id.includes(term)
+          );
+        });
       }
 
       // Apply grade filter
@@ -103,12 +122,7 @@ export function useStudents(filters: StudentFilters = {}) {
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  const handleStudentSearch = useCallback((query: string) => {
-    const searchFilters = { ...filters, search: query };
-    fetchStudents(searchFilters);
-  }, [filters, fetchStudents]);
+  }
 
   const handleStudentSort = useCallback((criteria: SortCriteria) => {
     setSortCriteria(criteria);
@@ -156,10 +170,13 @@ export function useStudents(filters: StudentFilters = {}) {
     setStudents(sortedStudents);
   }, [students]);
 
+  // Remove direct fetchStudents calls from callbacks
   const handleStudentFilter = useCallback((filterType: string, value: any) => {
-    const newFilters = { ...filters, [filterType]: value };
-    fetchStudents(newFilters);
-  }, [filters, fetchStudents]);
+    // Only update filters state
+    // The parent component should own filters state and pass it to useStudents
+    // If you want to keep this here, use setFilters instead of fetchStudents
+    // setFilters(prev => ({ ...prev, [filterType]: value }));
+  }, []);
 
   const handleBulkActions = useCallback(async (studentIds: string[], action: BulkAction) => {
     setLoading(true);
@@ -217,19 +234,19 @@ export function useStudents(filters: StudentFilters = {}) {
   }, []);
 
   const refreshStudentList = useCallback(() => {
-    fetchStudents(filters);
-  }, [filters, fetchStudents]);
+    // Only update filters state to trigger useEffect
+    // setFilters(prev => ({ ...prev }));
+  }, []);
 
   useEffect(() => {
     fetchStudents(filters);
-  }, [fetchStudents, filters]);
+  }, [filters]);
 
   return {
     students,
     loading,
     error,
     sortCriteria,
-    handleStudentSearch,
     handleStudentSort,
     handleStudentFilter,
     handleBulkActions,

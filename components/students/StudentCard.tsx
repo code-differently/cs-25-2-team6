@@ -103,7 +103,7 @@ export default function StudentCard({ student, selected, onSelect }: StudentCard
             fontSize: '18px',
             fontWeight: 'bold'
           }}>
-            {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+            {`${typeof student.firstName === 'string' && student.firstName.length > 0 ? student.firstName.charAt(0) : '?'}${typeof student.lastName === 'string' && student.lastName.length > 0 ? student.lastName.charAt(0) : ''}`}
           </div>
 
           <div style={{ flex: 1 }}>
@@ -135,7 +135,9 @@ export default function StudentCard({ student, selected, onSelect }: StudentCard
           fontWeight: '500',
           ...getStatusColor(student.status)
         }}>
-          {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
+          {typeof student.status === 'string' && student.status.length > 0
+            ? student.status.charAt(0).toUpperCase() + student.status.slice(1)
+            : 'Unknown'}
         </div>
       </div>
 

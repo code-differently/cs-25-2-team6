@@ -121,7 +121,7 @@ export type ValidationResult = z.infer<typeof ValidationResultSchema>;
 export interface ReportRequest {
   filters: ReportFilters;
   includeStats: boolean;
-  format: 'json' | 'csv'; // For future export features
+  format: 'json' | 'csv';
 }
 
 // Report response interface

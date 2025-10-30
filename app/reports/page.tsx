@@ -21,7 +21,7 @@ export default function Reports() {
         <div className="mb-6">
           <h1 className="page-title mb-2">📊 Attendance Reports</h1>
           <p className="page-description mb-4">
-            Use natural language to query attendance data
+            View detailed attendance insights and identify trends in depth or at a glance.
           </p>
           
           <div className="max-w-4xl mx-auto">
@@ -31,7 +31,7 @@ export default function Reports() {
               placeholder="Type a query like 'show me students with absences this week' or 'list all attendance alerts'"
             />
             <p className="text-xs text-gray-500 mt-2 pl-2">
-              Pro tip: Try asking specific questions about attendance patterns, alerts, or individual students
+              tip: Try asking Agent P questions about attendance patterns, alerts, or individual students.
             </p>
           </div>
         </div>

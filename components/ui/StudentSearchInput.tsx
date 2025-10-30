@@ -43,12 +43,14 @@ const StudentSearchInput: React.FC<StudentSearchInputProps> = ({
     const filtered = students.filter(student => {
       const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
       const email = student.email?.toLowerCase() || '';
+      const id = student.id?.toLowerCase() || '';
       const term = searchTerm.toLowerCase();
       
       return fullName.includes(term) || 
              student.firstName.toLowerCase().includes(term) ||
              student.lastName.toLowerCase().includes(term) ||
-             email.includes(term);
+             email.includes(term) ||
+             id.includes(term);
     });
 
     setFilteredStudents(filtered);
